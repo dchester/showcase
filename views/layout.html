@@ -1,0 +1,14 @@
+<!doctype html>
+<html>
+	<head>
+		<link rel="stylesheet" type="text/css" href="/vendor/bootstrap/css/bootstrap.css">
+		<link rel="stylesheet" type="text/css" href="/css/global.css">
+		{% block css %}{% endblock %}
+	</head>
+	<body>
+		{% include 'header.html' %}
+		{% block content %}{% endblock %}
+		{% include 'footer.html' %}
+		{% block footer_js %}{% endblock %}
+	</body>
+</html>

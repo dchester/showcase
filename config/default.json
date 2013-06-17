@@ -1,0 +1,8 @@
+{
+  "database": {
+    "dialect": "mysql",
+    "database": "cms",
+    "username": "cms",
+    "password": "cms"
+  }
+}

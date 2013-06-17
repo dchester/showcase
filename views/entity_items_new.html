@@ -1,0 +1,37 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+
+	<h1 class="pagetitle">
+		<a href="/admin/entities/{{ entity.id }}/items">{{ entity.title }}</a>
+		<span class="transparent">{{ subtitle }}</span>
+	</h1>
+
+	<div class="content">
+
+		<h3 class="muted">{{ entity.description }}</h3>
+
+		<form method="post">
+			<table class="table">
+				{% for field in fields %}
+					<tr>
+						<th>{{ field.title }}</th>
+						<td>
+							{% if field.data_type == 'text' %}
+								<textarea name="{{field.name}}">{{ item[field.name] }}</textarea>
+							{% else %}
+								<input type="text" name="{{ field.name }}" value="{{ item[field.name] }}">
+								<div class="description">{{ field.description }}</div>
+							{% endif %}
+						</td>
+					</tr>
+				{% endfor %}
+			</table>
+			<button class="btn btn-primary btn-large">
+				<i class="icon-ok icon-white"></i>
+				Save
+			</button>
+		</form>
+	</div>
+
+{% endblock %}

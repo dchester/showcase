@@ -1,0 +1,56 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+
+	<h1 class="pagetitle">
+		{{ entity.title }}
+		<a class="btn btn-darker btn-large" href="/admin/entities/{{ entity.id }}/items/new">
+			<i class="icon-plus icon-white"></i>
+			Create New
+		</a>
+	</h1>
+
+	<div class="content">
+
+		<h3 class="muted">{{ entity.description }}</h3>
+
+		{% if items.length %}
+			<table class="table">
+				<tr>
+					{% for field in fields %}
+						<th>{{ field.title }}</th>
+					{% endfor %}
+					<th></th>
+				</tr>
+
+				{% for item in items %}
+
+					<tr>
+						{% for field in fields %}
+							<td>{{ item[field.name] }}</td>
+						{% endfor %}
+
+						<td class="actions nowrap">
+							<a class="btn" href="/admin/entities/{{ entity.id }}/items/{{ item.id }}/edit">
+								<i class="icon-pencil"></i>
+								edit
+							</a>
+							<form action="/admin/entities/{{ entity.id }}/items/{{ item.id }}" method="post">
+								<input type="hidden" name="_method" value="delete">
+								<button class="btn">
+									<i class="icon-remove"></i>
+									remove
+								</button>
+							</form>
+						</td>
+
+					</tr>	
+
+				{% endfor %}
+			</table>
+		{% else %}
+			<div class="muted">Nothing to see here yet.</div>
+		{% endif %}
+	</div>
+
+{% endblock %}

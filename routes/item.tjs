@@ -1,0 +1,132 @@
+var Deferrals = require('../lib/deferrals');
+
+exports.initialize = function(app) {
+
+	var models = app.dreamer.models;
+
+	app.get("/admin/entities/:entity_id/items/:entity_item_id/edit", function(req, res) {
+
+		var entity_id = req.params.entity_id;
+		var entity_item_id = req.params.entity_item_id;
+
+		var entity, item, fields, item_data;
+
+		await {
+
+			var deferrals = new Deferrals(defer(), defer(), defer(), defer());
+
+			models.entities.find({ where: { id: entity_id } })
+				.error(req.error)
+				.success(function(_entity) {
+					entity = _entity;
+					deferrals.run();
+				});
+
+			models.entity_items.find({ where: { id: entity_item_id } })
+				.error(req.error)
+				.success(function(_item) {
+					item = _item;
+					deferrals.run();
+				});
+
+			models.entity_item_data.find({ where: { entity_item_id: entity_item_id } })
+				.error(req.error)
+				.success(function(_item_data) {
+					item_data = _item_data;
+					deferrals.run();
+				});
+
+			models.entity_fields.findAll({ where: { entity_id: entity_id } })
+				.error(req.error)
+				.success(function(_fields) {
+					fields = _fields;
+					deferrals.run();
+				});
+		}
+
+		var data = JSON.parse(item_data.data);
+
+		for (k in data) { 
+			item[k] = data[k];
+		}
+
+		var subtitle = ["", item.id, "Edit"].join(' › ');
+
+		res.render("entity_items_new.html", {
+			item: item,
+			fields: fields,
+			entity: entity,
+			subtitle: subtitle
+		});
+	});
+
+	app.post("/admin/entities/:entity_id/items/:entity_item_id/edit", function(req, res) {
+
+		var entity_id = req.params.entity_id;
+		var entity_item_id = req.params.entity_item_id;
+
+		var item, fields, item_data;
+
+		await {
+
+			var deferrals = new Deferrals(defer(), defer(), defer());
+
+			models.entity_items.find({ where: { id: entity_item_id } })
+				.error(req.error)
+				.success(function(_item) {
+					item = _item;
+					deferrals.run();
+				});
+
+			models.entity_item_data.find({ where: { entity_item_id: entity_item_id } })
+				.error(req.error)
+				.success(function(_item_data) {
+					item_data = _item_data;
+					deferrals.run();
+				});
+
+			models.entity_fields.findAll({ where: { entity_id: entity_id } })
+				.error(req.error)
+				.success(function(_fields) {
+					fields = _fields;
+					deferrals.run();
+				});
+		}
+
+		var data = JSON.parse(item_data.data);
+
+		fields.forEach(function(field) {
+			data[field.name] = req.body[field.name];
+		});	
+
+		item_data.data = JSON.stringify(data);
+
+		await {
+
+			var deferrals = new Deferrals(defer(), defer());
+
+			item_data.save()
+				.error(req.error)
+				.success(function(data) {
+					deferrals.run();
+				});
+
+			item.updated_time = new Date();
+
+			item.save()
+				.error(req.error)
+				.success(function(item) {
+
+					var data = models.entity_item_data.build({
+						entity_item_id: item.id,
+						data: JSON.stringify(item_data),
+						content_type: 'application/json'
+					});
+
+					deferrals.run();
+				});
+		}
+
+		res.redirect("/admin/entities/" + entity_id + "/items");
+	});
+};

@@ -1,0 +1,127 @@
+{% extends 'layout.html' %}
+
+{% block css %}
+	<link rel="stylesheet" type="text/css" href="/css/entities.css">
+{% endblock %}
+
+{% block content %}
+
+	<h1 class="pagetitle">
+		<a href="/admin/entities">Streams</a>
+		<span class="transparent">{{ subtitle }}</span>
+	</h1>
+
+	<div class="content"> 
+
+		<form id="stream" method="post">
+			<table class="table" id="entity_form">
+				<tr>
+					<th>Stream Title</th>
+					<td>
+						<input type="text" name="title" value="{{ entity.title }}">
+						<div class="description">Title of the stream (e.g., Featured Books of the Month)</div>
+					</td>
+				</tr>
+				<tr>
+					<th>Description</th>
+					<td>
+						<input type="text" name="description" value="{{ entity.description }}">
+						<div class="description">What goes in this stream and how is it used?</div>
+					</td>
+				</tr>
+				<tr>
+					<th>REST Mountpoint</th>
+					<td>
+						<input type="text" name="rest_mountpoint" value="{{ entity.rest_mountpoint }}">
+						<div class="description">Where to find this stream in the API (e.g., /api/featured_books)</div>
+					</td>
+				</tr>
+				<tr>
+					<th>Fields</th>
+					<td>
+						<div class="clean" id="fields"></div>
+						<button class="btn btn-darker" type="button" id="new_field">
+							<i class="icon-plus icon-white"></i>
+							Add New Field
+						</button>
+					</td>
+				</tr>
+			</table>
+
+			<button class="btn btn-primary btn-large">
+				<i class="icon-ok icon-white"></i>
+				Save
+			</button>
+
+			<script type="text/html" id="row_template">
+				<div class="delete">&times;</div>
+				<input type="text" class="title" name="field_title" placeholder="Title...">
+				<input type="text" class="name" name="field_name" placeholder="Key Name...">
+				<select class="data_type" name="field_data_type">
+					<option>string</option>
+					<option>text</option>
+					<option>markdown</option>
+					<option>boolean</option>
+					<option>json</option>
+					<option>date</option>
+					<option>key_name</option>
+					<option>numeric_identifier</option>
+				</select>
+				<select class="required" name="field_is_required">
+					<option>required</option>
+					<option>optional</option>
+				</select>
+				<input type="text" class="field_description" name="field_description" placeholder="Description...">
+			</script>
+		</form>
+	</div>
+
+{% endblock %}
+
+{% block footer_js %}
+
+	<script>
+
+		var Stream = function(args) {
+
+			this.initialize = function(args) {
+				this.element = args.element;
+				this.element.querySelector('#new_field')
+					.addEventListener('click', this.addFieldInputs.bind(this));
+			};
+
+			this.addFieldInputs = function() {
+				var fields = this.element.querySelector('#fields');
+				var row_template = this.element.querySelector('#row_template');
+				var row = document.createElement('div');
+				row.className = 'row';
+				row.innerHTML = row_template.innerHTML;
+				fields.appendChild(row);
+				var deleter = row.querySelector(".delete");
+				deleter.addEventListener('click', function() {
+					row.parentNode.removeChild(row);
+				});
+			};
+
+			this.initialize(args);
+		}
+
+		var stream = new Stream({ element: document.querySelector('#stream') });
+		stream.addFieldInputs();
+
+	</script>
+
+{% endblock %}
+
+
+
+{% block comment %}
+
+	<tr>
+		<th>Name</th>
+		<th>Data Type</th>
+		<th>Required?</th>
+		<th></th>
+	</tr>
+
+{% endblock %}

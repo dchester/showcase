@@ -1,0 +1,48 @@
+#entity_form {
+	width: 990px;
+}
+#new_field {
+	margin-top: 0.6em;
+	margin-bottom: 1.2em;
+}
+.delete {
+	font-size: 24px;
+	line-height: 1;
+	padding: 0 0.6em 0 0.3em;
+	opacity: 0.3;
+	cursor: pointer;
+	position: absolute;
+	right: 12px;
+	top: 12px;
+}
+.delete:hover {
+	opacity: 0.7;
+	color: red;
+}
+#fields .row {
+	margin: 0;
+	position: relative;
+	border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+	padding-top: 10px;
+	padding-bottom: 10px;
+	margin-bottom: 10px;
+}
+#fields .row input {
+	top: 0;
+}
+#fields .title {
+	width: 22%;
+}
+#fields .name {
+	width: 22%;
+}
+#fields .data_type {
+	width: 22%;
+}
+#fields .required {
+	width: 22%;
+}
+#fields .field_description {
+	width: 90%;
+}
+

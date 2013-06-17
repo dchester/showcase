@@ -1,0 +1,39 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+
+	<h1 class="pagetitle">
+		Streams
+		<a class="btn btn-darker btn-large" href="/admin/entities/new">
+			<i class="icon-plus icon-white"></i>
+			Create Stream
+		</a>
+	</h1>
+
+	<div class="content">
+
+		<table class="table">
+			{% for entity in entities %}
+				<tr>
+					<td><a href="/admin/entities/{{ entity.id }}/items">{{ entity.title }}</a></td>
+					<td>{{ entity.description }}</td>
+
+					<td class="nowrap actions">
+						<a class="btn" href="/admin/entities/{{ entity.id }}/edit">
+							<i class="icon-pencil"></i>
+							edit
+						</a>
+						<form action="/admin/entities/{{ entity.id }}" method="post">
+							<input type="hidden" name="_method" value="delete">
+							<button class="btn">
+								<i class="icon-remove"></i>
+								remove
+							</button>
+						</form>
+					</td>
+				</tr>
+			{% endfor %}
+		</table>
+	</div>
+
+{% endblock %}

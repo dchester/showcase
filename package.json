@@ -1,0 +1,12 @@
+{
+  "name": "flight-cms",
+  "version": "0.0.1",
+  "dependencies": {
+    "dreamer": "https://github.com/dchester/dreamer/archive/master.tar.gz",
+    "async": "*",
+    "express": "*",
+    "swig": "*",
+    "consolidate": "*",
+    "tamejs": "*"
+  }
+}

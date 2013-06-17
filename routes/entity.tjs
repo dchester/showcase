@@ -1,0 +1,233 @@
+var Deferrals = require('../lib/deferrals');
+var Entity = require('../lib/entity.tjs');
+var async = require('async');
+
+var coalesceArray = function(data) {
+	return Array.isArray(data) ? data : [ data ];
+};
+
+var field_attribute_names = [ 'title', 'name', 'data_type', 'is_required' ];
+
+exports.initialize = function(app) {
+
+	var models = app.dreamer.models;
+
+	app.get("/admin/entities", function(req, res) {
+
+		models.entities.findAll()
+			.error(res.json)
+			.success(function(entities) {
+				res.render("entities.html", { entities: entities });
+			});
+	});
+
+	app.get("/admin/entities/new", function(req, res) {
+		var subtitle = ' › New';
+		res.render("entities_new.html", { subtitle: subtitle });
+	});
+
+	app.post("/admin/entities/new", function(req, res) {
+
+		var entity_data = {
+			title: req.body.title,
+			description: req.body.description,
+			rest_mountpoint: req.body.rest_mountpoint
+		}
+
+		var fields = [];
+		var field_attributes = {};
+
+		field_attribute_names.forEach(function(name) {
+			field_attributes[name] = coalesceArray(req.body["field_" + name]);
+		});
+
+		field_attributes.name.forEach(function(field_name, index) {
+
+			var field_data = {
+				name: field_name,
+				title: field_attributes.title[index],
+				data_type: field_attributes.data_type[index],
+				is_required: field_attributes.is_required[index]
+			};
+
+			fields.push(field_data);
+		});
+
+		var entity = models.entities.build(entity_data);
+
+		entity.save()
+			.error(req.error)
+			.success(function(entity) {
+
+				async.forEach(fields, function(field_data, callback) {
+
+					field_data.entity_id = entity.id;
+
+					var field = models.entity_fields.build(field_data);
+					field.save()
+						.success(callback)
+						.error(res.json);
+
+				}, function() {
+					//app.flash({ success: 'saved' });
+					res.redirect('/admin/entities');
+				});
+			});
+	});
+
+	app.post("/admin/entities/:id/edit", function(req, res) {
+
+		var saved_entity, saved_fields;
+
+		await {
+			var deferrals = new Deferrals(defer(), defer());
+
+			models.entities.find({ where: { id: entity_id } })
+				.error(req.error)
+				.success(function(_entity) {
+					saved_entity = _entity;
+					deferrals.run();
+				});
+
+			models.entity_fields.find({ where: { entity_id: entity_id } })
+				.error(req.error)
+				.success(function(_fields) {
+					saved_fields = _fields;
+					deferrals.run();
+				});
+		}
+
+		var entity_data = {
+			title: req.body.title,
+			description: req.body.description,
+			rest_mountpoint: req.body.rest_mountpoint
+		}
+
+		var fields = [];
+		var field_attributes = {};
+
+		['title', 'name', 'data_type', 'is_required'].forEach(function(name) {
+			field_attributes[name] = coalesceArray(req.body["field_" + name]);
+		});
+
+		field_attributes.name.forEach(function(field_name, index) {
+
+			var field_data = {
+				name: field_name,
+				title: field_attributes.title[index],
+				data_type: field_attributes.data_type[index],
+				is_required: field_attributes.is_required[index]
+			};
+
+			fields.push(field_data);
+		});
+
+		['title', 'description', 'rest_mountpoint'].forEach( function(key) {
+			saved_entity[key] = entity_data[key];
+		});
+
+		saved_entity.save()
+			.error(req.error)
+			.success(function(entity) {
+
+				var changes = { additions: [], deletions: [], modifications: [] };
+
+				field_data.forEach(function(field) {
+					var match = saved_fields
+						.filter(function(f) { return field.name == f.name } )
+						.shift();
+
+					if (!match) changes.additions.push(field);
+				});
+
+				saved_fields.forEach(function(field) {
+					var match = field_data
+						.filter(function(f) { return field.name == f.name } )
+						.shift();
+
+					if (!match) {
+						changes.deletions.push(field);
+					} else {
+						field_attribute_names.forEach(function(name) {
+							if (field[name] != field_data[name]) {
+								field[name] = field_data[name];
+								changes.modifications[field.name] = field;
+							}
+						});
+					}
+				});
+
+				// iterate through deletions
+
+				// iterate through additions
+
+				// iterate through changes
+
+
+				async.forEach(fields, function(field_data, callback) {
+
+					field_data.entity_id = entity.id;
+
+					var field = models.entity_fields.build(field_data);
+					field.save()
+						.success(callback)
+						.error(res.json);
+
+				}, function() {
+					//app.flash({ success: 'saved' });
+					res.redirect('/admin/entities');
+				});
+			});
+		
+
+
+
+	});
+
+	app.get("/admin/entities/:id/edit", function(req, res) {
+
+		var entity_id = req.params.id;
+		var entity, fields;
+
+		await 
+			var deferrals = new Deferrals(defer(), defer());
+
+			models.entities.find({ where: { id: entity_id } })
+				.error(req.error)
+				.success(function(_entity) {
+					entity = _entity;
+					deferrals.run();
+				});
+
+			models.entity_fields.find({ where: { entity_id: entity_id } })
+				.error(req.error)
+				.success(function(_fields) {
+					fields = _fields;
+					deferrals.run();
+				});
+		}
+
+		res.render("entities_new.html", {
+			entity: entity,
+			fields: fields
+		});
+
+	});
+
+	app.del("/admin/entities/:id", function(req, res) {
+
+		var entity_id = req.params.id;
+
+		models.entities.find({ where: { id: entity_id } })
+			.error(req.error)
+			.success(function(entity) {
+				entity.destroy()
+					.success(function() {
+						res.redirect("/admin/entities");
+					});
+			});
+
+	});
+
+};
+

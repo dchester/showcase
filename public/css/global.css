@@ -1,0 +1,123 @@
+* {
+	box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+}
+.table {
+	width: auto;
+	min-width: 900px;
+}
+.table td form {
+	margin: 0;
+	display: inline-block;
+}
+select, textarea, input[type="text"], input[type="password"], input[type="datetime"], input[type="datetime-local"], input[type="date"], input[type="month"], input[type="time"], input[type="week"], input[type="number"], input[type="email"], input[type="url"], input[type="search"], input[type="tel"], input[type="color"], .uneditable-input {
+	height: 40px;
+}
+.table th,
+.table td {
+	border-top: none;
+	border-bottom: 1px solid #ddd;
+	vertical-align: middle;
+}
+.navbar-inverse .navbar-inner {
+	background: #46a1c7;
+	border-color: #3b93b8;
+	padding-top: 10px;
+	padding-bottom: 8px;
+}
+.navbar-inverse .brand,
+.navbar-inverse .nav > li > a {
+	color: white;
+	text-shadow: none;
+}
+.navbar-inverse .nav .active > a,
+.navbar-inverse .nav .active > a:hover,
+.navbar-inverse .nav .active > a:focus {
+	background: transparent;
+	color: white;
+}
+.navbar .nav > .active > a,
+.navbar .nav > .active > a:hover,
+.navbar .nav > .active > a:focus {
+	-webkit-box-shadow: none;
+	-moz-box-shadow: none;
+	box-shadow: none;
+}
+.pagetitle {
+	margin: 0 0 20px;
+	background: #368db1;
+	color: white;
+	font-weight: normal;
+	padding: 20px;
+}
+.pagetitle a {
+	text-decoration: none;
+	color: inherit;
+}
+.btn {
+	background: #f0f0f0;
+	border: none;
+	text-shadow: none;
+	padding: 10px 16px;
+	border-radius: 2px;
+	box-shadow: none;
+}
+.btn-large {
+	padding: 13px 32px 13px 26px;
+}
+.btn-primary {
+	background: #368db1;
+}
+.btn-primary:hover {
+	background: #368db1;
+	opacity: 0.8;
+}
+.btn-darker {
+	background: rgba(0, 0, 0, 0.2);
+	color: white;
+}
+.btn-darker:hover {
+	background: rgba(0, 0, 0, 0.3);
+	color: white;
+}
+.muted {
+	font-weight: normal;
+}
+.content {
+	margin: 0 20px;
+}
+.nowrap {
+	white-space: nowrap;
+}
+td.actions {
+	width: 1px;
+}
+hr.footer {
+	margin-top: 100px;
+}
+form .table td,
+form .table th {
+	background: #e9f4f9;
+	border-color: white;
+	border-width: 2px;
+	padding-left: 2em;
+	color: rgba(0, 0, 0, 0.7);
+}
+form .table th {
+	width: 25%;
+}
+form .table td input[type=text] {
+	position: relative;
+	top: 3px;
+	width: 90%;
+	padding-top: 0.6em;
+	padding-bottom: 0.6em;
+}
+.transparent {
+	opacity: 0.5;
+}
+.description {
+	opacity: 0.5;
+	margin-bottom: 0.5em;
+}

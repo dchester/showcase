@@ -1,0 +1,25 @@
+DONE
+- remove entities and items
+- edit entities and items
+
+NEXT
+- field descriptions
+- zero states
+- pills w/ counts
+- logo in
+- warn on removing items
+- pagination
+- upload images
+- field validators
+- custom api routes per entity
+- design / style
+- internationalization
+- log all changes
+- references
+- support markdown
+- factor
+- storage engines
+- oauth / user sessions
+- access control / roles
+- csrf tokens
+- soft deletes
