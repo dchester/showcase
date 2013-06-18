@@ -3,6 +3,9 @@
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 }
+a:hover {
+	text-decoration: none;
+}
 .table {
 	width: auto;
 	min-width: 900px;

@@ -77,6 +77,8 @@ exports.initialize = function(app) {
 
 	app.post("/admin/entities/:id/edit", function(req, res) {
 
+		var entity_id = req.params.id;
+
 		var saved_entity, saved_fields;
 
 		await {
@@ -89,7 +91,7 @@ exports.initialize = function(app) {
 					deferrals.run();
 				});
 
-			models.entity_fields.find({ where: { entity_id: entity_id } })
+			models.entity_fields.findAll({ where: { entity_id: entity_id } })
 				.error(req.error)
 				.success(function(_fields) {
 					saved_fields = _fields;
@@ -132,51 +134,69 @@ exports.initialize = function(app) {
 
 				var changes = { additions: [], deletions: [], modifications: [] };
 
-				field_data.forEach(function(field) {
+				fields.forEach(function(field) {
 					var match = saved_fields
-						.filter(function(f) { return field.name == f.name } )
+						.filter(function(f) { return field.name == f.name; } )
 						.shift();
 
 					if (!match) changes.additions.push(field);
 				});
 
 				saved_fields.forEach(function(field) {
-					var match = field_data
-						.filter(function(f) { return field.name == f.name } )
+					var match = fields
+						.filter(function(f) { return field.name == f.name; } )
 						.shift();
 
 					if (!match) {
 						changes.deletions.push(field);
 					} else {
 						field_attribute_names.forEach(function(name) {
-							if (field[name] != field_data[name]) {
-								field[name] = field_data[name];
+							if (field[name] != match[name]) {
+								field[name] = match[name];
 								changes.modifications[field.name] = field;
 							}
 						});
 					}
 				});
 
-				// iterate through deletions
+				console.log("CHANGES", JSON.parse(JSON.stringify(changes)));
 
-				// iterate through additions
+				await {
 
-				// iterate through changes
+					changes.deletions.forEach(function(deletion) {
+						var deferral = defer();
+						models.entity_fields.find({ where: { id: deletion.id } })
+							.error(req.error)
+							.success(function(field) { 
+								field.destroy()
+									.error(req.error)
+									.success(function() { deferral(); });
+							});
+					});
 
+					changes.modifications.forEach(function(modification) {
+						var deferral = defer();
+						models.entity_fields.find({ where: { id: modification.id } })
+							.error(req.error)
+							.success(function(field) {
+								field.updateAttributes(modification);
+								field.save()
+									.error(req.error)
+									.success(function() { deferral(); });
+							});
+					});
 
-				async.forEach(fields, function(field_data, callback) {
+					changes.additions.forEach(function(addition) {
+						var deferral = defer();
+						var field = models.entity_fields.build(addition);
+						field.save()
+							.error(req.error)
+							.success(function() { deferral(); });
+					});
+				}
 
-					field_data.entity_id = entity.id;
-
-					var field = models.entity_fields.build(field_data);
-					field.save()
-						.success(callback)
-						.error(res.json);
-
-				}, function() {
-					//app.flash({ success: 'saved' });
-					res.redirect('/admin/entities');
-				});
+				//app.flash({ success: 'saved' });
+				res.redirect('/admin/entities');
 			});
 		
 
@@ -189,7 +209,7 @@ exports.initialize = function(app) {
 		var entity_id = req.params.id;
 		var entity, fields;
 
-		await 
+		await {
 			var deferrals = new Deferrals(defer(), defer());
 
 			models.entities.find({ where: { id: entity_id } })
@@ -199,7 +219,7 @@ exports.initialize = function(app) {
 					deferrals.run();
 				});
 
-			models.entity_fields.find({ where: { entity_id: entity_id } })
+			models.entity_fields.findAll({ where: { entity_id: entity_id } })
 				.error(req.error)
 				.success(function(_fields) {
 					fields = _fields;

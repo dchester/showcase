@@ -4,6 +4,11 @@
 	<link rel="stylesheet" type="text/css" href="/css/entities.css">
 {% endblock %}
 
+{% block header_js %}
+	<script src="/vendor/underscore/underscore.js"></script>
+	<script src="/vendor/swig/swig.js"></script>
+{% endblock %}
+
 {% block content %}
 
 	<h1 class="pagetitle">
@@ -54,24 +59,21 @@
 			</button>
 
 			<script type="text/html" id="row_template">
-				<div class="delete">&times;</div>
-				<input type="text" class="title" name="field_title" placeholder="Title...">
-				<input type="text" class="name" name="field_name" placeholder="Key Name...">
-				<select class="data_type" name="field_data_type">
-					<option>string</option>
-					<option>text</option>
-					<option>markdown</option>
-					<option>boolean</option>
-					<option>json</option>
-					<option>date</option>
-					<option>key_name</option>
-					<option>numeric_identifier</option>
-				</select>
-				<select class="required" name="field_is_required">
-					<option>required</option>
-					<option>optional</option>
-				</select>
-				<input type="text" class="field_description" name="field_description" placeholder="Description...">
+				{% raw %}
+					<div class="delete">&times;</div>
+					<input type="text" class="title" name="field_title" placeholder="Title..." value="{{ field.title }}">
+					<input type="text" class="name" name="field_name" placeholder="Key Name..." value="{{ field.name }}">
+					<select class="data_type" name="field_data_type">
+						{% for data_type in data_types %}
+							<option {% if field.data_type == data_type.name %}selected="selected"{% endif %}>{{ data_type.name }}</option>
+						{% endfor %}
+					</select>
+					<select class="required" name="field_is_required">
+						<option>required</option>
+						<option>optional</option>
+					</select>
+					<input type="text" class="field_description" name="field_description" placeholder="Description...">
+				{% endraw %}
 			</script>
 		</form>
 	</div>
@@ -82,21 +84,34 @@
 
 	<script>
 
+		var data_types = ['string', 'number', 'email', 'url', 'boolean']
+			.map(function(name) { return { name: name } });
+
 		var Stream = function(args) {
 
 			this.initialize = function(args) {
+
 				this.element = args.element;
 				this.element.querySelector('#new_field')
 					.addEventListener('click', this.addFieldInputs.bind(this));
+
+				var source = this.element.querySelector("#row_template").innerHTML;
+				this.template = swig.compile(source);
 			};
 
-			this.addFieldInputs = function() {
+			this.addFieldInputs = function(args) {
+
+				args = args || {};
+
+				var field = args.field;
+
 				var fields = this.element.querySelector('#fields');
-				var row_template = this.element.querySelector('#row_template');
 				var row = document.createElement('div');
 				row.className = 'row';
-				row.innerHTML = row_template.innerHTML;
+
+				row.innerHTML = this.template({ field: field });
 				fields.appendChild(row);
+
 				var deleter = row.querySelector(".delete");
 				deleter.addEventListener('click', function() {
 					row.parentNode.removeChild(row);
@@ -107,21 +122,13 @@
 		}
 
 		var stream = new Stream({ element: document.querySelector('#stream') });
-		stream.addFieldInputs();
+
+		var fields = {{ fields|json_encode|raw }} || [];
+		fields.forEach(function(field) {
+			stream.addFieldInputs({ field: field });
+		});
 
 	</script>
 
 {% endblock %}
 
-
-
-{% block comment %}
-
-	<tr>
-		<th>Name</th>
-		<th>Data Type</th>
-		<th>Required?</th>
-		<th></th>
-	</tr>
-
-{% endblock %}
