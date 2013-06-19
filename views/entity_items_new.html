@@ -1,11 +1,15 @@
 {% extends 'layout.html' %}
 
-{% block content %}
+{% block page_header %}
 
 	<h1 class="pagetitle">
 		<a href="/admin/entities/{{ entity.id }}/items">{{ entity.title }}</a>
 		<span class="transparent">{{ subtitle }}</span>
 	</h1>
+
+{% endblock %}
+
+{% block content %}
 
 	<div class="content">
 

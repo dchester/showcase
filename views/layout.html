@@ -8,6 +8,8 @@
 	</head>
 	<body>
 		{% include 'header.html' %}
+		{% block page_header %}{% endblock %}
+		{% include 'flash.html' %}
 		{% block content %}{% endblock %}
 		{% include 'footer.html' %}
 		{% block footer_js %}{% endblock %}

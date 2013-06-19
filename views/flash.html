@@ -1,0 +1,32 @@
+{% for message in messages.success %}
+
+	<div class="alert alert-success alert-block">
+		{{ message }}
+	</div>
+
+{% endfor %}
+
+{% for message in messages.info %}
+
+	<div class="alert alert-info alert-block">
+		{{ message }}
+	</div>
+
+{% endfor %}
+
+{% for message in messages.warning %}
+
+	<div class="alert alert-warning alert-block">
+		{{ message }}
+	</div>
+
+{% endfor %}
+
+{% for message in messages.danger %}
+
+	<div class="alert alert-danger alert-block">
+		{{ message }}
+	</div>
+
+{% endfor %}
+

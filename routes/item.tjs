@@ -50,13 +50,14 @@ exports.initialize = function(app) {
 			item[k] = data[k];
 		}
 
-		var subtitle = ["", item.id, "Edit"].join(' › ');
+		var subtitle = ["", "#" + item.id, "Edit"].join(' › ');
 
 		res.render("entity_items_new.html", {
 			item: item,
 			fields: fields,
 			entity: entity,
-			subtitle: subtitle
+			subtitle: subtitle,
+			messages: req.flash('info')
 		});
 	});
 
@@ -127,6 +128,7 @@ exports.initialize = function(app) {
 				});
 		}
 
-		res.redirect("/admin/entities/" + entity_id + "/items");
+		req.flash('info', 'Saved item #' + entity_item_id);
+		res.redirect("/admin/entities/" + entity_id + "/items/" + entity_item_id);
 	});
 };

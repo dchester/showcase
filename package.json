@@ -7,6 +7,7 @@
     "express": "*",
     "swig": "*",
     "consolidate": "*",
-    "tamejs": "*"
+    "tamejs": "*",
+    "connect-flash": "*"
   }
 }

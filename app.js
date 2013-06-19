@@ -6,6 +6,7 @@ var consolidate = require('consolidate');
 var Dreamer = require('dreamer');
 var async = require('async');
 var tamejs = require('tamejs').register();
+var flash = require('connect-flash');
 
 var app = express();
 
@@ -30,6 +31,23 @@ var errorHandler = function(req, res, next) {
 	next();
 };
 
+var flashLoader = function(req, res, next) {
+
+	var _render = res.render;
+
+	res.render = function() {
+
+		if (req.method == 'GET') {
+			res.locals.messages = req.flash();
+			console.log("MESSAGES", res.locals.messages);
+		}
+		
+		_render.apply(res, arguments);
+	};
+
+	next();
+}
+
 app.configure(function(){
 	app.engine('.html', consolidate.swig);
 	app.set('view engine', 'html');
@@ -42,6 +60,8 @@ app.configure(function(){
 	app.use(express.methodOverride());
 	app.use(express.cookieParser('__SECRET__'));
 	app.use(express.session());
+	app.use(flash());
+	app.use(flashLoader);
 	app.use(app.router);
 	app.use(express.static(path.join(__dirname, 'public')));
 });
@@ -100,6 +120,8 @@ app.get("/admin/entities/:id/items", function(req, res) {
 							dreamer.models.entity_fields.findAll({ where: { entity_id: entity_id } })
 								.error(req.error)
 								.success(function(fields) {
+
+									req.flash('info', 'Good job');
 
 									res.render("entity_items.html", { 
 										entity: entity,

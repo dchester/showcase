@@ -118,7 +118,8 @@ exports.initialize = function(app) {
 				name: field_name,
 				title: field_attributes.title[index],
 				data_type: field_attributes.data_type[index],
-				is_required: field_attributes.is_required[index]
+				is_required: field_attributes.is_required[index],
+				entity_id: entity_id
 			};
 
 			fields.push(field_data);
