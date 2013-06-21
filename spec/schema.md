@@ -17,6 +17,7 @@ Possible fields or attributes an entity might have
 - title
 - name
 - data_type
+- description
 - is_required   boolean
 ```
 

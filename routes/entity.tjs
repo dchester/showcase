@@ -6,7 +6,7 @@ var coalesceArray = function(data) {
 	return Array.isArray(data) ? data : [ data ];
 };
 
-var field_attribute_names = [ 'title', 'name', 'data_type', 'is_required' ];
+var field_attribute_names = [ 'title', 'name', 'data_type', 'description', 'is_required' ];
 
 exports.initialize = function(app) {
 
@@ -47,6 +47,7 @@ exports.initialize = function(app) {
 				name: field_name,
 				title: field_attributes.title[index],
 				data_type: field_attributes.data_type[index],
+				description: field_attributes.description[index],
 				is_required: field_attributes.is_required[index]
 			};
 
@@ -108,7 +109,7 @@ exports.initialize = function(app) {
 		var fields = [];
 		var field_attributes = {};
 
-		['title', 'name', 'data_type', 'is_required'].forEach(function(name) {
+		field_attribute_names.forEach(function(name) {
 			field_attributes[name] = coalesceArray(req.body["field_" + name]);
 		});
 
@@ -118,6 +119,7 @@ exports.initialize = function(app) {
 				name: field_name,
 				title: field_attributes.title[index],
 				data_type: field_attributes.data_type[index],
+				description: field_attributes.description[index],
 				is_required: field_attributes.is_required[index],
 				entity_id: entity_id
 			};
@@ -134,6 +136,9 @@ exports.initialize = function(app) {
 			.success(function(entity) {
 
 				var changes = { additions: [], deletions: [], modifications: [] };
+
+				console.log("fields", JSON.parse(JSON.stringify(fields)));
+				console.log("saved_fields", JSON.parse(JSON.stringify(saved_fields)));
 
 				fields.forEach(function(field) {
 					var match = saved_fields
@@ -152,9 +157,12 @@ exports.initialize = function(app) {
 						changes.deletions.push(field);
 					} else {
 						field_attribute_names.forEach(function(name) {
+							console.log(field[name], 'vs', match[name]);
 							if (field[name] != match[name]) {
 								field[name] = match[name];
 								changes.modifications[field.name] = field;
+							} else {
+								console.log(field[name], 'vs', match[name]);
 							}
 						});
 					}
@@ -197,7 +205,8 @@ exports.initialize = function(app) {
 				}
 
 				//app.flash({ success: 'saved' });
-				res.redirect('/admin/entities');
+				//res.redirect('/admin/entities');
+				res.send("OK");
 			});
 		
 
