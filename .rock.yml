@@ -1,1 +1,3 @@
 runtime: node08
+build: npm install && bower install && grunt
+run: node app run

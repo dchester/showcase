@@ -1,7 +1,6 @@
 {% extends 'layout.html' %}
 
-{% block content %}
-
+{% block page_header %}
 	<h1 class="pagetitle">
 		{{ entity.title }}
 		<a class="btn btn-darker btn-large" href="/admin/entities/{{ entity.id }}/items/new">
@@ -9,6 +8,9 @@
 			Create New
 		</a>
 	</h1>
+{% endblock %}
+
+{% block content %}
 
 	<div class="content">
 
@@ -17,6 +19,7 @@
 		{% if items.length %}
 			<table class="table">
 				<tr>
+					<th>ID</th>
 					{% for field in fields %}
 						<th>{{ field.title }}</th>
 					{% endfor %}
@@ -26,6 +29,10 @@
 				{% for item in items %}
 
 					<tr>
+						<td>
+							<a href="/admin/entities/{{ entity.id }}/items/{{ item.id }}/edit">#{{ item.id }}</a>
+						</td>
+
 						{% for field in fields %}
 							<td>{{ item[field.name] }}</td>
 						{% endfor %}

@@ -3,6 +3,9 @@
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 }
+h1, h2, h3, h4, h5, h6 {
+	text-rendering: optimizespeed;
+}
 a:hover {
 	text-decoration: none;
 }
@@ -16,6 +19,8 @@ a:hover {
 }
 select, textarea, input[type="text"], input[type="password"], input[type="datetime"], input[type="datetime-local"], input[type="date"], input[type="month"], input[type="time"], input[type="week"], input[type="number"], input[type="email"], input[type="url"], input[type="search"], input[type="tel"], input[type="color"], .uneditable-input {
 	height: 40px;
+	border-radius: 0;
+	font-size: 16px;
 }
 .table th,
 .table td {
@@ -23,11 +28,20 @@ select, textarea, input[type="text"], input[type="password"], input[type="dateti
 	border-bottom: 1px solid #ddd;
 	vertical-align: middle;
 }
+.table td {
+	padding-right: 28px;
+}
+.table td:last-child {
+	padding-right: 8px;
+}
 .navbar-inverse .navbar-inner {
-	background: #46a1c7;
-	border-color: #3b93b8;
+	background: #2B687E;
+	border-color: #225a72;
 	padding-top: 10px;
 	padding-bottom: 8px;
+	border-width: 0 0 2px 0;
+	padding: 20px 20px;
+	vertical-align: middle;
 }
 .navbar-inverse .brand,
 .navbar-inverse .nav > li > a {
@@ -47,16 +61,27 @@ select, textarea, input[type="text"], input[type="password"], input[type="dateti
 	-moz-box-shadow: none;
 	box-shadow: none;
 }
+.navbar .nav {
+	margin: 8px 10px 0 0;
+	font-size: 18px;
+}
 .pagetitle {
 	margin: 0 0 20px;
 	background: #368db1;
-	color: white;
+	color: #d0e5ed;
 	font-weight: normal;
-	padding: 20px;
+	padding: 16px 0 18px 20px;
+	border-bottom: 2px solid #307c9c;
+}
+h1.pagetitle {
+	font-size: 26px;
 }
 .pagetitle a {
 	text-decoration: none;
 	color: inherit;
+}
+.pagetitle a.btn {
+	margin-left: 20px;
 }
 .btn {
 	background: #f0f0f0;
@@ -84,6 +109,13 @@ select, textarea, input[type="text"], input[type="password"], input[type="dateti
 	background: rgba(0, 0, 0, 0.3);
 	color: white;
 }
+.btn [class^=icon] {
+	opacity: 0.75;
+	margin-right: 3px;
+}
+h3.muted {
+	font-size: 20px;
+}
 .muted {
 	font-weight: normal;
 }
@@ -110,12 +142,25 @@ form .table th {
 form .table th {
 	width: 25%;
 }
+form .table td textarea,
 form .table td input[type=text] {
 	position: relative;
 	top: 3px;
 	width: 90%;
 	padding-top: 0.6em;
 	padding-bottom: 0.6em;
+}
+form .table td textarea {
+	height: 150px;
+}
+form .table td textarea + .error,
+form .table td input[type=text] + .error {
+	width: 90%;
+	padding: 3px 8px;
+	color: white;
+	background: #f8784c;
+	margin-top: -10px;
+	margin-bottom: 10px;
 }
 .transparent {
 	opacity: 0.5;
@@ -130,4 +175,9 @@ form .table td input[type=text] {
 .alert.alert-block {
 	padding-left: 20px;
 	font-size: 16px
+}
+textarea:focus, input[type="text"]:focus, input[type="password"]:focus, input[type="datetime"]:focus, input[type="datetime-local"]:focus, input[type="date"]:focus, input[type="month"]:focus, input[type="time"]:focus, input[type="week"]:focus, input[type="number"]:focus, input[type="email"]:focus, input[type="url"]:focus, input[type="search"]:focus, input[type="tel"]:focus, input[type="color"]:focus, .uneditable-input:focus {
+	-webkit-box-shadow: none;
+	-moz-box-shadow: none;
+	box-shadow: none;
 }

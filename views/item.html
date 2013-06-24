@@ -22,11 +22,16 @@
 						<th>{{ field.title }}</th>
 						<td>
 							{% if field.data_type == 'text' %}
-								<textarea name="{{field.name}}">{{ item[field.name] }}</textarea>
+								<textarea name="{{ field.name }}" placeholder="{{ field.control.placeholder }}">{{ item[field.name] }}</textarea>
 							{% else %}
-								<input type="text" name="{{ field.name }}" value="{{ item[field.name] }}">
-								<div class="description">{{ field.description }}</div>
+								<input type="text" name="{{ field.name }}" value="{{ item[field.name] }}" placeholder="{{ field.control.placeholder }}">
 							{% endif %}
+						
+							{% if errors[field.name] %}
+								<div class="error">{{ errors[field.name] }}</div>
+							{% endif %}
+
+							<div class="description">{{ field.description }}</div>
 						</td>
 					</tr>
 				{% endfor %}

@@ -33,18 +33,18 @@ var errorHandler = function(req, res, next) {
 
 var flashLoader = function(req, res, next) {
 
-	var _render = res.render;
+		var _render = res.render;
 
-	res.render = function() {
-
-		if (req.method == 'GET') {
+		res.render = function() {
 			res.locals.messages = req.flash();
-			console.log("MESSAGES", res.locals.messages);
-		}
-		
-		_render.apply(res, arguments);
-	};
+			_render.apply(res, arguments);
+		};
 
+		next();
+};
+
+var flashDebug = function(req, res, next) {
+	console.log("DEBUG", res.locals.messages);
 	next();
 }
 
@@ -68,125 +68,18 @@ app.configure(function(){
 
 var dreamer = Dreamer.initialize({
 	app: app,
-	schema: "spec/schema.md",
-	//resources: "spec/resources.md"
+	schema: "spec/schema.md"
 });
 
 app.dreamer = dreamer;
 
-app.del("/admin/entities/:entity_id/items/:item_id", function(req, res) {
-
-	var entity_id = req.params.entity_id;
-	var item_id = req.params.item_id;
-
-	dreamer.models.entity_items.find({ where: { id: item_id } })
-		.error(req.error)
-		.success(function(entity) {
-			entity.destroy()
-				.success(function() {
-					res.redirect("/admin/entities/" + entity_id + "/items");
-				});
-		});
-});
-
-app.get("/admin/entities/:id/items", function(req, res) {
-
-	var entity_id = req.params.id;
-
-	dreamer.models.entity_items.findAll({ where: { entity_id: entity_id } })
-		.error(req.error)
-		.success(function(items) {
-
-			var ids = items.map(function(i) { return i.id });
-
-			dreamer.models.entity_item_data.findAll({ where: { entity_item_id: ids } })
-				.success(function(item_data) {
-
-					items = JSON.parse(JSON.stringify(items));
-					items.forEach(function(item) {
-
-						var data = JSON.parse(item_data
-							.filter(function(d) { return d.entity_item_id == item.id })
-							.shift()
-							.data);
-
-						for (k in data) { item[k] = data[k] }
-					});
-
-					dreamer.models.entities.find({ where: { id: entity_id } })
-						.error(req.error)
-						.success(function(entity) {
-
-							dreamer.models.entity_fields.findAll({ where: { entity_id: entity_id } })
-								.error(req.error)
-								.success(function(fields) {
-
-									req.flash('info', 'Good job');
-
-									res.render("entity_items.html", { 
-										entity: entity,
-										items: items,
-										fields: fields
-									});
-								});
-						});
-				});
-		});
-});
-
-app.get("/admin/entities/:id/items/new", function(req, res) {
-
-	dreamer.models.entities.find({ where: { id: req.params.id } })
-		.error(req.error)
-		.success(function(entity) {
-			dreamer.models.entity_fields.findAll({ where: { entity_id: req.params.id } })
-				.success(function(fields) {
-					res.render("entity_items_new.html", {
-						fields: fields,
-						entity: entity
-					});
-				});
-		});
-});
-
-
-app.post("/admin/entities/:id/items/new", function(req, res) {
-
-	var entity_id = req.params.id;
-
-	dreamer.models.entity_fields.findAll({ entity_id: entity_id })
-		.error(req.error)
-		.success(function(fields) {
-
-			var item_data = {};
-
-			fields.forEach(function(field) {
-				item_data[field.name] = req.body[field.name];
-			});	
-
-			var item = dreamer.models.entity_items.build({ entity_id: entity_id });
-
-			item.save()
-				.error(req.error)
-				.success(function(item) {
-
-					var data = dreamer.models.entity_item_data.build({
-						entity_item_id: item.id,
-						data: JSON.stringify(item_data),
-						content_type: 'application/json'
-					});
-
-					data.save()
-						.error(req.error)
-						.success(function() {
-							res.redirect("/admin/entities/" + entity_id + "/items");
-						});
-				});
-		});
+app.get('/', function(req, res) {
+	res.redirect("/admin/entities");
 });
 
 require('./routes/entity.tjs').initialize(app);
 require('./routes/item.tjs').initialize(app);
+require('./routes/api.tjs').initialize(app);
 
 dreamer.dream();
 

@@ -1,0 +1,195 @@
+{% extends 'layout.html' %}
+
+{% block css %}
+	<link rel="stylesheet" type="text/css" href="/css/entities.css">
+{% endblock %}
+
+{% block header_js %}
+	<script src="/vendor/underscore/underscore.js"></script>
+	<script src="/vendor/swig/swig.js"></script>
+{% endblock %}
+
+{% block page_header %}
+	<h1 class="pagetitle">
+		<a href="/admin/entities">Collections</a>
+		<span class="transparent">{{ subtitle }}</span>
+	</h1>
+{% endblock %}
+
+{% block content %}
+
+	<div class="content"> 
+
+		<form id="collection" method="post">
+			<table class="table" id="entity_form">
+				<tr>
+					<th>Collection Title</th>
+					<td>
+						<input type="text" name="title" value="{{ entity.title }}">
+						<div class="description">Title of the collection (e.g., Featured Books of the Month)</div>
+					</td>
+				</tr>
+				<tr>
+					<th>Description</th>
+					<td>
+						<input type="text" name="description" value="{{ entity.description }}">
+						<div class="description">What goes in this collection and how is it used?</div>
+					</td>
+				</tr>
+				<tr>
+					<th>Handle</th>
+					<td>
+						<input type="text" name="name" value="{{ entity.name }}" data-autoupdate="{% if entity.name %}0{% else %}1{% endif %}">
+						<div class="description">Short name for computers; lowercase with no spaces (e.g., featured_books)</div>
+					</td>
+				</tr>
+				<tr>
+					<th>Item Fields</th>
+					<td>
+						<ul class="clean" id="fields"></ul>
+						<button class="btn btn-darker" type="button" id="new_field">
+							<i class="icon-plus icon-white"></i>
+							Add New Field
+						</button>
+					</td>
+				</tr>
+			</table>
+
+			<button class="btn btn-primary btn-large">
+				<i class="icon-ok icon-white"></i>
+				Save
+			</button>
+
+			<script type="text/html" id="row_template">
+				{% raw %}
+					<div class="inputs">
+						<input type="text" class="title" name="field_title" placeholder="Title..." value="{{ field.title }}">
+						<input type="text" class="field_description" name="field_description" placeholder="Description..." value="{{ field.description }}">
+						<select class="data_type" name="field_data_type">
+							{% for data_type in data_types %}
+								<option {% if field.data_type == data_type.name %}selected="selected"{% endif %}>{{ data_type.name }}</option>
+							{% endfor %}
+						</select>
+						<select class="required" name="field_is_required">
+							<option>required</option>
+							<option>optional</option>
+						</select>
+						<div class="extended">
+							<input type="text" class="name" name="field_name" data-autoupdate="{% if field.name %}0{% else %}1{% endif %}" placeholder="Key Name..." value="{{ field.name }}">
+							<input type="hidden" class="order" name="field_index" placeholder="Index..." value="{{ field.index }}">
+						</div>
+					</div>
+					<div class="tools">
+						<div class="delete"><i class="icon-remove"></i></div>
+						<div class="handle"><i class="icon-th"></i></div>
+					</div>
+				{% endraw %}
+			</script>
+		</form>
+	</div>
+
+{% endblock %}
+
+{% block footer_js %}
+
+	<script>
+
+		var data_types = {{ controls|json_encode|raw }};
+
+		var InputPair = function(args) {
+
+			this.source = args.source;
+			this.target = args.target;
+
+			this.transform = args.transform || function(str) {
+				return str
+					.toLowerCase()
+					.replace(/(^\s+|\s+$)/g, '')
+					.replace(/\s/g, '_');
+			};
+
+			if (!parseInt(this.target.getAttribute('data-autoupdate'))) return;
+
+			this.source.addEventListener('keyup', function(e) {
+
+				var transformedValue = this.transform(this.source.value);
+
+				if (!this.target.getAttribute('data-dirty')) {
+					this.target.value = transformedValue;
+				}
+
+			}.bind(this));
+
+			this.target.addEventListener('keyup', function() {
+				this.target.setAttribute('data-dirty', true);
+
+			}.bind(this));
+		};
+
+		var Collection = function(args) {
+
+			this.initialize = function(args) {
+
+				this.element = args.element;
+				this.element.querySelector('#new_field')
+					.addEventListener('click', this.addFieldInputs.bind(this));
+
+				var source = this.element.querySelector("#row_template").innerHTML;
+				this.template = swig.compile(source);
+			};
+
+			this.addFieldInputs = function(args) {
+
+				args = args || {};
+
+				var field = args.field;
+
+				var fields = this.element.querySelector('#fields');
+				var row = document.createElement('li');
+				row.className = 'row';
+
+				row.innerHTML = this.template({ field: field });
+				fields.appendChild(row);
+
+				var deleter = row.querySelector(".delete");
+				deleter.addEventListener('click', function() {
+					row.parentNode.removeChild(row);
+				});
+
+				new InputPair({
+					source: row.querySelector('input[name=field_title]'),
+					target: row.querySelector('input[name=field_name]')
+				});
+			};
+
+			this.initialize(args);
+		}
+
+		var collection = new Collection({ element: document.querySelector('#collection') });
+
+		var fields = {{ fields|json_encode|raw }} || [];
+		fields.forEach(function(field, index) {
+			field.index = index;
+			collection.addFieldInputs({ field: field });
+		});
+
+		$('#fields').sortable({ forcePlaceholderSize: true })
+			.bind('sortupdate', function() {
+				console.log("UPDATE");
+				var inputs = document.querySelectorAll('#fields li input[name=field_index]');
+				var forEach = Array.prototype.forEach;
+				forEach.call(inputs, function(input, index) {
+					console.log(input, index);
+					input.value = index;
+				});
+			});
+
+		new InputPair({
+			source: document.querySelector("input[name=title]"),
+			target: document.querySelector("input[name=name]")
+		});
+
+	</script>
+
+{% endblock %}
+

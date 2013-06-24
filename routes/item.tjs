@@ -1,8 +1,42 @@
 var Deferrals = require('../lib/deferrals');
+var Entity = require('../lib/entity');
+var Item = require('../lib/item');
 
 exports.initialize = function(app) {
 
 	var models = app.dreamer.models;
+
+	app.del("/admin/entities/:entity_id/items/:item_id", function(req, res) {
+
+		var entity_id = req.params.entity_id;
+		var item_id = req.params.item_id;
+
+		Item.destroy({
+			id: item_id,
+			error: req.error,
+			success: function(item) {
+				res.redirect("/admin/entities/" + entity_id + "/items");
+			}
+		});
+	});
+
+	app.get("/admin/entities/:id/items", function(req, res) {
+
+		var entity_id = req.params.id;
+
+		Item.findAll({
+			entity_id: entity_id,
+			error: req.error,
+			success: function(items) {
+
+				res.render("items.html", { 
+					items: items,
+					entity: items.entity,
+					fields: items.entity.fields
+				});
+			}
+		});
+	});
 
 	app.get("/admin/entities/:entity_id/items/:entity_item_id/edit", function(req, res) {
 
@@ -11,53 +45,20 @@ exports.initialize = function(app) {
 
 		var entity, item, fields, item_data;
 
-		await {
+		Item.find({
+			id: entity_item_id,
+			error: req.error,
+			success: function(item) {
 
-			var deferrals = new Deferrals(defer(), defer(), defer(), defer());
+				var subtitle = ["", "#" + item.id, "Edit"].join(' › ');
 
-			models.entities.find({ where: { id: entity_id } })
-				.error(req.error)
-				.success(function(_entity) {
-					entity = _entity;
-					deferrals.run();
+				res.render("item.html", {
+					item: item,
+					entity: item.entity,
+					fields: item.entity.fields,
+					subtitle: subtitle
 				});
-
-			models.entity_items.find({ where: { id: entity_item_id } })
-				.error(req.error)
-				.success(function(_item) {
-					item = _item;
-					deferrals.run();
-				});
-
-			models.entity_item_data.find({ where: { entity_item_id: entity_item_id } })
-				.error(req.error)
-				.success(function(_item_data) {
-					item_data = _item_data;
-					deferrals.run();
-				});
-
-			models.entity_fields.findAll({ where: { entity_id: entity_id } })
-				.error(req.error)
-				.success(function(_fields) {
-					fields = _fields;
-					deferrals.run();
-				});
-		}
-
-		var data = JSON.parse(item_data.data);
-
-		for (k in data) { 
-			item[k] = data[k];
-		}
-
-		var subtitle = ["", "#" + item.id, "Edit"].join(' › ');
-
-		res.render("entity_items_new.html", {
-			item: item,
-			fields: fields,
-			entity: entity,
-			subtitle: subtitle,
-			messages: req.flash('info')
+			}
 		});
 	});
 
@@ -66,69 +67,69 @@ exports.initialize = function(app) {
 		var entity_id = req.params.entity_id;
 		var entity_item_id = req.params.entity_item_id;
 
-		var item, fields, item_data;
+		Item.update({
+			id: entity_item_id,
+			data: req.body,
+			error: req.error,
+			invalid: function(item) {
 
-		await {
+				var subtitle = ["", "#" + item.id, "Edit"].join(' › ');
 
-			var deferrals = new Deferrals(defer(), defer(), defer());
-
-			models.entity_items.find({ where: { id: entity_item_id } })
-				.error(req.error)
-				.success(function(_item) {
-					item = _item;
-					deferrals.run();
+				res.render("item.html", {
+					item: item,
+					errors: item.errors,
+					entity: item.entity,
+					fields: item.entity.fields,
+					subtitle: subtitle
 				});
+			},
+			success: function() {
+				req.flash('info', 'Saved item #' + entity_item_id);
+				res.redirect("/admin/entities/" + entity_id + "/items");
+			}
+		});
+	});
 
-			models.entity_item_data.find({ where: { entity_item_id: entity_item_id } })
-				.error(req.error)
-				.success(function(_item_data) {
-					item_data = _item_data;
-					deferrals.run();
+	app.get("/admin/entities/:id/items/new", function(req, res) {
+
+		var entity_id = req.params.id;
+		var subtitle = ' › New';
+
+		Entity.find({
+			id: entity_id,		
+			error: req.error,
+			success: function(entity) {
+				res.render("item.html", {
+					subtitle: subtitle,
+					entity: entity,
+					fields: entity.fields
 				});
+			}
+		});
+	});
 
-			models.entity_fields.findAll({ where: { entity_id: entity_id } })
-				.error(req.error)
-				.success(function(_fields) {
-					fields = _fields;
-					deferrals.run();
+	app.post("/admin/entities/:id/items/new", function(req, res) {
+
+		var entity_id = req.params.id;
+
+		Item.create({
+			data: req.body,
+			error: req.error,
+			invalid: function(item) {
+
+				var subtitle = " › New";
+
+				res.render("item.html", {
+					errors: item.errors,
+					entity: item.entity,
+					fields: item.entity.fields,
+					subtitle: subtitle
 				});
-		}
-
-		var data = JSON.parse(item_data.data);
-
-		fields.forEach(function(field) {
-			data[field.name] = req.body[field.name];
-		});	
-
-		item_data.data = JSON.stringify(data);
-
-		await {
-
-			var deferrals = new Deferrals(defer(), defer());
-
-			item_data.save()
-				.error(req.error)
-				.success(function(data) {
-					deferrals.run();
-				});
-
-			item.updated_time = new Date();
-
-			item.save()
-				.error(req.error)
-				.success(function(item) {
-
-					var data = models.entity_item_data.build({
-						entity_item_id: item.id,
-						data: JSON.stringify(item_data),
-						content_type: 'application/json'
-					});
-
-					deferrals.run();
-				});
-		}
-
-		req.flash('info', 'Saved item #' + entity_item_id);
-		res.redirect("/admin/entities/" + entity_id + "/items/" + entity_item_id);
+			},
+			success: function(item) {
+				req.flash('success', "Created item");
+				res.redirect("/admin/entities/" + entity_id + "/items");
+			}
+		});
 	});
 };

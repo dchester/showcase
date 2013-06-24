@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "jquery": "*",
+    "jquery-sortable": "https://github.com/farhadi/html5sortable.git"
+  }
+}

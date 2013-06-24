@@ -1,6 +1,12 @@
 {
   "name": "flight-cms",
   "version": "0.0.1",
+  "devDependencies": {
+    "bower": "*",
+    "grunt": "*",
+    "grunt-cli": "*",
+    "grunt-contrib-concat": "*"
+  },
   "dependencies": {
     "dreamer": "https://github.com/dchester/dreamer/archive/master.tar.gz",
     "async": "*",
@@ -8,6 +14,7 @@
     "swig": "*",
     "consolidate": "*",
     "tamejs": "*",
-    "connect-flash": "*"
+    "express-flash": "*",
+    "validator": "*"
   }
 }

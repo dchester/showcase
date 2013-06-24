@@ -5,6 +5,19 @@
 	margin-top: 0.6em;
 	margin-bottom: 1.2em;
 }
+.handle {
+	font-size: 24px;
+	line-height: 1;
+	padding: 0 0.6em 0 0.3em;
+	opacity: 0.3;
+	cursor: move;
+	position: absolute;
+	right: 12px;
+	top: 36px;
+}
+.handle:hover {
+	opacity: 0.7;
+}
 .delete {
 	font-size: 24px;
 	line-height: 1;
@@ -19,6 +32,15 @@
 	opacity: 0.7;
 	color: red;
 }
+#fields {
+	margin: 0;
+}
+#fields li {
+	list-style: none;
+}
+.sortable-placeholder {
+	bordder 1px dotted rgba(#000, 0.5);
+}
 #fields .row {
 	margin: 0;
 	position: relative;
@@ -31,18 +53,22 @@
 	top: 0;
 }
 #fields .title {
-	width: 22%;
+	width: 90%;
+}
+#fields .field_description {
+	width: 50%;
+	font-size: 14px;
+}
+#fields .data_type {
+	width: 20%;
+	font-size: 14px;
+}
+#fields .required {
+	width: 19%;
+	font-size: 14px;
 }
 #fields .name {
 	width: 22%;
-}
-#fields .data_type {
-	width: 22%;
-}
-#fields .required {
-	width: 22%;
-}
-#fields .field_description {
-	width: 90%;
+	font-size: 14px;
 }
 

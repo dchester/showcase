@@ -1,23 +1,26 @@
 DONE
 - remove entities and items
 - edit entities and items
+- field descriptions
+- logo in
+- reorder fields
+- design / style
+- factor
+- JSON api
 
 NEXT
-- field descriptions
-- zero states
-- pills w/ counts
-- logo in
-- warn on removing items
-- pagination
-- upload images
 - field validators
+- pills w/ counts
+- pagination
+- support markdown
+- zero states
+- warn on removing items
+- upload images
 - custom api routes per entity
-- design / style
 - internationalization
 - log all changes
+- drafts / publishing
 - references
-- support markdown
-- factor
 - storage engines
 - oauth / user sessions
 - access control / roles

@@ -1,0 +1,50 @@
+var Deferrals = require('../lib/deferrals');
+var Item = require('../lib/item');
+
+var Entity = require('../lib/entity.tjs');
+
+exports.initialize = function(app) {
+
+	var models = app.dreamer.models;
+
+	app.get('/api/:entity_key', function(req, res) {
+
+		var name = req.params.entity_key;
+
+		var entity, items;
+
+		await {
+			var deferrals = new Deferrals(defer());
+
+			Entity.find({
+				name: name,
+				error: req.error,
+				success: function(_entity) {
+					entity = _entity;
+					deferrals.run();
+				}
+			});
+		}
+
+		await {
+			var deferrals = new Deferrals(defer());
+
+			Item.findAll({
+				entity_id: entity.id,
+				error: req.error,
+				success: function(_items) {
+					items = _items;
+					deferrals.run();
+				}
+			});
+		}
+
+		items.forEach(function(item) {
+			delete item.entity_id;
+			delete item.active_status;
+		});
+
+		res.json(items);
+	});
+};
+
