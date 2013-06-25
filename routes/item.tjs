@@ -54,8 +54,8 @@ exports.initialize = function(app) {
 
 				res.render("item.html", {
 					item: item,
-					entity: item.entity,
-					fields: item.entity.fields,
+					entity: item._entity,
+					fields: item._entity.fields,
 					subtitle: subtitle
 				});
 			}
@@ -77,9 +77,9 @@ exports.initialize = function(app) {
 
 				res.render("item.html", {
 					item: item,
-					errors: item.errors,
-					entity: item.entity,
-					fields: item.entity.fields,
+					errors: item._errors,
+					entity: item._entity,
+					fields: item._entity.fields,
 					subtitle: subtitle
 				});
 			},
@@ -113,6 +113,7 @@ exports.initialize = function(app) {
 		var entity_id = req.params.id;
 
 		Item.create({
+			entity_id: entity_id,
 			data: req.body,
 			error: req.error,
 			invalid: function(item) {
@@ -120,9 +121,10 @@ exports.initialize = function(app) {
 				var subtitle = " › New";
 
 				res.render("item.html", {
-					errors: item.errors,
-					entity: item.entity,
-					fields: item.entity.fields,
+					item: item,
+					errors: item._errors,
+					entity: item._entity,
+					fields: item._entity.fields,
 					subtitle: subtitle
 				});
 			},
