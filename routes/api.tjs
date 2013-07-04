@@ -1,3 +1,4 @@
+var async = require('async');
 var Deferrals = require('../lib/deferrals');
 var Item = require('../lib/item');
 
@@ -40,11 +41,21 @@ exports.initialize = function(app) {
 		}
 
 		items.forEach(function(item) {
+			item._entity = entity;
 			delete item.entity_id;
 			delete item.active_status;
 		});
 
-		res.json(items);
+		async.forEach(items, function(item, callback) {
+
+			Item._inflate(item, function(item) {
+				callback();
+			});
+
+		}, function() {
+			res.json(items);
+		});
+
 	});
 };
 

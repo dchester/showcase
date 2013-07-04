@@ -7,7 +7,8 @@ module.exports = function(grunt) {
       dist: {
         src: [
           'components/jquery/jquery.js',
-          'components/jquery-sortable/jquery.sortable.js'
+          'components/jquery-sortable/jquery.sortable.js',
+          'components/bootstrap/js/bootstrap.js'
         ],
         dest: 'public/dist/global.js'
       }

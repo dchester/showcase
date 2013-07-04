@@ -12,6 +12,11 @@ a:hover {
 .table {
 	width: auto;
 	min-width: 900px;
+	margin-bottom: 30px;
+}
+.table.table-condensed {
+	min-width: 700px;
+	margin-bottom: 15px;
 }
 .table td form {
 	margin: 0;
@@ -70,7 +75,7 @@ select, textarea, input[type="text"], input[type="password"], input[type="dateti
 	background: #368db1;
 	color: #d0e5ed;
 	font-weight: normal;
-	padding: 16px 0 18px 20px;
+	padding: 16px 0 15px 20px;
 	border-bottom: 2px solid #307c9c;
 }
 h1.pagetitle {
@@ -80,7 +85,7 @@ h1.pagetitle {
 	text-decoration: none;
 	color: inherit;
 }
-.pagetitle a.btn {
+.pagetitle > a.btn:last-child {
 	margin-left: 20px;
 }
 .btn {
@@ -162,6 +167,10 @@ form .table td input[type=text] + .error {
 	margin-top: -10px;
 	margin-bottom: 10px;
 }
+form .table.table-condensed input[type=text], 
+form .table.table-condensed select {
+	font-size: 14px;
+}
 .transparent {
 	opacity: 0.5;
 }
@@ -171,6 +180,7 @@ form .table td input[type=text] + .error {
 }
 .pagetitle + .alert.alert-block {
 	margin-top: -20px;
+	border-radius: 0;
 }
 .alert.alert-block {
 	padding-left: 20px;
@@ -180,4 +190,56 @@ textarea:focus, input[type="text"]:focus, input[type="password"]:focus, input[ty
 	-webkit-box-shadow: none;
 	-moz-box-shadow: none;
 	box-shadow: none;
+}
+.pagination span.btn {
+	opacity: 0.5;
+}
+.pagination span.btn:hover {
+	background: rgba(0, 0, 0, 0.2);
+	opacity: 0.5;
+	cursor: default;
+}
+.pagination {
+	margin: 0;
+	display: inline;
+	font-size: 22px;
+}
+.pagination .btn {
+	padding-left: 20px;
+	padding-right: 20px;
+}
+.pagination .btn + .btn {
+	margin: 0 0 0 -3px;
+}
+.pagination-summary {
+	display: inline-block;
+	font-size: 16px;
+	opacity: 0.8;
+	margin-left: 0.4em;
+}
+.pagination:first-line {
+	font-size: 0;
+}
+.pagetitle .pagination {
+	margin-left: 12px;
+}
+.viewport-center {
+	top: 0;
+	left: 0;
+	display: -webkit-box;
+	-webkit-box-orient: horizontal;
+	-webkit-box-pack: center;
+	-webkit-box-align: center;
+	display: -moz-box;
+	-moz-box-orient: horizontal;
+	-moz-box-pack: center;
+	-moz-box-align: center;
+	display: box;
+	box-orient: horizontal;
+	box-pack: center;
+	box-align: center;
+}
+.pagetitle .pagination,
+.pagetitle .pagination-summary {
+	display: none;
 }

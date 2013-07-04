@@ -4,5 +4,9 @@
     "database": "cms",
     "username": "cms",
     "password": "cms"
+  },
+  "files": {
+    "tmp_path": "/var/tmp",
+    "storage_path": "/var/tmp"
   }
 }

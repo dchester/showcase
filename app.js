@@ -7,6 +7,8 @@ var Dreamer = require('dreamer');
 var async = require('async');
 var tamejs = require('tamejs').register();
 var flash = require('connect-flash');
+var config = require('config');
+var mkdirp = require('mkdirp');
 
 var app = express();
 
@@ -48,6 +50,15 @@ var flashDebug = function(req, res, next) {
 	next();
 }
 
+var storagePath;
+if (!config.files.storage_path.match(/^\//)) {
+	storagePath = path.join(__dirname, config.files.storage_path); 
+} else {
+	storagePath = config.files.storage_path; 
+}
+
+mkdirp.sync(config.files.storage_path + "/files");
+
 app.configure(function(){
 	app.engine('.html', consolidate.swig);
 	app.set('view engine', 'html');
@@ -64,6 +75,7 @@ app.configure(function(){
 	app.use(flashLoader);
 	app.use(app.router);
 	app.use(express.static(path.join(__dirname, 'public')));
+	app.use(express.static(storagePath));
 });
 
 var dreamer = Dreamer.initialize({

@@ -14,7 +14,13 @@
     "swig": "*",
     "consolidate": "*",
     "tamejs": "*",
-    "express-flash": "*",
-    "validator": "*"
+    "connect-flash": "*",
+    "validator": "*",
+    "pagination": "https://github.com/vanng822/pagination/archive/master.tar.gz",
+    "config": "*",
+    "path": "*",
+    "sha1": "*",
+    "mv": "*",
+    "mkdirp": "*"
   }
 }

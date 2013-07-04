@@ -1,0 +1,15 @@
+<div class="pagination">
+	{% if pagination.previous %}
+		<a href="{{ pagination.prelink }}page={{ pagination.previous }}" class="btn btn-darker btn-large">
+			<i class="icon-chevron-left {{ icon_color }}"></i>
+		</a>
+	{% else %}
+		<span class="btn btn-darker btn-large"><i class="icon-chevron-left {{ icon_color }}"></i></span>
+	{% endif %}
+
+	{% if pagination.next %}
+		<a href="{{ pagination.prelink }}page={{ pagination.next }}" class="btn btn-darker btn-large"><i class="icon-chevron-right {{ icon_color }}"></i></a>
+	{% else %}
+		<span class="btn btn-darker btn-large"><i class="icon-chevron-right {{ icon_color }}"></i></span>
+	{% endif %}
+</div>

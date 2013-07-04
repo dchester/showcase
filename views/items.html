@@ -3,6 +3,14 @@
 {% block page_header %}
 	<h1 class="pagetitle">
 		{{ entity.title }}
+
+		{% set icon_color = "icon-white" %}
+		{% include "pagination.html" %}
+
+		<div class="pagination-summary">
+			{{ pagination.fromResult }}-{{ pagination.toResult }} of {{ pagination.totalResult }}
+		</div>
+
 		<a class="btn btn-darker btn-large" href="/admin/entities/{{ entity.id }}/items/new">
 			<i class="icon-plus icon-white"></i>
 			Create New
@@ -17,6 +25,7 @@
 		<h3 class="muted">{{ entity.description }}</h3>
 
 		{% if items.length %}
+
 			<table class="table">
 				<tr>
 					<th>ID</th>
@@ -34,7 +43,7 @@
 						</td>
 
 						{% for field in fields %}
-							<td>{{ item[field.name] }}</td>
+							<td><p class="preview">{{ item[field.name] }}</p></td>
 						{% endfor %}
 
 						<td class="actions nowrap">
@@ -55,6 +64,14 @@
 
 				{% endfor %}
 			</table>
+
+			{% set icon_color = "icon-black" %}
+			{% include "pagination.html" %}
+
+			<div class="pagination-summary">
+				{{ pagination.fromResult }}-{{ pagination.toResult }} of {{ pagination.totalResult }}
+			</div>
+
 		{% else %}
 			<div class="muted">Nothing to see here yet.</div>
 		{% endif %}

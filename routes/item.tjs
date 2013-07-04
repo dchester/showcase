@@ -1,10 +1,60 @@
+var async = require('async');
+var Pagination = require('pagination').ItemPaginator;
+var sha1 = require('sha1');
+var mv = require('mv');
+var path = require('path');
+var config = require('config');
+
 var Deferrals = require('../lib/deferrals');
 var Entity = require('../lib/entity');
 var Item = require('../lib/item');
 
+
 exports.initialize = function(app) {
 
 	var models = app.dreamer.models;
+
+	var save_files = function(req, res, next) {
+
+		console.log("SAVE FILES...");
+
+		var entity_item_id = req.params.entity_item_id;
+		var file_keys = Object.keys(req.files);
+
+		async.forEach(file_keys, function(key, callback) {
+
+			var upload = req.files[key];
+
+			var filename = sha1(upload.path + Math.random()) + '-' + upload.name;
+			var target_path = path.join(config.files.storage_path, 'files', filename); 
+
+			console.log("storing " + target_path);
+
+			mv(upload.path, target_path, function(err) {
+
+				if (err) return req.error(err);
+
+				var file = models.files.build({
+					entity_item_id: entity_item_id,
+					path: filename,
+					original_filename: upload.name,
+					size: upload.size,
+					content_type: upload.type,
+					meta_json: '{}',
+					description: ''
+				});
+
+				file.save()
+					.error(req.error)
+					.success(function(file) {
+						console.log("saved", file.id);
+						req.body[key] = { file_id: file.id };
+						callback();
+					});
+			});
+
+		}, next);
+	};
 
 	app.del("/admin/entities/:entity_id/items/:item_id", function(req, res) {
 
@@ -23,16 +73,40 @@ exports.initialize = function(app) {
 	app.get("/admin/entities/:id/items", function(req, res) {
 
 		var entity_id = req.params.id;
+		var page = Number(req.query.page) || 1;
+		var perPage = 10;
 
 		Item.findAll({
 			entity_id: entity_id,
 			error: req.error,
+			page: page,
+			perPage: perPage,
 			success: function(items) {
+
+				var pagination = new Pagination({
+					rowsPerPage: perPage,
+					totalResult: items.totalCount,
+					current: page
+				});
+
+				pagination.data = pagination.getPaginationData();
+				pagination.data.prelink = pagination.preparePreLink(pagination.data.prelink);
+
+				items.forEach(function(item) {
+					Object.keys(item).forEach(function(key) {
+						if (typeof item[key] == 'string') {
+							if (item[key].length > 255) {
+								item[key] = item[key].substring(0, 127) + '...';
+							} 
+						}
+					});
+				});
 
 				res.render("items.html", { 
 					items: items,
 					entity: items.entity,
-					fields: items.entity.fields
+					fields: items.entity.fields,
+					pagination: pagination.data
 				});
 			}
 		});
@@ -62,7 +136,7 @@ exports.initialize = function(app) {
 		});
 	});
 
-	app.post("/admin/entities/:entity_id/items/:entity_item_id/edit", function(req, res) {
+	app.post("/admin/entities/:entity_id/items/:entity_item_id/edit", save_files, function(req, res) {
 
 		var entity_id = req.params.entity_id;
 		var entity_item_id = req.params.entity_item_id;
@@ -108,7 +182,7 @@ exports.initialize = function(app) {
 		});
 	});
 
-	app.post("/admin/entities/:id/items/new", function(req, res) {
+	app.post("/admin/entities/:id/items/new", save_files, function(req, res) {
 
 		var entity_id = req.params.id;
 

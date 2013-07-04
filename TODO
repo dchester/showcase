@@ -1,4 +1,5 @@
 DONE
+
 - remove entities and items
 - edit entities and items
 - field descriptions
@@ -7,22 +8,28 @@ DONE
 - design / style
 - factor
 - JSON api
+- field validators
+- pagination
 
 NEXT
-- field validators
-- pills w/ counts
-- pagination
+
+- fix requiredness
+- fields: date, markdown, images
 - support markdown
-- zero states
+- custom fields
+- drafts / publishing
 - warn on removing items
+- zero states
+- JSON API for writes
 - upload images
-- custom api routes per entity
 - internationalization
 - log all changes
-- drafts / publishing
+- customized preview
 - references
 - storage engines
 - oauth / user sessions
 - access control / roles
 - csrf tokens
 - soft deletes
+- pills w/ counts
+- custom api routes per entity

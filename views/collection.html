@@ -62,26 +62,75 @@
 
 			<script type="text/html" id="row_template">
 				{% raw %}
-					<div class="inputs">
-						<input type="text" class="title" name="field_title" placeholder="Title..." value="{{ field.title }}">
-						<input type="text" class="field_description" name="field_description" placeholder="Description..." value="{{ field.description }}">
-						<select class="data_type" name="field_data_type">
-							{% for data_type in data_types %}
-								<option {% if field.data_type == data_type.name %}selected="selected"{% endif %}>{{ data_type.name }}</option>
-							{% endfor %}
-						</select>
-						<select class="required" name="field_is_required">
-							<option>required</option>
-							<option>optional</option>
-						</select>
-						<div class="extended">
-							<input type="text" class="name" name="field_name" data-autoupdate="{% if field.name %}0{% else %}1{% endif %}" placeholder="Key Name..." value="{{ field.name }}">
-							<input type="hidden" class="order" name="field_index" placeholder="Index..." value="{{ field.index }}">
+					<div class="labels">
+						<div class="tools">
+							<div class="handle"><i class="icon-th"></i></div>
+						</div>
+						<div class="title">{{ field.title }}</div>
+						<div class="data_type">{{ field.data_type }}</div>
+						<div class="required">{{ field.is_required }}</div>
+						<div class="tools">
+							<div class="settings"><i class="icon-cog"></i></div>
+							<div class="delete"><i class="icon-remove"></i></div>
 						</div>
 					</div>
-					<div class="tools">
-						<div class="delete"><i class="icon-remove"></i></div>
-						<div class="handle"><i class="icon-th"></i></div>
+					<div class="overlay viewport-center">
+						<div class="inputs">
+
+							<h2>Field</h2>
+
+							<table class="table table-condensed">
+								<tr>
+									<th>Title</th>
+									<td>
+										<input type="text" class="title" name="field_title" placeholder="Title..." value="{{ field.title }}">
+										<div class="description">Title of the field</div>
+									</td>
+								</tr>
+								<tr>
+									<th>Handle</th>
+									<td>
+										<input type="text" class="name" name="field_name" data-autoupdate="{% if field.name %}0{% else %}1{% endif %}" placeholder="Handle..." value="{{ field.name }}">
+										<div class="description">Name of the field for computers (all lowercase, no spaces)</div>
+									</td>
+								</tr>
+								<tr>
+									<th>Description</th>
+									<td>
+										<input type="text" class="field_description" name="field_description" placeholder="Description..." value="{{ field.description }}">
+										<div class="description">Description / help text to appear along with the form input</div>
+									</td>
+								</tr>
+								<tr>
+									<th>Data Type</th>
+									<td>
+										<select class="data_type" name="field_data_type">
+											{% for data_type in data_types %}
+												<option {% if field.data_type == data_type.name %}selected="selected"{% endif %}>{{ data_type.name }}</option>
+											{% endfor %}
+										</select>
+										<div class="description">Data type to determine input and validation rules</div>
+									</td>
+								</tr>
+								<tr>
+									<th>Required</th>
+									<td>
+										<select class="required" name="field_is_required">
+											<option>required</option>
+											<option>optional</option>
+										</select>
+										<div class="description">Is this field required?</div>
+									</td>
+									</td>
+								</tr>
+							</table>
+
+							<input type="hidden" class="order" name="field_index" placeholder="Index..." value="{{ field.index }}">
+							<button type="button" class="btn btn-primary">
+								<i class="icon-ok icon-white"></i>
+								Save
+							</button>
+						</div>
 					</div>
 				{% endraw %}
 			</script>
@@ -126,13 +175,31 @@
 			}.bind(this));
 		};
 
+		var InputReflector = function(args) {
+
+			this.source = args.source;
+			this.target = args.target;
+
+			this.target.innerText = this.source.value;
+
+			this.source.addEventListener('change', function(e) {
+				this.target.innerText = e.target.value;
+			}.bind(this));
+
+			this.source.addEventListener('keyup', function(e) {
+				this.target.innerText = e.target.value;
+			}.bind(this));
+		};
+
 		var Collection = function(args) {
 
 			this.initialize = function(args) {
 
 				this.element = args.element;
 				this.element.querySelector('#new_field')
-					.addEventListener('click', this.addFieldInputs.bind(this));
+					.addEventListener('click', function() {
+						this.addFieldInputs({ show: true });
+					}.bind(this));
 
 				var source = this.element.querySelector("#row_template").innerHTML;
 				this.template = swig.compile(source);
@@ -160,6 +227,35 @@
 					source: row.querySelector('input[name=field_title]'),
 					target: row.querySelector('input[name=field_name]')
 				});
+
+				new InputReflector({
+					source: row.querySelector('.inputs .title'),
+					target: row.querySelector('.labels .title')
+				});
+
+				new InputReflector({
+					source: row.querySelector('.inputs .data_type'),
+					target: row.querySelector('.labels .data_type')
+				});
+
+				new InputReflector({
+					source: row.querySelector('.inputs .required'),
+					target: row.querySelector('.labels .required')
+				});
+
+				var modal = row.querySelector('.overlay');
+
+				row.querySelector('.settings').addEventListener('click', function(e) {
+					modal.classList.add('visible');
+				});
+
+				modal.querySelector('button').addEventListener('click', function(e) {
+					modal.classList.remove('visible');
+				});
+
+				if (args.show) {
+					modal.classList.add('visible');
+				}
 			};
 
 			this.initialize(args);
@@ -173,13 +269,11 @@
 			collection.addFieldInputs({ field: field });
 		});
 
-		$('#fields').sortable({ forcePlaceholderSize: true })
+		$('#fields').sortable({ forcePlaceholderSize: true, handle: '.handle' })
 			.bind('sortupdate', function() {
-				console.log("UPDATE");
 				var inputs = document.querySelectorAll('#fields li input[name=field_index]');
 				var forEach = Array.prototype.forEach;
 				forEach.call(inputs, function(input, index) {
-					console.log(input, index);
 					input.value = index;
 				});
 			});

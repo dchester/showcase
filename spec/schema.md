@@ -58,6 +58,21 @@ Data comprising the item record
 
 ```
 - entity_item_id
-- data
+- data             text
 - content_type
 ```
+
+### Files
+
+Uploaded files associated with items
+
+```
+- entity_item_id     nullable
+- path
+- original_filename  nullable
+- description        nullable
+- content_type
+- meta_json          text,nullable
+- size               integer
+```
+
