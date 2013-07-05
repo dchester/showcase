@@ -9,6 +9,7 @@ var tamejs = require('tamejs').register();
 var flash = require('connect-flash');
 var config = require('config');
 var mkdirp = require('mkdirp');
+var armrest = require('armrest');
 
 var app = express();
 
@@ -87,6 +88,11 @@ app.dreamer = dreamer;
 
 app.get('/', function(req, res) {
 	res.redirect("/admin/entities");
+});
+
+app.get ('/admin/fields', function(req, res) {
+	var fields = require('./lib/fields');
+	res.render("fields.html", { fields: fields.controls });
 });
 
 require('./routes/entity.tjs').initialize(app);

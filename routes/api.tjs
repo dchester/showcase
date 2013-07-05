@@ -1,8 +1,10 @@
 var async = require('async');
+var armrest = require('armrest');
 var Deferrals = require('../lib/deferrals');
 var Item = require('../lib/item');
 
 var Entity = require('../lib/entity.tjs');
+var EXAMPLE_LENGTH = 500;
 
 exports.initialize = function(app) {
 
@@ -42,8 +44,6 @@ exports.initialize = function(app) {
 
 		items.forEach(function(item) {
 			item._entity = entity;
-			delete item.entity_id;
-			delete item.active_status;
 		});
 
 		async.forEach(items, function(item, callback) {
@@ -53,9 +53,56 @@ exports.initialize = function(app) {
 			});
 
 		}, function() {
+
+			items.forEach(function(item) {
+				delete item.entity_id;
+				delete item.active_status;
+				delete item._entity;
+			});
+
 			res.json(items);
 		});
 
+	});
+
+	app.get ('/admin/api', function(req, res) {
+
+		var api = armrest.client("localhost:3000");
+
+		Entity.findAll({
+			success: function(entities) {
+
+				var resources = [];
+
+				async.forEach(entities, function(entity, cb) {
+
+					api.get({
+						url: '/api/' + entity.name,
+						success: function(items, response) {
+
+							var example_response = response.body;
+							if (example_response && example_response.length > EXAMPLE_LENGTH) {
+								example_response = example_response.substring(0, EXAMPLE_LENGTH) + '...';
+							}
+
+							var resource = {
+								method: 'GET',
+								route: '/api/' + entity.name,
+								description: entity.title + ' Listing',
+								example_response: example_response
+							};
+
+							resources.push(resource);
+							cb();
+						}
+					});
+
+				}, function() {
+					res.render("api.html", { resources: resources });
+				});
+
+			}
+		});
 	});
 };
 

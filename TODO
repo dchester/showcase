@@ -10,18 +10,19 @@ DONE
 - JSON api
 - field validators
 - pagination
+- fix requiredness
 
 NEXT
 
-- fix requiredness
 - fields: date, markdown, images
 - support markdown
-- custom fields
 - drafts / publishing
+- write tests
 - warn on removing items
+- upload images
+- custom fields
 - zero states
 - JSON API for writes
-- upload images
 - internationalization
 - log all changes
 - customized preview

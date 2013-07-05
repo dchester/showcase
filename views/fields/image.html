@@ -1,0 +1,8 @@
+{% if item[field.name].url %}
+	<img src="{{ item[field.name].url }}" width="100" height="100">
+	<input type="hidden" name="{{ field.name }}" value="{{ item[field.name].id }}">
+	<button type="button">delete</button>
+{% else %}
+	<input type="file" name="{{ field.name }}" value="{{ item[field.name] }}">
+{% endif %}
+

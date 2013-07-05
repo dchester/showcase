@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+
+{% block css %}
+	<link rel="stylesheet" type="text/css" href="/vendor/hljs/hljs.css">
+{% endblock %}
+
+
+{% block content %}
+
+	<h1 class="pagetitle">REST API</h1>
+
+	<div class="content content-condensed">
+
+		{% for resource in resources %}
+
+			<h4>{{ resource.method }} {{ resource.route }}</h4>
+
+			<p>{{ resource.description }}</p>
+
+			<pre><code>{{ resource.example_response }}</code></pre>
+
+			<hr>
+
+		{% endfor %}
+
+	</div>
+
+{% endblock %}
+
+{% block footer_js %}
+	<script src="/vendor/hljs/hljs.min.js"></script>
+	<script>hljs.initHighlightingOnLoad();</script>
+{% endblock %}

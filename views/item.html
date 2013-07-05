@@ -21,18 +21,7 @@
 					<tr>
 						<th>{{ field.title }}</th>
 						<td>
-							{% if field.data_type == 'text' %}
-								<textarea name="{{ field.name }}" placeholder="{{ field.control.placeholder }}">{{ item[field.name] }}</textarea>
-							{% else if field.data_type == 'image' %}
-								{% if item[field.name].url %}
-									<img src="{{ item[field.name].url }}" width="100" height="100">
-									<input type="hidden" name="{{ field.name }}" value="{{ item[field.name].id }}">
-								{% else %}
-									<input type="file" name="{{ field.name }}" value="{{ item[field.name] }}">
-								{% endif %}
-							{% else %}
-								<input type="text" name="{{ field.name }}" value="{{ item[field.name] }}" placeholder="{{ field.control.placeholder }}">
-							{% endif %}
+							{% include field.template %}
 						
 							{% if errors[field.name] %}
 								<div class="error">{{ errors[field.name] }}</div>

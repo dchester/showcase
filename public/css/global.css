@@ -88,6 +88,9 @@ h1.pagetitle {
 .pagetitle > a.btn:last-child {
 	margin-left: 20px;
 }
+code {
+	font-family: Consolas, "Liberation Mono", Courier, monospace;
+}
 .btn {
 	background: #f0f0f0;
 	border: none;
@@ -242,4 +245,7 @@ textarea:focus, input[type="text"]:focus, input[type="password"]:focus, input[ty
 .pagetitle .pagination,
 .pagetitle .pagination-summary {
 	display: none;
+}
+.content-condensed {
+	width: 990px;
 }

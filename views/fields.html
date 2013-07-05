@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+
+{% block content %}
+	<h1 class="pagetitle">
+		Fields
+	</h1>
+	<div class="content">
+		<table class="table">
+			<tr>
+				<th>Name</th>
+				<th>Validator</th>
+				<th>Template</th>
+			</tr>
+			{% for field in fields %}
+				<tr>
+					<td>{{ field.name }}</td>
+					<td>{{ field.validator }}</td>
+					<td>{{ field.template }}</td>
+				</tr>
+			{% endfor %}
+		</table>
+	</div>
+{% endblock %}

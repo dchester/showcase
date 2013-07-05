@@ -126,6 +126,11 @@ exports.initialize = function(app) {
 
 				var subtitle = ["", "#" + item.id, "Edit"].join(' › ');
 
+				var fields = item._entity.fields;
+				fields.forEach(function(field) {
+					field.template = 'fields/' + field.control.template + '.html';
+				});
+
 				res.render("item.html", {
 					item: item,
 					entity: item._entity,
@@ -173,6 +178,11 @@ exports.initialize = function(app) {
 			id: entity_id,		
 			error: req.error,
 			success: function(entity) {
+
+				entity.fields.forEach(function(field) {
+					field.template = 'fields/' + field.control.template + '.html';
+				});
+
 				res.render("item.html", {
 					subtitle: subtitle,
 					entity: entity,
