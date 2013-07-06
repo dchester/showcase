@@ -70,6 +70,16 @@ select, textarea, input[type="text"], input[type="password"], input[type="dateti
 	margin: 8px 10px 0 0;
 	font-size: 18px;
 }
+.navbar .nav i {
+	opacity: 0.5;
+	position: relative;
+	top: 3px;
+	margin: 0 0.3em 0 0;
+	font-size: 24px;
+}
+.navbar .nav i.icon-plane {
+	margin-right: 0.3em;
+}
 .pagetitle {
 	margin: 0 0 20px;
 	background: #368db1;

@@ -46,11 +46,6 @@ var flashLoader = function(req, res, next) {
 		next();
 };
 
-var flashDebug = function(req, res, next) {
-	console.log("DEBUG", res.locals.messages);
-	next();
-}
-
 var storagePath;
 if (!config.files.storage_path.match(/^\//)) {
 	storagePath = path.join(__dirname, config.files.storage_path); 

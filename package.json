@@ -5,7 +5,8 @@
     "bower": "*",
     "grunt": "*",
     "grunt-cli": "*",
-    "grunt-contrib-concat": "*"
+    "grunt-contrib-concat": "*",
+    "grunt-contrib-copy": "*"
   },
   "dependencies": {
     "dreamer": "https://github.com/dchester/dreamer/archive/master.tar.gz",

@@ -29,13 +29,22 @@ exports.initialize = function(app) {
 			});
 		}
 
+		var criteria = {};
+
+		entity.fields.forEach(function(field) {
+			if (field.name in req.query) {
+				criteria[field.name] = req.query[field.name];
+			}
+		});
+
 		await {
 			var deferrals = new Deferrals(defer());
 
 			Item.findAll({
 				entity_id: entity.id,
 				error: req.error,
-				success: function(_items) {
+				criteria: criteria,
+				success: function(_items, totalCount) {
 					items = _items;
 					deferrals.run();
 				}
@@ -60,6 +69,10 @@ exports.initialize = function(app) {
 				delete item._entity;
 			});
 
+			var totalCount = items.totalCount;
+			var content_range = "items 0-" + (totalCount - 1) + "/" + totalCount;
+
+			res.header('Content-Range', content_range);
 			res.json(items);
 		});
 

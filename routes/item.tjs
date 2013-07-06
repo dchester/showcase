@@ -16,8 +16,6 @@ exports.initialize = function(app) {
 
 	var save_files = function(req, res, next) {
 
-		console.log("SAVE FILES...");
-
 		var entity_item_id = req.params.entity_item_id;
 		var file_keys = Object.keys(req.files);
 
@@ -27,8 +25,6 @@ exports.initialize = function(app) {
 
 			var filename = sha1(upload.path + Math.random()) + '-' + upload.name;
 			var target_path = path.join(config.files.storage_path, 'files', filename); 
-
-			console.log("storing " + target_path);
 
 			mv(upload.path, target_path, function(err) {
 
@@ -47,7 +43,6 @@ exports.initialize = function(app) {
 				file.save()
 					.error(req.error)
 					.success(function(file) {
-						console.log("saved", file.id);
 						req.body[key] = { file_id: file.id };
 						callback();
 					});
@@ -154,11 +149,17 @@ exports.initialize = function(app) {
 
 				var subtitle = ["", "#" + item.id, "Edit"].join(' › ');
 
+				var fields = item._entity.fields;
+
+				fields.forEach(function(field) {
+					field.template = 'fields/' + field.control.template + '.html';
+				});
+
 				res.render("item.html", {
 					item: item,
 					errors: item._errors,
 					entity: item._entity,
-					fields: item._entity.fields,
+					fields: fields,
 					subtitle: subtitle
 				});
 			},
@@ -204,11 +205,17 @@ exports.initialize = function(app) {
 
 				var subtitle = " › New";
 
+				var fields = item._entity.fields;
+
+				fields.forEach(function(field) {
+					field.template = 'fields/' + field.control.template + '.html';
+				});
+
 				res.render("item.html", {
 					item: item,
 					errors: item._errors,
 					entity: item._entity,
-					fields: item._entity.fields,
+					fields: fields,
 					subtitle: subtitle
 				});
 			},
