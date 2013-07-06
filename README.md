@@ -31,6 +31,11 @@ Edit your database configuration in `config/default.json`:
 }
 ```
 
+Set up the database schema:
+```
+$ node app.js schema-sync
+```
+
 Then start your server:
 
 ```
@@ -40,9 +45,7 @@ Server listening on port 3000...
 
 ## Collections
 
-Once the server is up and running, start by creating a new collection.  A collection is a set of items that contain similar items.  Other CMSs might call a collection a "content type" or "custom post type".
-
-Define a collection and its fields, and then use the admin interface to add items.  Also see the JSON API.
+Once the server is up and running, start by creating a new collection.  A collection is a set of items that contain similar items.  Other CMSs might call a collection a "content type" or "custom post type".  Define a collection and its fields, and then use the admin interface to add items.  Also see the JSON API.
 
 ## License
 
