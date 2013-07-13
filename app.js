@@ -59,7 +59,7 @@ app.configure(function(){
 	app.engine('.html', consolidate.swig);
 	app.set('view engine', 'html');
 	app.set('views', views);
-	app.set('port', process.env.PORT || 3000);
+	app.set('port', process.env.PORT || config.port || 3000);
 	app.use(errorHandler);
 	app.use(express.favicon());
 	app.use(express.logger('dev'));

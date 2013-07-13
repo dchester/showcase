@@ -4,7 +4,7 @@ var Deferrals = require('../lib/deferrals');
 var Item = require('../lib/item');
 
 var Entity = require('../lib/entity.tjs');
-var EXAMPLE_LENGTH = 500;
+var EXAMPLE_LENGTH = 1500;
 
 exports.initialize = function(app) {
 
@@ -13,6 +13,9 @@ exports.initialize = function(app) {
 	app.get('/api/:entity_key', function(req, res) {
 
 		var name = req.params.entity_key;
+
+		var per_page = req.query.per_page || 40;
+		var page = req.query.page || 0;
 
 		var entity, items;
 
@@ -42,8 +45,10 @@ exports.initialize = function(app) {
 
 			Item.findAll({
 				entity_id: entity.id,
-				error: req.error,
 				criteria: criteria,
+				page: page,
+				per_page: per_page,
+				error: req.error,
 				success: function(_items, totalCount) {
 					items = _items;
 					deferrals.run();
@@ -80,7 +85,7 @@ exports.initialize = function(app) {
 
 	app.get ('/admin/api', function(req, res) {
 
-		var api = armrest.client("localhost:3000");
+		var api = armrest.client("localhost:" + app.get('port'));
 
 		Entity.findAll({
 			success: function(entities) {
@@ -91,6 +96,7 @@ exports.initialize = function(app) {
 
 					api.get({
 						url: '/api/' + entity.name,
+						params: { per_page: 1 },
 						success: function(items, response) {
 
 							var example_response = response.body;
