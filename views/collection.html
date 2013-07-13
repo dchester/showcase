@@ -68,7 +68,7 @@
 						</div>
 						<div class="title">{{ field.title }}</div>
 						<div class="data_type">{{ field.data_type }}</div>
-						<div class="required">{{ field.is_required }}</div>
+						<div class="required">{% if field.is_required %}required{% else %}optional{% endif %}</div>
 						<div class="tools">
 							<div class="settings"><i class="icon-cog"></i></div>
 							<div class="delete"><i class="icon-remove"></i></div>
@@ -116,11 +116,10 @@
 									<th>Required</th>
 									<td>
 										<select class="required" name="field_is_required">
-											<option>required</option>
-											<option>optional</option>
+											<option value="1" {% if field.is_required %}selected="selected"{% endif %}>required</option>
+											<option value="0" {% if !field.is_required %}selected="selected"{% endif %}>optional</option>
 										</select>
 										<div class="description">Is this field required?</div>
-									</td>
 									</td>
 								</tr>
 							</table>
@@ -180,15 +179,15 @@
 			this.source = args.source;
 			this.target = args.target;
 
-			this.target.innerText = this.source.value;
 
-			this.source.addEventListener('change', function(e) {
-				this.target.innerText = e.target.value;
-			}.bind(this));
+			this.transform = args.transform || function(value) { return value };
 
-			this.source.addEventListener('keyup', function(e) {
-				this.target.innerText = e.target.value;
-			}.bind(this));
+			this.reflect = function(e) { this.target.innerText = this.transform(e.target.value); };
+
+			this.target.innerText = this.transform(this.source.value);
+
+			this.source.addEventListener('change', this.reflect.bind(this));
+			this.source.addEventListener('keyup', this.reflect.bind(this));
 		};
 
 		var Collection = function(args) {
@@ -240,7 +239,8 @@
 
 				new InputReflector({
 					source: row.querySelector('.inputs .required'),
-					target: row.querySelector('.labels .required')
+					target: row.querySelector('.labels .required'),
+					transform: function(is_required) { return Number(is_required) ? 'required' : 'optional' }
 				});
 
 				var modal = row.querySelector('.overlay');
