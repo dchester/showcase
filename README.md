@@ -39,7 +39,7 @@ $ node app.js schema-sync
 Then start your server:
 
 ```
-$ node app.js
+$ node app.js run
 Server listening on port 3000...
 ```
 
