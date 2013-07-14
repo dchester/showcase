@@ -33,7 +33,7 @@ pre .status {
 
 pre .number,
 pre .hexcolor {
-  color: #40a070
+  color: #099;
 }
 
 pre .string,
@@ -71,11 +71,14 @@ pre .django .tag .keyword {
   font-weight: normal
 }
 
-pre .attribute,
+pre .attribute {
+  color: navy;
+}
+
 pre .variable,
 pre .instancevar,
 pre .lisp .body {
-  color: #008080
+  color: #099;
 }
 
 pre .regexp {
