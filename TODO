@@ -11,24 +11,24 @@ DONE
 - field validators
 - pagination
 - fix requiredness
+- make the API not hardcoded to port 3000
+- JSON API for writes
+- document how to run on a port
+- upload images
+
 
 NEXT
 
 - cancel out of adding a field
-- document how to run on a port
 - document adding permissions for a user?
 - explain what are fields
-- make the API not hardcoded to port 3000
-- add configuration for on which port to run
 - fields: date, markdown, images
 - support markdown
 - drafts / publishing
 - write tests
 - warn on removing items
-- upload images
 - custom fields
 - zero states
-- JSON API for writes
 - internationalization
 - log all changes
 - customized preview

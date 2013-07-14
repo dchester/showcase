@@ -67,7 +67,7 @@ select, textarea, input[type="text"], input[type="password"], input[type="dateti
 	box-shadow: none;
 }
 .navbar .nav {
-	margin: 8px 10px 0 0;
+	margin: 4px 10px 0 0;
 	font-size: 18px;
 }
 .navbar .nav i {
@@ -258,4 +258,17 @@ textarea:focus, input[type="text"]:focus, input[type="password"]:focus, input[ty
 }
 .content-condensed {
 	width: 990px;
+}
+pre {
+	border-radius: 2px;
+	background: #f8f8f8;
+}
+body pre code {
+	padding: 0;
+}
+p {
+	margin: 0;
+}
+p + pre {
+	margin-top: 10px;
 }

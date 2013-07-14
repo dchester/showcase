@@ -22,6 +22,8 @@
     "path": "*",
     "sha1": "*",
     "mv": "*",
-    "mkdirp": "*"
+    "mkdirp": "*",
+    "armrest": "*",
+    "mysql": "*"
   }
 }
