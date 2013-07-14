@@ -66,7 +66,7 @@ app.configure(function(){
 	app.use(express.bodyParser());
 	app.use(express.methodOverride());
 	app.use(express.cookieParser('__SECRET__'));
-	app.use(express.session());
+	app.use('/admin', express.session());
 	app.use(flash());
 	app.use(flashLoader);
 	app.use(app.router);
