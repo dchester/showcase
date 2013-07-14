@@ -39,8 +39,8 @@ $ node app.js schema-sync
 Then start your server:
 
 ```
-$ node app.js run
-Server listening on port 3000...
+$ PORT=4000 node app.js run
+Server listening on port 4000...
 ```
 
 ## Collections
