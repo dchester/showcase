@@ -13,10 +13,8 @@ exports.initialize = function(app) {
 	app.get('/api/:entity_key', function(req, res) {
 
 		var name = req.params.entity_key;
-
 		var per_page = req.query.per_page || 40;
 		var page = req.query.page || 0;
-
 		var entity, items;
 
 		await {
@@ -69,9 +67,7 @@ exports.initialize = function(app) {
 		}, function() {
 
 			items.forEach(function(item) {
-				delete item.entity_id;
-				delete item.active_status;
-				delete item._entity;
+				item = Item.distill(item);
 			});
 
 			var totalCount = items.totalCount;
@@ -80,7 +76,118 @@ exports.initialize = function(app) {
 			res.header('Content-Range', content_range);
 			res.json(items);
 		});
+	});
 
+	app.get('/api/:entity_key/:id', function(req, res) {
+
+		var id = req.params.id;
+		var name = req.params.entity_key;
+
+		var entity, item;
+
+		await {
+			var deferrals = new Deferrals(defer());
+
+			Entity.find({
+				name: name,
+				error: req.error,
+				success: function(_entity) {
+					entity = _entity;
+					deferrals.run();
+				}
+			});
+		}
+
+		await {
+			var deferrals = new Deferrals(defer());
+			Item.findAll({
+				criteria:{ id: id },
+				entity_id: entity.id,
+				success: function(items) {
+					item = items.shift();
+					deferrals.run();
+				}
+			});
+		}
+
+		if (!item) {
+			res.json(404, { error: "not found" });
+		} else {
+			res.json(Item.distill(item));
+		}
+
+	});
+
+	app.post('/api/:entity_key', function(req, res) {
+
+		var name = req.params.entity_key;
+		var entity;
+
+		await {
+			var deferrals = new Deferrals(defer());
+
+			Entity.find({
+				name: name,
+				error: req.error,
+				success: function(_entity) {
+					entity = _entity;
+					deferrals.run();
+				}
+			});
+		}
+
+		var data = {};
+
+		entity.fields.forEach(function(field) {
+			data[field.name] = String(req.body[field.name]);
+		});
+
+		Item.create({
+			entity_id: entity.id,
+			data: data,
+			success: function(item) {
+				var location = '/api/' + name + '/' + item.id;
+				res.location(location);
+				res.json(201, { id: item.id } );
+			},
+			invalid: function(item) { res.json(400, { errors: item._errors } ); },
+			error: function(error) { res.json(500, error); }
+		});
+	});
+
+	app.post('/api/:entity_key/:entity_item_id', function(req, res) {
+
+		var name = req.params.entity_key;
+		var entity_item_id = req.params.entity_item_id;
+		var entity;
+
+		await {
+			var deferrals = new Deferrals(defer());
+
+			Entity.find({
+				name: name,
+				error: req.error,
+				success: function(_entity) {
+					entity = _entity;
+					deferrals.run();
+				}
+			});
+		}
+
+		var data = {};
+
+		entity.fields.forEach(function(field) {
+			data[field.name] = String(req.body[field.name]);
+		});
+
+		Item.update({
+			id: entity_item_id,
+			entity_id: entity.id,
+			data: data,
+			success: function(item) { res.json(200, { id: item.id } ); },
+			invalid: function(item) { res.json(400, { errors: item._errors } ); },
+			error: function(error) { res.json(500, error); }
+		});
 	});
 
 	app.get ('/admin/api', function(req, res) {

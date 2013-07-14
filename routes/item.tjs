@@ -9,7 +9,6 @@ var Deferrals = require('../lib/deferrals');
 var Entity = require('../lib/entity');
 var Item = require('../lib/item');
 
-
 exports.initialize = function(app) {
 
 	var models = app.dreamer.models;
