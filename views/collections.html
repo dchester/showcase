@@ -1,5 +1,7 @@
 {% extends 'layout.html' %}
 
+{% set title = 'Collections' %}
+
 {% block page_header %}
 	<h1 class="pagetitle">
 		Collections
@@ -13,29 +15,32 @@
 {% block content %}
 
 	<div class="content">
+		{% if entities.length %}
+			<table class="table">
+				{% for entity in entities %}
+					<tr>
+						<td><a href="/admin/entities/{{ entity.id }}/items">{{ entity.title }}</a></td>
+						<td>{{ entity.description }}</td>
 
-		<table class="table">
-			{% for entity in entities %}
-				<tr>
-					<td><a href="/admin/entities/{{ entity.id }}/items">{{ entity.title }}</a></td>
-					<td>{{ entity.description }}</td>
-
-					<td class="nowrap actions">
-						<a class="btn" href="/admin/entities/{{ entity.id }}/edit">
-							<i class="icon-pencil"></i>
-							edit
-						</a>
-						<form action="/admin/entities/{{ entity.id }}" method="post">
-							<input type="hidden" name="_method" value="delete">
-							<button class="btn">
-								<i class="icon-remove"></i>
-								remove
-							</button>
-						</form>
-					</td>
-				</tr>
-			{% endfor %}
-		</table>
+						<td class="nowrap actions">
+							<a class="btn" href="/admin/entities/{{ entity.id }}/edit">
+								<i class="icon-pencil"></i>
+								edit
+							</a>
+							<form action="/admin/entities/{{ entity.id }}" method="post" class="delete">
+								<input type="hidden" name="_method" value="delete">
+								<button class="btn">
+									<i class="icon-remove"></i>
+									remove
+								</button>
+							</form>
+						</td>
+					</tr>
+				{% endfor %}
+			</table>
+		{% else %}
+			<h3 class="muted">No collections yet.</h3>
+		{% endif %}
 	</div>
 
 {% endblock %}

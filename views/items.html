@@ -1,5 +1,7 @@
 {% extends 'layout.html' %}
 
+{% set title = 'Items' %}
+
 {% block page_header %}
 	<h1 class="pagetitle">
 		{{ entity.title }}
@@ -51,7 +53,7 @@
 								<i class="icon-pencil"></i>
 								edit
 							</a>
-							<form action="/admin/entities/{{ entity.id }}/items/{{ item.id }}" method="post">
+							<form action="/admin/entities/{{ entity.id }}/items/{{ item.id }}" method="post" class="delete">
 								<input type="hidden" name="_method" value="delete">
 								<button class="btn">
 									<i class="icon-remove"></i>
