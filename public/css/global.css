@@ -42,8 +42,6 @@ select, textarea, input[type="text"], input[type="password"], input[type="dateti
 .navbar-inverse .navbar-inner {
 	background: #2B687E;
 	border-color: #225a72;
-	padding-top: 10px;
-	padding-bottom: 8px;
 	border-width: 0 0 2px 0;
 	padding: 20px 20px;
 	vertical-align: middle;
@@ -67,7 +65,7 @@ select, textarea, input[type="text"], input[type="password"], input[type="dateti
 	box-shadow: none;
 }
 .navbar .nav {
-	margin: 4px 10px 0 0;
+	margin: 0 10px 0 0;
 	font-size: 18px;
 }
 .navbar .nav i {
@@ -82,14 +80,14 @@ select, textarea, input[type="text"], input[type="password"], input[type="dateti
 }
 .pagetitle {
 	margin: 0 0 20px;
-	background: #368db1;
+	background: #4a98b9;
 	color: #d0e5ed;
 	font-weight: normal;
-	padding: 16px 0 15px 20px;
+	padding: 13px 0 12px 20px;
 	border-bottom: 2px solid #307c9c;
 }
 h1.pagetitle {
-	font-size: 26px;
+	font-size: 21px;
 }
 .pagetitle a {
 	text-decoration: none;
