@@ -27,17 +27,17 @@
 					</td>
 				</tr>
 				<tr>
-					<th>Description</th>
-					<td>
-						<input type="text" name="description" value="{{ entity.description }}">
-						<div class="description">What goes in this collection and how is it used?</div>
-					</td>
-				</tr>
-				<tr>
 					<th>Handle</th>
 					<td>
 						<input type="text" name="name" value="{{ entity.name }}" data-autoupdate="{% if entity.name %}0{% else %}1{% endif %}">
 						<div class="description">Short name for computers; lowercase with no spaces (e.g., featured_books)</div>
+					</td>
+				</tr>
+				<tr>
+					<th>Description</th>
+					<td>
+						<input type="text" name="description" value="{{ entity.description }}">
+						<div class="description">What goes in this collection and how is it used?</div>
 					</td>
 				</tr>
 				<tr>
@@ -75,6 +75,7 @@
 						<div class="inputs">
 
 							<h2>Field</h2>
+							<input type="hidden" name="field_id" value="{{ field.id }}">
 
 							<table class="table table-condensed">
 								<tr>
