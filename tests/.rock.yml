@@ -1,1 +1,2 @@
 runtime: ruby20
+run: rspec test.rb
