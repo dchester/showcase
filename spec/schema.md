@@ -19,7 +19,7 @@ Possible fields or attributes an entity might have
 - data_type
 - description
 - is_required   boolean
-- index         int
+- index         integer
 ```
 
 ### Field Constraints

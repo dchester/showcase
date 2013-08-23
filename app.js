@@ -28,7 +28,10 @@ var errorHandler = function(req, res, next) {
 			var error = arguments[0];
 		}
 
-		res.json(status, error);
+		var response = JSON.parse(JSON.stringify(error));
+		response.message = error.toString();
+
+		res.json(status, response);
 	};
 
 	next();
@@ -94,5 +97,14 @@ require('./routes/entity.tjs').initialize(app);
 require('./routes/item.tjs').initialize(app);
 require('./routes/api.tjs').initialize(app);
 
-dreamer.dream();
+
+dreamer.models.entities.find({})
+	.success(function() {
+		dreamer.dream();
+	})
+	.error(function(err) {
+		console.warn("Couldn't start up: " + err);
+		console.warn("Do you need to initialize the schema?  See `node app schema-sync`");
+	});
+
 
