@@ -127,6 +127,10 @@
 								<i class="icon-ok icon-white"></i>
 								Save
 							</button>
+							<button type="button" class="btn cancel_fields">
+								<i class="icon-remove icon-white"></i>
+								Cancel
+							</button>
 						</div>
 					</div>
 				{% endraw %}
@@ -248,7 +252,12 @@
 					modal.classList.add('visible');
 				});
 
-				modal.querySelector('button').addEventListener('click', function(e) {
+				modal.querySelector('button.save_fields').addEventListener('click', function(e) {
+					modal.classList.remove('visible');
+				});
+
+				modal.querySelector('button.cancel_fields').addEventListener('click', function(e) {
+					row.parentNode.removeChild(row);
 					modal.classList.remove('visible');
 				});
 
