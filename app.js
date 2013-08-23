@@ -97,14 +97,5 @@ require('./routes/entity.tjs').initialize(app);
 require('./routes/item.tjs').initialize(app);
 require('./routes/api.tjs').initialize(app);
 
-
-dreamer.models.entities.find({})
-	.success(function() {
-		dreamer.dream();
-	})
-	.error(function(err) {
-		console.warn("Couldn't start up: " + err);
-		console.warn("Do you need to initialize the schema?  See `node app schema-sync`");
-	});
-
+dreamer.dream();
 
