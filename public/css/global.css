@@ -170,6 +170,7 @@ form .table td input[type=text] {
 form .table td textarea {
 	height: 150px;
 }
+form .error,
 form .table td textarea + .error,
 form .table td input[type=text] + .error {
 	width: 90%;

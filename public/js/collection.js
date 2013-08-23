@@ -55,6 +55,13 @@ var Collection = function(args) {
 
 		var source = this.element.querySelector("#row_template").innerHTML;
 		this.template = swig.compile(source);
+
+		this.element.addEventListener('submit', function(e) {
+			if (!this.element.querySelector("input[name=field_title]")) {
+				e.preventDefault();
+				this.element.classList.add('error-no-fields');
+			}
+		}.bind(this));
 	};
 
 	this.addFieldInputs = function(args) {
@@ -62,6 +69,8 @@ var Collection = function(args) {
 		args = args || {};
 
 		var field = args.field;
+
+		this.element.classList.remove('error-no-fields');
 
 		var fields = this.element.querySelector('#fields');
 		var row = document.createElement('li');
@@ -114,6 +123,7 @@ var Collection = function(args) {
 		if (args.show) {
 			modal.classList.add('visible');
 		}
+
 	};
 
 	this.initialize(args);
