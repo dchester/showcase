@@ -116,7 +116,10 @@ var Collection = function(args) {
 		});
 
 		modal.querySelector('button.cancel_fields').addEventListener('click', function(e) {
-			row.parentNode.removeChild(row);
+			var field_id_input = row.querySelector('input[name=field_id]');
+			if (!(field_id_input && field_id_input.value)) {
+				row.parentNode.removeChild(row);
+			}
 			modal.classList.remove('visible');
 		});
 
