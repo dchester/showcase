@@ -1,0 +1,20 @@
+<textarea style="display: none" name="{{ field.name }}" placeholder="{{ field.control.placeholder }}">{{ item[field.name] }}</textarea>
+<div class="editor-container" id="editor_{{ field.name }}"></div>
+<script>
+(function() {
+	var editor = new EpicEditor({
+		container: document.querySelector("#editor_{{ field.name }}"),
+		textarea: document.querySelector("textarea[name={{ field.name }}]"),
+		basePath: '/dist/epic',
+		theme: {
+			editor: '/../../css/epic-editor-light.css'
+		},
+		file: {
+			name: Math.random()
+		},
+		autogrow: true
+	});
+	editor.load();
+}());
+</script>
+

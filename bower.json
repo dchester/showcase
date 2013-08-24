@@ -6,6 +6,7 @@
     "bootstrap": "http://twitter.github.com/bootstrap/assets/bootstrap.zip",
     "jquery": "*",
     "jquery-sortable": "https://github.com/farhadi/html5sortable.git",
-    "font-awesome": "*"
+    "font-awesome": "*",
+    "EpicEditor": "*"
   }
 }

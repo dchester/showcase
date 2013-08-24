@@ -7,10 +7,11 @@ module.exports = function(grunt) {
         options: { separator: ';' },
         src: [
           'components/underscore/underscore.js',
-          'components/swig/swig.js',
           'components/jquery/jquery.js',
           'components/jquery-sortable/jquery.sortable.js',
-          'components/bootstrap/js/bootstrap.js'
+          'components/bootstrap/js/bootstrap.js',
+          'components/EpicEditor/epiceditor/js/epiceditor.js',
+          'components/swig/swig.js'
         ],
         dest: 'public/dist/js/global.js'
       },
@@ -25,6 +26,9 @@ module.exports = function(grunt) {
     copy: {
       main: {
         files: [ { expand: true, cwd: 'components/font-awesome/font/', src: ['**'], dest: 'public/dist/font/' } ]
+      },
+      epic: {
+        files: [ { expand: true, cwd: 'components/EpicEditor/epiceditor/themes/', src: ['**'], dest: 'public/dist/epic/themes/' } ]
       }
     }
   });
