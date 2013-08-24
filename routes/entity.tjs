@@ -13,11 +13,32 @@ exports.initialize = function(app) {
 
 	app.get("/admin/entities", function(req, res) {
 
-		Entity.findAll({
-			error: req.error,
-			success: function(entities) {
-				res.render("collections.html", { entities: entities });
-			},
+		var entities, entity_counts;
+
+		await {
+
+			var deferrals = new Deferrals(defer(), defer());
+
+			Entity.findAll({
+				error: req.error,
+				success: function(_entities) {
+					entities = _entities;
+					deferrals.run();
+				}
+			});
+
+			Entity.itemCounts({
+				error: req.error,
+				success: function(_entity_counts) {
+					entity_counts = _entity_counts;
+					deferrals.run();
+				}
+			});
+		}
+
+		res.render("collections.html", { 
+			entities: entities,
+			entity_counts: entity_counts
 		});
 	});
 

@@ -101,10 +101,11 @@ code {
 }
 .btn {
 	background: #f0f0f0;
+	color: #787878;
 	border: none;
 	text-shadow: none;
 	padding: 10px 16px;
-	border-radius: 2px;
+	border-radius: 3px;
 	box-shadow: none;
 	margin-right: 5px;
 }
@@ -125,6 +126,7 @@ code {
 }
 .btn-primary {
 	background: #368db1;
+	color: white;
 }
 .btn-primary:hover {
 	background: #368db1;
@@ -283,4 +285,12 @@ p {
 }
 p + pre {
 	margin-top: 10px;
+}
+.badge {
+	margin-left: 5px;
+	background: #ccc;
+}
+.editor-container {
+	width: 93%;
+	border: 1px solid #ccc;
 }
