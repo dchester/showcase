@@ -15,28 +15,34 @@ DONE
 - JSON API for writes
 - document how to run on a port
 - upload images
+- put handle before subscription for collections
+- cancel out of adding a field
+- require adding one field
+- fields: date, images
+- drafts / publishing
+- warn on removing items
+- support markdown
+- pills w/ counts
 
 
 NEXT
 
-- cancel out of adding a field
+- fix type validation
+- new fields out-of-order
+- namespaces / workspaces
+- settings: jsonp 
+- storage engines
+- access control / roles
 - document adding permissions for a user?
 - explain what are fields
-- fields: date, markdown, images
-- support markdown
-- drafts / publishing
+- log all changes
 - write tests
-- warn on removing items
 - custom fields
 - zero states
 - internationalization
-- log all changes
 - customized preview
 - references
-- storage engines
 - oauth / user sessions
-- access control / roles
 - csrf tokens
 - soft deletes
-- pills w/ counts
 - custom api routes per entity
