@@ -1244,2124 +1244,6 @@
   });
 
 }).call(this);
-;/*! Swig https://paularmstrong.github.com/swig | https://github.com/paularmstrong/swig/blob/master/LICENSE */
-/*! Cross-Browser Split 1.0.1 (c) Steven Levithan <stevenlevithan.com>; MIT License An ECMA-compliant, uniform cross-browser split method */
-/*! Underscore.js (c) 2011 Jeremy Ashkenas | https://github.com/documentcloud/underscore/blob/master/LICENSE */
-/*! DateZ (c) 2011 Tomo Universalis | https://github.com/TomoUniversalis/DateZ/blob/master/LISENCE */(function () {
-  var str = '{{ a }}',
-    splitter;
-  if (str.split(/(\{\{.*?\}\})/).length === 0) {
-
-    /** Repurposed from Steven Levithan's
-     *  Cross-Browser Split 1.0.1 (c) Steven Levithan <stevenlevithan.com>; MIT License An ECMA-compliant, uniform cross-browser split method
-     */
-    splitter = function (str, separator, limit) {
-      if (Object.prototype.toString.call(separator) !== '[object RegExp]') {
-        return splitter._nativeSplit.call(str, separator, limit);
-      }
-
-      var output = [],
-        lastLastIndex = 0,
-        flags = (separator.ignoreCase ? 'i' : '') + (separator.multiline ? 'm' : '') + (separator.sticky ? 'y' : ''),
-        separator2,
-        match,
-        lastIndex,
-        lastLength;
-
-      separator = RegExp(separator.source, flags + 'g');
-
-      str = str.toString();
-      if (!splitter._compliantExecNpcg) {
-        separator2 = RegExp('^' + separator.source + '$(?!\\s)', flags);
-      }
-
-      if (limit === undefined || limit < 0) {
-        limit = Infinity;
-      } else {
-        limit = Math.floor(+limit);
-        if (!limit) {
-          return [];
-        }
-      }
-
-      function fixExec() {
-        var i = 1;
-        for (i; i < arguments.length - 2; i += 1) {
-          if (arguments[i] === undefined) {
-            match[i] = undefined;
-          }
-        }
-      }
-
-      match = separator.exec(str);
-      while (match) {
-        lastIndex = match.index + match[0].length;
-
-        if (lastIndex > lastLastIndex) {
-          output.push(str.slice(lastLastIndex, match.index));
-
-          if (!splitter._compliantExecNpcg && match.length > 1) {
-            match[0].replace(separator2, fixExec);
-          }
-
-          if (match.length > 1 && match.index < str.length) {
-            Array.prototype.push.apply(output, match.slice(1));
-          }
-
-          lastLength = match[0].length;
-          lastLastIndex = lastIndex;
-
-          if (output.length >= limit) {
-            break;
-          }
-        }
-
-        if (separator.lastIndex === match.index) {
-          separator.lastIndex += 1; // avoid an infinite loop
-        }
-        match = separator.exec(str);
-      }
-
-      if (lastLastIndex === str.length) {
-        if (lastLength || !separator.test('')) {
-          output.push('');
-        }
-      } else {
-        output.push(str.slice(lastLastIndex));
-      }
-
-      return output.length > limit ? output.slice(0, limit) : output;
-    };
-
-    splitter._compliantExecNpcg = /()??/.exec('')[1] === undefined;
-    splitter._nativeSplit = String.prototype.split;
-
-    String.prototype.split = function (separator, limit) {
-      return splitter(this, separator, limit);
-    };
-  }
-}());
-swig = (function () {
-var swig = {},
-dateformat = {},
-filters = {},
-helpers = {},
-parser = {},
-tags = {};
-(function (exports) {
-
-
-
-var config = {
-    allowErrors: false,
-    autoescape: true,
-    cache: true,
-    encoding: 'utf8',
-    filters: filters,
-    root: '/',
-    tags: tags,
-    extensions: {},
-    tzOffset: 0
-  },
-  _config = _.extend({}, config),
-  CACHE = {};
-
-// Call this before using the templates
-exports.init = function (options) {
-  CACHE = {};
-  _config = _.extend({}, config, options);
-  _config.filters = _.extend(filters, options.filters);
-  _config.tags = _.extend(tags, options.tags);
-
-  dateformat.defaultTZOffset = _config.tzOffset;
-};
-
-function TemplateError(error) {
-  return { render: function () {
-    return '<pre>' + error.stack + '</pre>';
-  }};
-}
-
-function createRenderFunc(code) {
-  // The compiled render function - this is all we need
-  return new Function('_context', '_parents', '_filters', '_', '_ext', [
-    '_parents = _parents ? _parents.slice() : [];',
-    '_context = _context || {};',
-    // Prevents circular includes (which will crash node without warning)
-    'var j = _parents.length,',
-    '  _output = "",',
-    '  _this = this;',
-    // Note: this loop averages much faster than indexOf across all cases
-    'while (j--) {',
-    '   if (_parents[j] === this.id) {',
-    '     return "Circular import of template " + this.id + " in " + _parents[_parents.length-1];',
-    '   }',
-    '}',
-    // Add this template as a parent to all includes in its scope
-    '_parents.push(this.id);',
-    code,
-    'return _output;'
-  ].join(''));
-}
-
-function createTemplate(data, id) {
-  var template = {
-      // Allows us to include templates from the compiled code
-      compileFile: exports.compileFile,
-      // These are the blocks inside the template
-      blocks: {},
-      // Distinguish from other tokens
-      type: parser.TEMPLATE,
-      // The template ID (path relative to template dir)
-      id: id
-    },
-    tokens,
-    code,
-    render;
-
-  // The template token tree before compiled into javascript
-  if (_config.allowErrors) {
-    tokens = parser.parse.call(template, data, _config.tags, _config.autoescape);
-  } else {
-    try {
-      tokens = parser.parse.call(template, data, _config.tags, _config.autoescape);
-    } catch (e) {
-      return new TemplateError(e);
-    }
-  }
-
-  template.tokens = tokens;
-
-  // The raw template code
-  code = parser.compile.call(template);
-
-  if (code !== false) {
-    render = createRenderFunc(code);
-  } else {
-    render = function (_context, _parents, _filters, _, _ext) {
-      template.tokens = tokens;
-      code = parser.compile.call(template, '', _context);
-      var fn = createRenderFunc(code);
-      return fn.call(this, _context, _parents, _filters, _, _ext);
-    };
-  }
-
-  template.render = function (context, parents) {
-    if (_config.allowErrors) {
-      return render.call(this, context, parents, _config.filters, _, _config.extensions);
-    }
-    try {
-      return render.call(this, context, parents, _config.filters, _, _config.extensions);
-    } catch (e) {
-      return new TemplateError(e);
-    }
-  };
-
-  return template;
-}
-
-function getTemplate(source, options) {
-  var key = options.filename || source;
-  if (_config.cache || options.cache) {
-    if (!CACHE.hasOwnProperty(key)) {
-      CACHE[key] = createTemplate(source, key);
-    }
-
-    return CACHE[key];
-  }
-
-  return createTemplate(source, key);
-}
-
-exports.compileFile = function (filepath, forceAllowErrors) {
-  var tpl, get;
-
-  if (_config.cache && CACHE.hasOwnProperty(filepath)) {
-    return CACHE[filepath];
-  }
-
-  if (typeof window !== 'undefined') {
-    throw new TemplateError({ stack: 'You must pre-compile all templates in-browser. Use `swig.compile(template);`.' });
-  }
-
-  get = function () {
-    var excp,
-      getSingle,
-      c;
-    getSingle = function (prefix) {
-      var file = ((/^\//).test(filepath) || (/^.:/).test(filepath)) ? filepath : prefix + '/' + filepath,
-        data;
-      try {
-        data = fs.readFileSync(file, config.encoding);
-        tpl = getTemplate(data, { filename: filepath });
-      } catch (e) {
-        excp = e;
-      }
-    };
-    if (typeof _config.root === "string") {
-      getSingle(_config.root);
-    }
-    if (_config.root instanceof Array) {
-      c = 0;
-      while (tpl === undefined && c < _config.root.length) {
-        getSingle(_config.root[c]);
-        c = c + 1;
-      }
-    }
-    if (tpl === undefined) {
-      throw excp;
-    }
-  };
-
-  if (_config.allowErrors || forceAllowErrors) {
-    get();
-  } else {
-    try {
-      get();
-    } catch (error) {
-      tpl = new TemplateError(error);
-    }
-  }
-  return tpl;
-};
-
-exports.compile = function (source, options) {
-  var tmpl = getTemplate(source, options || {});
-
-  return function (source, options) {
-    return tmpl.render(source, options);
-  };
-};
-})(swig);
-(function (exports) {
-
-// Javascript keywords can't be a name: 'for.is_invalid' as well as 'for' but not 'for_' or '_for'
-var KEYWORDS = /^(Array|ArrayBuffer|Boolean|Date|Error|eval|EvalError|Function|Infinity|Iterator|JSON|Math|Namespace|NaN|Number|Object|QName|RangeError|ReferenceError|RegExp|StopIteration|String|SyntaxError|TypeError|undefined|uneval|URIError|XML|XMLList|break|case|catch|continue|debugger|default|delete|do|else|finally|for|function|if|in|instanceof|new|return|switch|this|throw|try|typeof|var|void|while|with)(?=(\.|$))/;
-
-// Returns TRUE if the passed string is a valid javascript string literal
-exports.isStringLiteral = function (string) {
-  if (typeof string !== 'string') {
-    return false;
-  }
-
-  var first = string.substring(0, 1),
-    last = string.charAt(string.length - 1, 1),
-    teststr;
-
-  if ((first === last) && (first === "'" || first === '"')) {
-    teststr = string.substr(1, string.length - 2).split('').reverse().join('');
-
-    if ((first === "'" && (/'(?!\\)/).test(teststr)) || (last === '"' && (/"(?!\\)/).test(teststr))) {
-      throw new Error('Invalid string literal. Unescaped quote (' + string[0] + ') found.');
-    }
-
-    return true;
-  }
-
-  return false;
-};
-
-// Returns TRUE if the passed string is a valid javascript number or string literal
-exports.isLiteral = function (string) {
-  var literal = false;
-
-  // Check if it's a number literal
-  if ((/^\d+([.]\d+)?$/).test(string)) {
-    literal = true;
-  } else if (exports.isStringLiteral(string)) {
-    literal = true;
-  }
-
-  return literal;
-};
-
-// Variable names starting with __ are reserved.
-exports.isValidName = function (string) {
-  return ((typeof string === 'string')
-    && string.substr(0, 2) !== '__'
-    && (/^([$A-Za-z_]+[$A-Za-z_0-9]*)(\.?([$A-Za-z_]+[$A-Za-z_0-9]*))*$/).test(string)
-    && !KEYWORDS.test(string));
-};
-
-// Variable names starting with __ are reserved.
-exports.isValidShortName = function (string) {
-  return string.substr(0, 2) !== '__' && (/^[$A-Za-z_]+[$A-Za-z_0-9]*$/).test(string) && !KEYWORDS.test(string);
-};
-
-// Checks if a name is a vlaid block name
-exports.isValidBlockName = function (string) {
-  return (/^[A-Za-z]+[A-Za-z_0-9]*$/).test(string);
-};
-
-function stripWhitespace(input) {
-  return input.replace(/^\s+|\s+$/g, '');
-}
-exports.stripWhitespace = stripWhitespace;
-
-// the varname is split on (/(\.|\[|\])/) but it may contain keys with dots,
-// e.g. obj['hello.there']
-// this function searches for these and preserves the literal parts
-function filterVariablePath(props) {
-
-	var filtered = [],
-		literal = '',
-		i = 0;
-	for (i; i < props.length; i += 1) {
-		if (props[i] && props[i].charAt(0) !== props[i].charAt(props[i].length - 1) &&
-				(props[i].indexOf('"') === 0 || props[i].indexOf("'") === 0)) {
-			literal = props[i];
-			continue;
-		}
-		if (props[i] === '.' && literal) {
-			literal += '.';
-			continue;
-		}
-		if (props[i].indexOf('"') === props[i].length - 1 || props[i].indexOf("'") === props[i].length - 1) {
-			literal += props[i];
-			filtered.push(literal);
-			literal = '';
-		} else {
-			filtered.push(props[i]);
-		}
-	}
-	return _.compact(filtered);
-}
-
-/**
-* Returns a valid javascript code that will
-* check if a variable (or property chain) exists
-* in the evaled context. For example:
-*  check('foo.bar.baz')
-* will return the following string:
-*  typeof foo !== 'undefined' && typeof foo.bar !== 'undefined' && typeof foo.bar.baz !== 'undefined'
-*/
-function check(variable, context) {
-  if (_.isArray(variable)) {
-    return '(true)';
-  }
-
-  variable = variable.replace(/^this/, '_this.__currentContext');
-
-  if (exports.isLiteral(variable)) {
-    return '(true)';
-  }
-
-  var props = variable.split(/(\.|\[|\])/),
-    chain = '',
-    output = [],
-    inArr = false,
-    prevDot = false;
-
-  if (typeof context === 'string' && context.length) {
-    props.unshift(context);
-  }
-
-  props = _.reject(props, function (val) {
-    return val === '';
-  });
-
-  props = filterVariablePath(props);
-
-  _.each(props, function (prop) {
-    if (prop === '.') {
-      prevDot = true;
-      return;
-    }
-
-    if (prop === '[') {
-      inArr = true;
-      return;
-    }
-
-    if (prop === ']') {
-      inArr = false;
-      return;
-    }
-
-    if (!chain) {
-      chain = prop;
-    } else if (inArr) {
-      if (!exports.isStringLiteral(prop)) {
-        if (prevDot) {
-          output[output.length - 1] = _.last(output).replace(/\] !== "undefined"$/, '_' + prop + '] !== "undefined"');
-          chain = chain.replace(/\]$/, '_' + prop + ']');
-          return;
-        }
-        chain += '[___' + prop + ']';
-      } else {
-        chain += '[' + prop + ']';
-      }
-    } else {
-      chain += '.' + prop;
-    }
-    prevDot = false;
-    output.push('typeof ' + chain + ' !== "undefined"');
-  });
-
-  return '(' + output.join(' && ') + ')';
-}
-exports.check = check;
-
-/**
-* Returns an escaped string (safe for evaling). If context is passed
-* then returns a concatenation of context and the escaped variable name.
-*/
-exports.escapeVarName = function (variable, context) {
-  if (_.isArray(variable)) {
-    _.each(variable, function (val, key) {
-      variable[key] = exports.escapeVarName(val, context);
-    });
-    return variable;
-  }
-
-  variable = variable.replace(/^this/, '_this.__currentContext');
-
-  if (exports.isLiteral(variable)) {
-    return variable;
-  }
-  if (typeof context === 'string' && context.length) {
-    variable = context + '.' + variable;
-  }
-
-  var chain = '',
-    props = variable.split(/(\.|\[|\])/),
-    inArr = false,
-    prevDot = false;
-
-  props = _.reject(props, function (val) {
-    return val === '';
-  });
-
-  props = filterVariablePath(props);
-
-  _.each(props, function (prop) {
-    if (prop === '.') {
-      prevDot = true;
-      return;
-    }
-
-    if (prop === '[') {
-      inArr = true;
-      return;
-    }
-
-    if (prop === ']') {
-      inArr = false;
-      return;
-    }
-
-    if (!chain) {
-      chain = prop;
-    } else if (inArr) {
-      if (!exports.isStringLiteral(prop)) {
-        if (prevDot) {
-          chain = chain.replace(/\]$/, '_' + prop + ']');
-        } else {
-          chain += '[___' + prop + ']';
-        }
-      } else {
-        chain += '[' + prop + ']';
-      }
-    } else {
-      chain += '.' + prop;
-    }
-    prevDot = false;
-  });
-
-  return chain;
-};
-
-exports.wrapMethod = function (variable, filter, context) {
-  var output = '(function () {\n',
-    args;
-
-  variable = variable || '""';
-
-  if (!filter) {
-    return variable;
-  }
-
-  args = filter.args.split(',');
-  args = _.map(args, function (value) {
-    var varname,
-      stripped = value.replace(/^\s+|\s+$/g, '');
-
-    try {
-      varname = '__' + parser.parseVariable(stripped).name.replace(/\W/g, '_');
-    } catch (e) {
-      return value;
-    }
-
-    if (exports.isValidName(stripped)) {
-      output += exports.setVar(varname, parser.parseVariable(stripped));
-      return varname;
-    }
-
-    return value;
-  });
-
-  args = (args && args.length) ? args.join(',') : '""';
-  output += 'return ';
-  output += (context) ? context + '["' : '';
-  output += filter.name;
-  output += (context) ? '"]' : '';
-  output += '.call(this';
-  output += (args.length) ? ', ' + args : '';
-  output += ');\n';
-
-  return output + '})()';
-};
-
-exports.wrapFilter = function (variable, filter) {
-  var output = '',
-    args = '';
-
-  variable = variable || '""';
-
-  if (!filter) {
-    return variable;
-  }
-
-  if (filters.hasOwnProperty(filter.name)) {
-    args = (filter.args) ? variable + ', ' + filter.args : variable;
-    output += exports.wrapMethod(variable, { name: filter.name, args: args }, '_filters');
-  } else {
-    throw new Error('Filter "' + filter.name + '" not found');
-  }
-
-  return output;
-};
-
-exports.wrapFilters = function (variable, filters, context, escape) {
-  var output = exports.escapeVarName(variable, context);
-
-  if (filters && filters.length > 0) {
-    _.each(filters, function (filter) {
-      switch (filter.name) {
-      case 'raw':
-        escape = false;
-        return;
-      case 'e':
-      case 'escape':
-        escape = filter.args || escape;
-        return;
-      default:
-        output = exports.wrapFilter(output, filter, '_filters');
-        break;
-      }
-    });
-  }
-
-  output = output || '""';
-  if (escape) {
-    output = '_filters.escape.call(this, ' + output + ', ' + escape + ')';
-  }
-
-  return output;
-};
-
-exports.setVar = function (varName, argument) {
-  var out = '',
-    props,
-    output,
-    inArr;
-  if ((/\[/).test(argument.name)) {
-    props = argument.name.split(/(\[|\])/);
-    output = [];
-    inArr = false;
-
-    _.each(props, function (prop) {
-      if (prop === '') {
-        return;
-      }
-
-      if (prop === '[') {
-        inArr = true;
-        return;
-      }
-
-      if (prop === ']') {
-        inArr = false;
-        return;
-      }
-
-      if (inArr && !exports.isStringLiteral(prop)) {
-        out += exports.setVar('___' + prop.replace(/\W/g, '_'), { name: prop, filters: [], escape: true });
-      }
-    });
-  }
-  out += 'var ' + varName + ' = "";\n' +
-    'if (' + check(argument.name, '_context') + ') {\n' +
-    '  ' + varName + ' = ' + exports.wrapFilters(argument.name, argument.filters, '_context', argument.escape) + ';\n' +
-    '} else if (' + check(argument.name) + ') {\n' +
-    '  ' + varName + ' = ' + exports.wrapFilters(argument.name, argument.filters, null, argument.escape)  + ';\n' +
-    '}\n';
-
-  if (argument.filters.length) {
-    out += ' else if (true) {\n';
-    out += '  ' + varName + ' = ' + exports.wrapFilters('', argument.filters, null, argument.escape) + ';\n';
-    out += '}\n';
-  }
-
-  return out;
-};
-
-exports.parseIfArgs = function (args, parser) {
-  var operators = ['==', '<', '>', '!=', '<=', '>=', '===', '!==', '&&', '||', 'in', 'and', 'or', 'mod', '%'],
-    errorString = 'Bad if-syntax in `{% if ' + args.join(' ') + ' %}...',
-    startParen = /^\(+/,
-    endParen = /\)+$/,
-    tokens = [],
-    prevType,
-    last,
-    closing = 0;
-
-  _.each(args, function (value, index) {
-    var endsep = 0,
-      startsep = 0,
-      operand;
-
-    if (startParen.test(value)) {
-      startsep = value.match(startParen)[0].length;
-      closing += startsep;
-      value = value.replace(startParen, '');
-
-      while (startsep) {
-        startsep -= 1;
-        tokens.push({ type: 'separator', value: '(' });
-      }
-    }
-
-    if ((/^\![^=]/).test(value) || (value === 'not')) {
-      if (value === 'not') {
-        value = '';
-      } else {
-        value = value.substr(1);
-      }
-      tokens.push({ type: 'operator', value: '!' });
-    }
-
-    if (endParen.test(value) && value.indexOf('(') === -1) {
-      if (!closing) {
-        throw new Error(errorString);
-      }
-      endsep = value.match(endParen)[0].length;
-      value = value.replace(endParen, '');
-      closing -= endsep;
-    }
-
-    if (value === 'in') {
-      last = tokens.pop();
-      prevType = 'inindex';
-    } else if (_.indexOf(operators, value) !== -1) {
-      if (prevType === 'operator') {
-        throw new Error(errorString);
-      }
-      value = value.replace('and', '&&').replace('or', '||').replace('mod', '%');
-      tokens.push({
-        value: value
-      });
-      prevType = 'operator';
-    } else if (value !== '') {
-      if (prevType === 'value') {
-        throw new Error(errorString);
-      }
-      operand = parser.parseVariable(value);
-
-      if (prevType === 'inindex') {
-        tokens.push({
-          preout: last.preout + exports.setVar('__op' + index, operand),
-          value: '(((_.isArray(__op' + index + ') || typeof __op' + index + ' === "string") && _.indexOf(__op' + index + ', ' + last.value + ') !== -1) || (typeof __op' + index + ' === "object" && ' + last.value + ' in __op' + index + '))'
-        });
-        last = null;
-      } else {
-        tokens.push({
-          preout: exports.setVar('__op' + index, operand),
-          value: '__op' + index
-        });
-      }
-      prevType = 'value';
-    }
-
-    while (endsep) {
-      endsep -= 1;
-      tokens.push({ type: 'separator', value: ')' });
-    }
-  });
-
-  if (closing > 0) {
-    throw new Error(errorString);
-  }
-
-  return tokens;
-};
-})(helpers);
-(function (exports) {
-
-var _months = {
-    full: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
-    abbr: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-  },
-  _days = {
-    full: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
-    abbr: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
-    alt: {'-1': 'Yesterday', 0: 'Today', 1: 'Tomorrow'}
-  };
-
-/*
-DateZ is licensed under the MIT License:
-Copyright (c) 2011 Tomo Universalis (http://tomouniversalis.com)
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-*/
-exports.defaultTZOffset = 0;
-exports.DateZ = function () {
-  var members = {
-      'default': ['getUTCDate', 'getUTCDay', 'getUTCFullYear', 'getUTCHours', 'getUTCMilliseconds', 'getUTCMinutes', 'getUTCMonth', 'getUTCSeconds', 'toISOString', 'toGMTString', 'toUTCString', 'valueOf', 'getTime'],
-      z: ['getDate', 'getDay', 'getFullYear', 'getHours', 'getMilliseconds', 'getMinutes', 'getMonth', 'getSeconds', 'getYear', 'toDateString', 'toLocaleDateString', 'toLocaleTimeString'],
-      'string': ['toLocaleString', 'toString', 'toTimeString'],
-      zSet: ['setDate', 'setFullYear', 'setHours', 'setMilliseconds', 'setMinutes', 'setMonth', 'setSeconds', 'setTime', 'setYear'],
-      set: ['setUTCDate', 'setUTCFullYear', 'setUTCHours', 'setUTCMilliseconds', 'setUTCMinutes', 'setUTCMonth', 'setUTCSeconds'],
-      'static': ['UTC', 'parse']
-    },
-    d = this,
-    i;
-
-  d.date = d.dateZ = (arguments.length > 1) ? new Date(Date.UTC.apply(Date, arguments) + ((new Date()).getTimezoneOffset() * 60000)) : (arguments.length === 1) ? new Date(new Date(arguments['0'])) : new Date();
-
-  d.timezoneOffset = d.dateZ.getTimezoneOffset();
-
-  function zeroPad(i) {
-    return (i < 10) ? '0' + i : i;
-  }
-  function _toTZString() {
-    var hours = zeroPad(Math.floor(Math.abs(d.timezoneOffset) / 60)),
-      minutes = zeroPad(Math.abs(d.timezoneOffset) - hours * 60),
-      prefix = (d.timezoneOffset < 0) ? '+' : '-',
-      abbr = (d.tzAbbreviation === undefined) ? '' : ' (' + d.tzAbbreviation + ')';
-
-    return 'GMT' + prefix + hours + minutes + abbr;
-  }
-
-  _.each(members.z, function (name) {
-    d[name] = function () {
-      return d.dateZ[name]();
-    };
-  });
-  _.each(members.string, function (name) {
-    d[name] = function () {
-      return d.dateZ[name].apply(d.dateZ, []).replace(/GMT[+\-]\\d{4} \\(([a-zA-Z]{3,4})\\)/, _toTZString());
-    };
-  });
-  _.each(members['default'], function (name) {
-    d[name] = function () {
-      return d.date[name]();
-    };
-  });
-  _.each(members['static'], function (name) {
-    d[name] = function () {
-      return Date[name].apply(Date, arguments);
-    };
-  });
-  _.each(members.zSet, function (name) {
-    d[name] = function () {
-      d.dateZ[name].apply(d.dateZ, arguments);
-      d.date = new Date(d.dateZ.getTime() - d.dateZ.getTimezoneOffset() * 60000 + d.timezoneOffset * 60000);
-      return d;
-    };
-  });
-  _.each(members.set, function (name) {
-    d[name] = function () {
-      d.date[name].apply(d.date, arguments);
-      d.dateZ = new Date(d.date.getTime() + d.date.getTimezoneOffset() * 60000 - d.timezoneOffset * 60000);
-      return d;
-    };
-  });
-
-  if (exports.defaultTZOffset) {
-    this.setTimezoneOffset(exports.defaultTZOffset);
-  }
-};
-exports.DateZ.prototype = {
-  getTimezoneOffset: function () {
-    return this.timezoneOffset;
-  },
-  setTimezoneOffset: function (offset, abbr) {
-    this.timezoneOffset = offset;
-    if (abbr) {
-      this.tzAbbreviation = abbr;
-    }
-    this.dateZ = new Date(this.date.getTime() + this.date.getTimezoneOffset() * 60000 - this.timezoneOffset * 60000);
-    return this;
-  }
-};
-
-// Day
-exports.d = function (input) {
-  return (input.getDate() < 10 ? '0' : '') + input.getDate();
-};
-exports.D = function (input) {
-  return _days.abbr[input.getDay()];
-};
-exports.j = function (input) {
-  return input.getDate();
-};
-exports.l = function (input) {
-  return _days.full[input.getDay()];
-};
-exports.N = function (input) {
-  var d = input.getDay();
-  return (d >= 1) ? d + 1 : 7;
-};
-exports.S = function (input) {
-  var d = input.getDate();
-  return (d % 10 === 1 && d !== 11 ? 'st' : (d % 10 === 2 && d !== 12 ? 'nd' : (d % 10 === 3 && d !== 13 ? 'rd' : 'th')));
-};
-exports.w = function (input) {
-  return input.getDay();
-};
-exports.z = function (input, offset, abbr) {
-  var year = input.getFullYear(),
-    e = new exports.DateZ(year, input.getMonth(), input.getDate(), 12, 0, 0),
-    d = new exports.DateZ(year, 0, 1, 12, 0, 0);
-
-  e.setTimezoneOffset(offset, abbr);
-  d.setTimezoneOffset(offset, abbr);
-  return Math.round((e - d) / 86400000);
-};
-
-// Week
-exports.W = function (input) {
-  var target = new Date(input.valueOf()),
-    dayNr = (input.getDay() + 6) % 7,
-    fThurs;
-
-  target.setDate(target.getDate() - dayNr + 3);
-  fThurs = target.valueOf();
-  target.setMonth(0, 1);
-  if (target.getDay() !== 4) {
-    target.setMonth(0, 1 + ((4 - target.getDay()) + 7) % 7);
-  }
-
-  return 1 + Math.ceil((fThurs - target) / 604800000);
-};
-
-// Month
-exports.F = function (input) {
-  return _months.full[input.getMonth()];
-};
-exports.m = function (input) {
-  return (input.getMonth() < 9 ? '0' : '') + (input.getMonth() + 1);
-};
-exports.M = function (input) {
-  return _months.abbr[input.getMonth()];
-};
-exports.n = function (input) {
-  return input.getMonth() + 1;
-};
-exports.t = function (input) {
-  return 32 - (new Date(input.getFullYear(), input.getMonth(), 32).getDate());
-};
-
-// Year
-exports.L = function (input) {
-  return new Date(input.getFullYear(), 1, 29).getDate() === 29;
-};
-exports.o = function (input) {
-  var target = new Date(input.valueOf());
-  target.setDate(target.getDate() - ((input.getDay() + 6) % 7) + 3);
-  return target.getFullYear();
-};
-exports.Y = function (input) {
-  return input.getFullYear();
-};
-exports.y = function (input) {
-  return (input.getFullYear().toString()).substr(2);
-};
-
-// Time
-exports.a = function (input) {
-  return input.getHours() < 12 ? 'am' : 'pm';
-};
-exports.A = function (input) {
-  return input.getHours() < 12 ? 'AM' : 'PM';
-};
-exports.B = function (input) {
-  var hours = input.getUTCHours(), beats;
-  hours = (hours === 23) ? 0 : hours + 1;
-  beats = Math.abs(((((hours * 60) + input.getUTCMinutes()) * 60) + input.getUTCSeconds()) / 86.4).toFixed(0);
-  return ('000'.concat(beats).slice(beats.length));
-};
-exports.g = function (input) {
-  var h = input.getHours();
-  return h === 0 ? 12 : (h > 12 ? h - 12 : h);
-};
-exports.G = function (input) {
-  return input.getHours();
-};
-exports.h = function (input) {
-  var h = input.getHours();
-  return ((h < 10 || (12 < h && 22 > h)) ? '0' : '') + ((h < 12) ? h : h - 12);
-};
-exports.H = function (input) {
-  var h = input.getHours();
-  return (h < 10 ? '0' : '') + h;
-};
-exports.i = function (input) {
-  var m = input.getMinutes();
-  return (m < 10 ? '0' : '') + m;
-};
-exports.s = function (input) {
-  var s = input.getSeconds();
-  return (s < 10 ? '0' : '') + s;
-};
-//u = function () { return ''; },
-
-// Timezone
-//e = function () { return ''; },
-//I = function () { return ''; },
-exports.O = function (input) {
-  var tz = input.getTimezoneOffset();
-  return (tz < 0 ? '-' : '+') + (tz / 60 < 10 ? '0' : '') + Math.abs((tz / 60)) + '00';
-};
-//T = function () { return ''; },
-exports.Z = function (input) {
-  return input.getTimezoneOffset() * 60;
-};
-
-// Full Date/Time
-exports.c = function (input) {
-  return input.toISOString();
-};
-exports.r = function (input) {
-  return input.toUTCString();
-};
-exports.U = function (input) {
-  return input.getTime() / 1000;
-};
-})(dateformat);
-(function (exports) {
-
-exports.add = function (input, addend) {
-  if (_.isArray(input) && _.isArray(addend)) {
-    return input.concat(addend);
-  }
-
-  if (typeof input === 'object' && typeof addend === 'object') {
-    return _.extend(input, addend);
-  }
-
-  if (_.isNumber(input) && _.isNumber(addend)) {
-    return input + addend;
-  }
-
-  return input + addend;
-};
-
-exports.addslashes = function (input) {
-  if (typeof input === 'object') {
-    _.each(input, function (value, key) {
-      input[key] = exports.addslashes(value);
-    });
-    return input;
-  }
-  return input.replace(/\\/g, '\\\\').replace(/\'/g, "\\'").replace(/\"/g, '\\"');
-};
-
-exports.capitalize = function (input) {
-  if (typeof input === 'object') {
-    _.each(input, function (value, key) {
-      input[key] = exports.capitalize(value);
-    });
-    return input;
-  }
-  return input.toString().charAt(0).toUpperCase() + input.toString().substr(1).toLowerCase();
-};
-
-exports.date = function (input, format, offset, abbr) {
-  var l = format.length,
-    date = new dateformat.DateZ(input),
-    cur,
-    i = 0,
-    out = '';
-
-  if (offset) {
-    date.setTimezoneOffset(offset, abbr);
-  }
-
-  for (i; i < l; i += 1) {
-    cur = format.charAt(i);
-    if (dateformat.hasOwnProperty(cur)) {
-      out += dateformat[cur](date, offset, abbr);
-    } else {
-      out += cur;
-    }
-  }
-  return out;
-};
-
-exports['default'] = function (input, def) {
-  return (typeof input !== 'undefined' && (input || typeof input === 'number')) ? input : def;
-};
-
-exports.escape = exports.e = function (input, type) {
-  type = type || 'html';
-  if (typeof input === 'string') {
-    if (type === 'js') {
-      var i = 0,
-        code,
-        out = '';
-
-      input = input.replace(/\\/g, '\\u005C');
-
-      for (i; i < input.length; i += 1) {
-        code = input.charCodeAt(i);
-        if (code < 32) {
-          code = code.toString(16).toUpperCase();
-          code = (code.length < 2) ? '0' + code : code;
-          out += '\\u00' + code;
-        } else {
-          out += input[i];
-        }
-      }
-
-      return out.replace(/&/g, '\\u0026')
-        .replace(/</g, '\\u003C')
-        .replace(/>/g, '\\u003E')
-        .replace(/\'/g, '\\u0027')
-        .replace(/"/g, '\\u0022')
-        .replace(/\=/g, '\\u003D')
-        .replace(/-/g, '\\u002D')
-        .replace(/;/g, '\\u003B');
-    }
-    return input.replace(/&(?!amp;|lt;|gt;|quot;|#39;)/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;');
-  }
-  return input;
-};
-
-exports.first = function (input) {
-  if (typeof input === 'object' && !_.isArray(input)) {
-    return '';
-  }
-
-  if (typeof input === 'string') {
-    return input.substr(0, 1);
-  }
-
-  return _.first(input);
-};
-
-exports.join = function (input, separator) {
-  if (_.isArray(input)) {
-    return input.join(separator);
-  }
-
-  if (typeof input === 'object') {
-    var out = [];
-    _.each(input, function (value, key) {
-      out.push(value);
-    });
-    return out.join(separator);
-  }
-  return input;
-};
-
-exports.json_encode = function (input, indent) {
-  return JSON.stringify(input, null, indent || 0);
-};
-
-exports.last = function (input) {
-  if (typeof input === 'object' && !_.isArray(input)) {
-    return '';
-  }
-
-  if (typeof input === 'string') {
-    return input.charAt(input.length - 1);
-  }
-
-  return _.last(input);
-};
-
-exports.length = function (input) {
-  if (typeof input === 'object') {
-    return _.keys(input).length;
-  }
-  return input.length;
-};
-
-exports.lower = function (input) {
-  if (typeof input === 'object') {
-    _.each(input, function (value, key) {
-      input[key] = exports.lower(value);
-    });
-    return input;
-  }
-  return input.toString().toLowerCase();
-};
-
-exports.replace = function (input, search, replacement, flags) {
-  var r = new RegExp(search, flags);
-  return input.replace(r, replacement);
-};
-
-exports.reverse = function (input) {
-  if (_.isArray(input)) {
-    return input.reverse();
-  }
-  return input;
-};
-
-exports.striptags = function (input) {
-  if (typeof input === 'object') {
-    _.each(input, function (value, key) {
-      input[key] = exports.striptags(value);
-    });
-    return input;
-  }
-  return input.toString().replace(/(<([^>]+)>)/ig, '');
-};
-
-exports.title = function (input) {
-  if (typeof input === 'object') {
-    _.each(input, function (value, key) {
-      input[key] = exports.title(value);
-    });
-    return input;
-  }
-  return input.toString().replace(/\w\S*/g, function (str) {
-    return str.charAt(0).toUpperCase() + str.substr(1).toLowerCase();
-  });
-};
-
-exports.uniq = function (input) {
-  return _.uniq(input);
-};
-
-exports.upper = function (input) {
-  if (typeof input === 'object') {
-    _.each(input, function (value, key) {
-      input[key] = exports.upper(value);
-    });
-    return input;
-  }
-  return input.toString().toUpperCase();
-};
-
-exports.url_encode = function (input) {
-  return encodeURIComponent(input);
-};
-
-exports.url_decode = function (input) {
-  return decodeURIComponent(input);
-};
-})(filters);
-(function (exports) {
-
-var variableRegexp  = /^\{\{[^\r]*?\}\}$/,
-  logicRegexp   = /^\{%[^\r]*?%\}$/,
-  commentRegexp   = /^\{#[^\r]*?#\}$/,
-
-  TEMPLATE = exports.TEMPLATE = 0,
-  LOGIC_TOKEN = 1,
-  VAR_TOKEN   = 2;
-
-exports.TOKEN_TYPES = {
-  TEMPLATE: TEMPLATE,
-  LOGIC: LOGIC_TOKEN,
-  VAR: VAR_TOKEN
-};
-
-function getMethod(input) {
-  return helpers.stripWhitespace(input).match(/^[\w\.]+/)[0];
-}
-
-function doubleEscape(input) {
-  return input.replace(/\\/g, '\\\\');
-}
-
-function getArgs(input) {
-  return doubleEscape(helpers.stripWhitespace(input).replace(/^[\w\.]+\(|\)$/g, ''));
-}
-
-function getContextVar(varName, context) {
-  var a = varName.split(".");
-  while (a.length) {
-    context = context[a.splice(0, 1)[0]];
-  }
-  return context;
-}
-
-function getTokenArgs(token, parts) {
-  parts = _.map(parts, doubleEscape);
-
-  var i = 0,
-    l = parts.length,
-    arg,
-    ender,
-    out = [];
-
-  function concat(from, ending) {
-    var end = new RegExp('\\' + ending + '$'),
-      i = from,
-      out = '';
-
-    while (!(end).test(out) && i < parts.length) {
-      out += ' ' + parts[i];
-      parts[i] = null;
-      i += 1;
-    }
-
-    if (!end.test(out)) {
-      throw new Error('Malformed arguments ' + out + ' sent to tag.');
-    }
-
-    return out.replace(/^ /, '');
-  }
-
-  for (i; i < l; i += 1) {
-    arg = parts[i];
-    if (arg === null || (/^\s+$/).test(arg)) {
-      continue;
-    }
-
-    if (
-      ((/^\"/).test(arg) && !(/\"[\]\}]?$/).test(arg))
-        || ((/^\'/).test(arg) && !(/\'[\]\}]?$/).test(arg))
-        || ((/^\{/).test(arg) && !(/\}$/).test(arg))
-        || ((/^\[/).test(arg) && !(/\]$/).test(arg))
-    ) {
-      switch (arg.substr(0, 1)) {
-      case "'":
-        ender = "'";
-        break;
-      case '"':
-        ender = '"';
-        break;
-      case '[':
-        ender = ']';
-        break;
-      case '{':
-        ender = '}';
-        break;
-      }
-      out.push(concat(i, ender));
-      continue;
-    }
-
-    out.push(arg);
-  }
-
-  return out;
-}
-
-function findSubBlocks(topToken, blocks) {
-  _.each(topToken.tokens, function (token, index) {
-    if (token.name === 'block') {
-      blocks[token.args[0]] = token;
-      findSubBlocks(token, blocks);
-    }
-  });
-}
-
-function getParentBlock(token) {
-  var block;
-
-  if (token.parentBlock) {
-    block = token.parentBlock;
-  } else if (token.parent) {
-    block = getParentBlock(_.last(token.parent));
-  }
-
-  return block;
-}
-
-exports.parseVariable = function (token, escape) {
-  if (!token) {
-    return {
-      type: null,
-      name: '',
-      filters: [],
-      escape: escape
-    };
-  }
-
-  var filters = [],
-    parts = token.replace(/^\{\{\s*|\s*\}\}$/g, '').split('|'),
-    varname = parts.shift(),
-    args = null,
-    part;
-
-  if ((/\(/).test(varname)) {
-    args = getArgs(varname.replace(/^\w+\./, ''));
-    varname = getMethod(varname);
-  }
-
-  _.each(parts, function (part, i) {
-    if (part && ((/^[\w\.]+\(/).test(part) || (/\)$/).test(part)) && !(/^[\w\.]+\([^\)]*\)$/).test(part)) {
-      parts[i] += ((parts[i + 1]) ? '|' + parts[i + 1] : '');
-      parts[i + 1] = false;
-    }
-  });
-  parts = _.without(parts, false);
-
-  _.each(parts, function (part) {
-    var filter_name = getMethod(part);
-    if ((/\(/).test(part)) {
-      filters.push({
-        name: filter_name,
-        args: getArgs(part)
-      });
-    } else {
-      filters.push({ name: filter_name, args: '' });
-    }
-  });
-
-  return {
-    type: VAR_TOKEN,
-    name: varname,
-    args: args,
-    filters: filters,
-    escape: escape
-  };
-};
-
-exports.parse = function (data, tags, autoescape) {
-  var rawtokens = helpers.stripWhitespace(data).split(/(\{%[^\r]*?%\}|\{\{.*?\}\}|\{#[^\r]*?#\})/),
-    escape = !!autoescape,
-    last_escape = escape,
-    stack = [[]],
-    index = 0,
-    i = 0,
-    j = rawtokens.length,
-    token,
-    parts,
-    tagname,
-    lines = 1,
-    curline = 1,
-    newlines = null,
-    lastToken,
-    rawStart = /^\{\% *raw *\%\}/,
-    rawEnd = /\{\% *endraw *\%\}$/,
-    inRaw = false,
-    stripAfter = false,
-    stripBefore = false,
-    stripStart = false,
-    stripEnd = false;
-
-  for (i; i < j; i += 1) {
-    token = rawtokens[i];
-    curline = lines;
-    newlines = token.match(/\n/g);
-    stripAfter = false;
-    stripBefore = false;
-    stripStart = false;
-    stripEnd = false;
-
-    if (newlines) {
-      lines += newlines.length;
-    }
-
-    if (inRaw !== false && !rawEnd.test(token)) {
-      inRaw += token;
-      continue;
-    }
-
-    // Ignore empty strings and comments
-    if (token.length === 0 || commentRegexp.test(token)) {
-      continue;
-    } else if (/^\s+$/.test(token)) {
-      token = token.replace(/ +/, ' ').replace(/\n+/, '\n');
-    } else if (variableRegexp.test(token)) {
-      token = exports.parseVariable(token, escape);
-    } else if (logicRegexp.test(token)) {
-      if (rawEnd.test(token)) {
-        // Don't care about the content in a raw tag, so end tag may not start correctly
-        token = inRaw + token.replace(rawEnd, '');
-        inRaw = false;
-        stack[index].push(token);
-        continue;
-      }
-
-      if (rawStart.test(token)) {
-        // Have to check the whole token directly, not just parts, as the tag may not end correctly while in raw
-        inRaw = token.replace(rawStart, '');
-        continue;
-      }
-
-      parts = token.replace(/^\{%\s*|\s*%\}$/g, '').split(' ');
-      if (parts[0] === '-') {
-        stripBefore = true;
-        parts.shift();
-      }
-      tagname = parts.shift();
-      if (_.last(parts) === '-') {
-        stripAfter = true;
-        parts.pop();
-      }
-
-      if (index > 0 && (/^end/).test(tagname)) {
-        lastToken = _.last(stack[stack.length - 2]);
-        if ('end' + lastToken.name === tagname) {
-          if (lastToken.name === 'autoescape') {
-            escape = last_escape;
-          }
-          lastToken.strip.end = stripBefore;
-          lastToken.strip.after = stripAfter;
-          stack.pop();
-          index -= 1;
-          continue;
-        }
-
-        throw new Error('Expected end tag for "' + lastToken.name + '", but found "' + tagname + '" at line ' + lines + '.');
-      }
-
-      if (!tags.hasOwnProperty(tagname)) {
-        throw new Error('Unknown logic tag at line ' + lines + ': "' + tagname + '".');
-      }
-
-      if (tagname === 'autoescape') {
-        last_escape = escape;
-        escape = (!parts.length || parts[0] === 'true') ? ((parts.length >= 2) ? parts[1] : true) : false;
-      }
-
-      token = {
-        type: LOGIC_TOKEN,
-        line: curline,
-        name: tagname,
-        compile: tags[tagname],
-        parent: _.uniq(stack[stack.length - 2] || []),
-        strip: {
-          before: stripBefore,
-          after: stripAfter,
-          start: false,
-          end: false
-        }
-      };
-      token.args = getTokenArgs(token, parts);
-
-      if (tags[tagname].ends) {
-        token.strip.after = false;
-        token.strip.start = stripAfter;
-        stack[index].push(token);
-        stack.push(token.tokens = []);
-        index += 1;
-        continue;
-      }
-    }
-
-    // Everything else is treated as a string
-    stack[index].push(token);
-  }
-
-  if (inRaw !== false) {
-    throw new Error('Missing expected end tag for "raw" on line ' + curline + '.');
-  }
-
-  if (index !== 0) {
-    lastToken = _.last(stack[stack.length - 2]);
-    throw new Error('Missing end tag for "' + lastToken.name + '" that was opened on line ' + lastToken.line + '.');
-  }
-
-  return stack[index];
-};
-
-function precompile(indent, context) {
-  var filepath,
-    extendsHasVar,
-    preservedTokens = [];
-
-  // Precompile - extract blocks and create hierarchy based on 'extends' tags
-  // TODO: make block and extends tags accept context variables
-
-  // Only precompile at the template level
-  if (this.type === TEMPLATE) {
-
-    _.each(this.tokens, function (token, index) {
-
-      if (!extendsHasVar) {
-        // Load the parent template
-        if (token.name === 'extends') {
-          filepath = token.args[0];
-
-          if (!helpers.isStringLiteral(filepath)) {
-
-            if (!context) {
-              extendsHasVar = true;
-              return;
-            }
-            filepath = "\"" + getContextVar(filepath, context) + "\"";
-          }
-
-          if (!helpers.isStringLiteral(filepath) || token.args.length > 1) {
-            throw new Error('Extends tag on line ' + token.line + ' accepts exactly one string literal as an argument.');
-          }
-          if (index > 0) {
-            throw new Error('Extends tag must be the first tag in the template, but "extends" found on line ' + token.line + '.');
-          }
-          token.template = this.compileFile(filepath.replace(/['"]/g, ''), true);
-          this.parent = token.template;
-
-          // inherit tokens/blocks from parent.
-          this.blocks = _.extend({}, this.parent.blocks, this.blocks);
-
-        } else if (token.name === 'block') { // Make a list of blocks
-          var blockname = token.args[0],
-            parentBlockIndex;
-
-          if (!helpers.isValidBlockName(blockname) || token.args.length !== 1) {
-            throw new Error('Invalid block tag name "' + blockname + '" on line ' + token.line + '.');
-          }
-
-          // store blocks as flat reference list on top-level
-          // template object
-          this.blocks[blockname] = token;
-
-          // child tokens may contain more blocks at this template
-          // level - apply to flat this.blocks object
-          findSubBlocks(token, this.blocks);
-
-          // search parent list for a matching block, replacing the
-          // parent template block tokens with the derived token.
-          if (this.parent) {
-
-            // Store parent token object on a derived block
-            token.parentBlock = this.parent.blocks[blockname];
-
-            // this will return -1 for a nested block
-            parentBlockIndex = _.indexOf(this.parent.tokens,
-                this.parent.blocks[blockname]);
-            if (parentBlockIndex >= 0) {
-              this.parent.tokens[parentBlockIndex] = token;
-            }
-
-          }
-        } else if (token.type === LOGIC_TOKEN) {
-          // Preserve any template logic from the extended template.
-          preservedTokens.push(token);
-        }
-        // else, discard any tokens that are not under a LOGIC_TOKEN
-        // or VAR_TOKEN (for example, static strings).
-
-      }
-    }, this);
-
-
-    // If extendsHasVar == true, then we know {% extends %} is not using a string literal, thus we can't
-    // compile until render is called, so we return false.
-    if (extendsHasVar) {
-      return false;
-    }
-
-    if (this.parent && this.parent.tokens) {
-      this.tokens = preservedTokens.concat(this.parent.tokens);
-    }
-  }
-}
-
-exports.compile = function compile(indent, context, template) {
-  var code = '',
-    wrappedInMethod,
-    blockname,
-    parentBlock;
-
-  indent = indent || '';
-
-  // Template parameter is optional (not used at the top-level), initialize
-  if (this.type === TEMPLATE) {
-    template = this;
-  }
-
-  // Initialize blocks
-  if (!this.blocks) {
-    this.blocks = {};
-  }
-
-  // Precompile step - process block inheritence into true token hierarchy
-  if (precompile.call(this, indent, context) === false) {
-    return false;
-  }
-
-  // If this is not a template then just iterate through its tokens
-  _.each(this.tokens, function (token, index) {
-    var name, key, args, prev, next;
-    if (typeof token === 'string') {
-      prev = this.tokens[index - 1];
-      next = this.tokens[index + 1];
-      if (prev && prev.strip && prev.strip.after) {
-        token = token.replace(/^\s+/, '');
-      }
-      if (next && next.strip && next.strip.before) {
-        token = token.replace(/\s+$/, '');
-      }
-      code += '_output += "' + doubleEscape(token).replace(/\n/g, '\\n').replace(/\r/g, '\\r').replace(/"/g, '\\"') + '";\n';
-      return code;
-    }
-
-    if (typeof token !== 'object') {
-      return; // Tokens can be either strings or objects
-    }
-
-    if (token.type === VAR_TOKEN) {
-      name = token.name.replace(/\W/g, '_');
-      key = (helpers.isLiteral(name)) ? '["' + name + '"]' : '.' + name;
-      args = (token.args && token.args.length) ? token.args : '';
-
-      code += 'if (typeof _context !== "undefined" && typeof _context' + key + ' === "function") {\n';
-      wrappedInMethod = helpers.wrapMethod('', { name: name, args: args }, '_context');
-      code += '  _output = (typeof _output === "undefined") ? ' + wrappedInMethod + ': _output + ' + wrappedInMethod + ';\n';
-      if (helpers.isValidName(name)) {
-        code += '} else if (typeof ' + name + ' === "function") {\n';
-        wrappedInMethod = helpers.wrapMethod('', { name: name, args: args });
-        code += '  _output = (typeof _output === "undefined") ? ' + wrappedInMethod + ': _output + ' + wrappedInMethod + ';\n';
-      }
-      code += '} else {\n';
-      code += helpers.setVar('__' + name, token);
-      code += '  _output = (typeof _output === "undefined") ? __' + name + ': _output + __' + name + ';\n';
-      code += '}\n';
-    }
-
-    if (token.type !== LOGIC_TOKEN) {
-      return; // Tokens can be either VAR_TOKEN or LOGIC_TOKEN
-    }
-
-    if (token.name === 'block') {
-      blockname = token.args[0];
-
-      // Sanity check - the template should be in the flat block list.
-      if (!template.blocks.hasOwnProperty(blockname)) {
-        throw new Error('Unrecognized nested block.  Block \"' + blockname +
-                '\" at line ' + token.line + ' of \"' + template.id +
-                '\" is not in template block list.');
-      }
-
-      code += compile.call(template.blocks[token.args[0]], indent + '  ', context, template);
-    } else if (token.name === 'parent') {
-      parentBlock = getParentBlock(token);
-      if (!parentBlock) {
-        throw new Error('No parent block found for parent tag at line ' +
-                token.line + '.');
-      }
-
-      code += compile.call(parentBlock, indent + '  ', context);
-    } else if (token.hasOwnProperty("compile")) {
-      if (token.strip.start && token.tokens.length && typeof token.tokens[0] === 'string') {
-        token.tokens[0] = token.tokens[0].replace(/^\s+/, '');
-      }
-      if (token.strip.end && token.tokens.length && typeof _.last(token.tokens) === 'string') {
-        token.tokens[token.tokens.length - 1] = _.last(token.tokens).replace(/\s+$/, '');
-      }
-      code += token.compile(indent + '  ', exports);
-    } else {
-      code += compile.call(token, indent + '  ', context);
-    }
-
-  }, this);
-
-  return code;
-};
-
-})(parser);
-tags['autoescape'] = (function () {
-module = {};
-/**
- * autoescape
- * Special handling hardcoded into the parser to determine whether variable output should be escaped or not
- */
-module.exports = function (indent, parser) {
-  return parser.compile.apply(this, [indent]);
-};
-module.exports.ends = true;
-return module.exports;
-})();
-tags['block'] = (function () {
-module = {};
-/**
- * block
- */
-module.exports = { ends: true };
-return module.exports;
-})();
-tags['else'] = (function () {
-module = {};
-
-/**
- * else
- */
-module.exports = function (indent, parser) {
-  var last = _.last(this.parent).name,
-    thisArgs = _.clone(this.args),
-    ifarg,
-    args,
-    out;
-
-  if (last === 'for') {
-    if (thisArgs.length) {
-      throw new Error('"else" tag cannot accept arguments in the "for" context.');
-    }
-    return '} if (__loopLength === 0) {\n';
-  }
-
-  if (last !== 'if') {
-    throw new Error('Cannot call else tag outside of "if" or "for" context.');
-  }
-
-  ifarg = thisArgs.shift();
-  args = (helpers.parseIfArgs(thisArgs, parser));
-  out = '';
-
-  if (ifarg) {
-    out += '} else if (\n';
-    out += '  (function () {\n';
-
-    _.each(args, function (token) {
-      if (token.hasOwnProperty('preout') && token.preout) {
-        out += token.preout + '\n';
-      }
-    });
-
-    out += 'return (\n';
-    _.each(args, function (token) {
-      out += token.value + ' ';
-    });
-    out += ');\n';
-
-    out += '  })()\n';
-    out += ') {\n';
-
-    return out;
-  }
-
-  return indent + '\n} else {\n';
-};
-return module.exports;
-})();
-tags['extends'] = (function () {
-module = {};
-/**
- * extends
- */
-module.exports = {};
-return module.exports;
-})();
-tags['filter'] = (function () {
-module = {};
-
-/**
- * filter
- */
-module.exports = function (indent, parser) {
-  var thisArgs = _.clone(this.args),
-    name = thisArgs.shift(),
-    args = (thisArgs.length) ? thisArgs.join(', ') : '',
-    value = '(function () {\n';
-  value += '  var _output = "";\n';
-  value += parser.compile.apply(this, [indent + '  ']) + '\n';
-  value += '  return _output;\n';
-  value += '})()\n';
-
-  return '_output += ' + helpers.wrapFilter(value.replace(/\n/g, ''), { name: name, args: args }) + ';\n';
-};
-module.exports.ends = true;
-return module.exports;
-})();
-tags['for'] = (function () {
-module = {};
-
-/**
-* for
-*/
-module.exports = function (indent, parser) {
-  var thisArgs = _.clone(this.args),
-    operand1 = thisArgs[0],
-    operator = thisArgs[1],
-    operand2 = parser.parseVariable(thisArgs[2]),
-    out = '',
-    loopShared;
-
-  indent = indent || '';
-
-  if (typeof operator !== 'undefined' && operator !== 'in') {
-    throw new Error('Invalid syntax in "for" tag');
-  }
-
-  if (!helpers.isValidShortName(operand1)) {
-    throw new Error('Invalid arguments (' + operand1 + ') passed to "for" tag');
-  }
-
-  if (!helpers.isValidName(operand2.name)) {
-    throw new Error('Invalid arguments (' + operand2.name + ') passed to "for" tag');
-  }
-
-  operand1 = helpers.escapeVarName(operand1);
-
-  loopShared = 'loop.index = __loopIndex + 1;\n' +
-    'loop.index0 = __loopIndex;\n' +
-    'loop.revindex = __loopLength - loop.index0;\n' +
-    'loop.revindex0 = loop.revindex - 1;\n' +
-    'loop.first = (__loopIndex === 0);\n' +
-    'loop.last = (__loopIndex === __loopLength - 1);\n' +
-    '_context["' + operand1 + '"] = __loopIter[loop.key];\n' +
-    parser.compile.apply(this, [indent + '   ']);
-
-  out = '(function () {\n' +
-    '  var loop = {}, __loopKey, __loopIndex = 0, __loopLength = 0, __keys = [],' +
-    '    __ctx_operand = _context["' + operand1 + '"],\n' +
-    '    loop_cycle = function() {\n' +
-    '      var args = _.toArray(arguments), i = loop.index0 % args.length;\n' +
-    '      return args[i];\n' +
-    '    };\n' +
-    helpers.setVar('__loopIter', operand2) +
-    '  else {\n' +
-    '    return;\n' +
-    '  }\n' +
-    // Basic for loops are MUCH faster than for...in. Prefer this arrays.
-    '  if (_.isArray(__loopIter)) {\n' +
-    '    __loopIndex = 0; __loopLength = __loopIter.length;\n' +
-    '    for (; __loopIndex < __loopLength; __loopIndex += 1) {\n' +
-    '       loop.key = __loopIndex;\n' +
-    loopShared +
-    '    }\n' +
-    '  } else if (typeof __loopIter === "object") {\n' +
-    '    __keys = _.keys(__loopIter);\n' +
-    '    __loopLength = __keys.length;\n' +
-    '    __loopIndex = 0;\n' +
-    '    for (; __loopIndex < __loopLength; __loopIndex += 1) {\n' +
-    '       loop.key = __keys[__loopIndex];\n' +
-    loopShared +
-    '    }\n' +
-    '  }\n' +
-    '  _context["' + operand1 + '"] = __ctx_operand;\n' +
-    '})();\n';
-
-  return out;
-};
-module.exports.ends = true;
-return module.exports;
-})();
-tags['if'] = (function () {
-module = {};
-
-/**
- * if
- */
-module.exports = function (indent, parser) {
-  var thisArgs = _.clone(this.args),
-    args = (helpers.parseIfArgs(thisArgs, parser)),
-    out = '(function () {\n';
-
-  _.each(args, function (token) {
-    if (token.hasOwnProperty('preout') && token.preout) {
-      out += token.preout + '\n';
-    }
-  });
-
-  out += '\nif (\n';
-  _.each(args, function (token) {
-    out += token.value + ' ';
-  });
-  out += ') {\n';
-  out += parser.compile.apply(this, [indent + '  ']);
-  out += '\n}\n';
-  out += '})();\n';
-
-  return out;
-};
-module.exports.ends = true;
-return module.exports;
-})();
-tags['import'] = (function () {
-module = {};
-
-/**
- * import
- */
-module.exports = function (indent, parser) {
-  if (this.args.length !== 3) {
-  }
-
-  var thisArgs = _.clone(this.args),
-    file = thisArgs[0],
-    as = thisArgs[1],
-    name = thisArgs[2],
-    out = '';
-
-  if (!helpers.isLiteral(file) && !helpers.isValidName(file)) {
-    throw new Error('Invalid attempt to import "' + file  + '".');
-  }
-
-  if (as !== 'as') {
-    throw new Error('Invalid syntax {% import "' + file + '" ' + as + ' ' + name + ' %}');
-  }
-
-  out += '_.extend(_context, (function () {\n';
-
-  out += 'var _context = {}, __ctx = {}, _output = "";\n' +
-    helpers.setVar('__template', parser.parseVariable(file)) +
-    '_this.compileFile(__template).render(__ctx, _parents);\n' +
-    '_.each(__ctx, function (item, key) {\n' +
-    '  if (typeof item === "function") {\n' +
-    '    _context["' + name + '_" + key] = item;\n' +
-    '  }\n' +
-    '});\n' +
-    'return _context;\n';
-
-  out += '})());\n';
-
-  return out;
-};
-return module.exports;
-})();
-tags['include'] = (function () {
-module = {};
-
-/**
- * include
- */
-module.exports = function (indent, parser) {
-  var args = _.clone(this.args),
-    template = args.shift(),
-    context = '_context',
-    ignore = false,
-    out = '',
-    ctx;
-
-  indent = indent || '';
-
-  if (!helpers.isLiteral(template) && !helpers.isValidName(template)) {
-    throw new Error('Invalid arguments passed to \'include\' tag.');
-  }
-
-  if (args.length) {
-    if (_.last(args) === 'only') {
-      context = '{}';
-      args.pop();
-    }
-
-    if (args.length > 1 && args[0] === 'ignore' & args[1] === 'missing') {
-      args.shift();
-      args.shift();
-      ignore = true;
-    }
-
-    if (args.length && args[0] !== 'with') {
-      throw new Error('Invalid arguments passed to \'include\' tag.');
-    }
-
-    if (args[0] === 'with') {
-      args.shift();
-      if (!args.length) {
-        throw new Error('Context for \'include\' tag not provided, but expected after \'with\' token.');
-      }
-
-      ctx = args.shift();
-
-      context = '_context["' + ctx + '"] || ' + ctx;
-    }
-  }
-
-  out = '(function () {\n' +
-    helpers.setVar('__template', parser.parseVariable(template)) + '\n' +
-    '  var includeContext = ' + context + ';\n';
-
-  if (ignore) {
-    out += 'try {\n';
-  }
-
-  out += '  if (typeof __template === "string") {\n';
-  out += '    _output += _this.compileFile(__template).render(includeContext, _parents);\n';
-  out += '  }\n';
-
-  if (ignore) {
-    out += '} catch (e) {}\n';
-  }
-  out += '})();\n';
-
-  return out;
-};
-return module.exports;
-})();
-tags['macro'] = (function () {
-module = {};
-
-/**
- * macro
- */
-module.exports = function (indent, parser) {
-  var thisArgs = _.clone(this.args),
-    macro = thisArgs.shift(),
-    args = '',
-    out = '';
-
-  if (thisArgs.length) {
-    args = JSON.stringify(thisArgs).replace(/^\[|\'|\"|\]$/g, '');
-  }
-
-  out += '_context.' + macro + ' = function (' + args + ') {\n';
-  out += '  var _output = "";\n';
-  out += parser.compile.apply(this, [indent + '  ']);
-  out += '  return _output;\n';
-  out += '};\n';
-
-  return out;
-};
-module.exports.ends = true;
-return module.exports;
-})();
-tags['parent'] = (function () {
-module = {};
-/**
-* parent
-*/
-module.exports = {};
-
-return module.exports;
-})();
-tags['raw'] = (function () {
-module = {};
-/**
- * raw
- */
-module.exports = { ends: true };
-return module.exports;
-})();
-tags['set'] = (function () {
-module = {};
-
-/**
- * set
- */
-module.exports = function (indent, parser) {
-  var thisArgs = _.clone(this.args),
-    varname = helpers.escapeVarName(thisArgs.shift(), '_context'),
-    value;
-
-  // remove '='
-  if (thisArgs.shift() !== '=') {
-    throw new Error('Invalid token "' + thisArgs[1] + '" in {% set ' + thisArgs[0] + ' %}. Missing "=".');
-  }
-
-  value = thisArgs[0];
-  if (helpers.isLiteral(value) || (/^\{|^\[/).test(value) || value === 'true' || value === 'false') {
-    return ' ' + varname + ' = ' + value + ';';
-  }
-
-  value = parser.parseVariable(value);
-  return ' ' + varname + ' = ' +
-    '(function () {\n' +
-    '  var _output;\n' +
-    parser.compile.apply({ tokens: [value] }, [indent]) + '\n' +
-    '  return _output;\n' +
-    '})();\n';
-};
-return module.exports;
-})();
-return swig;
-})();
 ;/*!
  * jQuery JavaScript Library v2.0.3
  * http://jquery.com/
@@ -12278,9 +10160,9 @@ $.fn.sortable = function(options) {
 })(jQuery);
 ;/* ===================================================
  * bootstrap-transition.js v2.3.2
- * http://twitter.github.com/bootstrap/javascript.html#transitions
+ * http://getbootstrap.com/2.3.2/javascript.html#transitions
  * ===================================================
- * Copyright 2012 Twitter, Inc.
+ * Copyright 2013 Twitter, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12337,9 +10219,9 @@ $.fn.sortable = function(options) {
 
 }(window.jQuery);/* ==========================================================
  * bootstrap-alert.js v2.3.2
- * http://twitter.github.com/bootstrap/javascript.html#alerts
+ * http://getbootstrap.com/2.3.2/javascript.html#alerts
  * ==========================================================
- * Copyright 2012 Twitter, Inc.
+ * Copyright 2013 Twitter, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12435,9 +10317,9 @@ $.fn.sortable = function(options) {
 
 }(window.jQuery);/* ============================================================
  * bootstrap-button.js v2.3.2
- * http://twitter.github.com/bootstrap/javascript.html#buttons
+ * http://getbootstrap.com/2.3.2/javascript.html#buttons
  * ============================================================
- * Copyright 2012 Twitter, Inc.
+ * Copyright 2013 Twitter, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12539,9 +10421,9 @@ $.fn.sortable = function(options) {
 
 }(window.jQuery);/* ==========================================================
  * bootstrap-carousel.js v2.3.2
- * http://twitter.github.com/bootstrap/javascript.html#carousel
+ * http://getbootstrap.com/2.3.2/javascript.html#carousel
  * ==========================================================
- * Copyright 2012 Twitter, Inc.
+ * Copyright 2013 Twitter, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12745,9 +10627,9 @@ $.fn.sortable = function(options) {
 
 }(window.jQuery);/* =============================================================
  * bootstrap-collapse.js v2.3.2
- * http://twitter.github.com/bootstrap/javascript.html#collapse
+ * http://getbootstrap.com/2.3.2/javascript.html#collapse
  * =============================================================
- * Copyright 2012 Twitter, Inc.
+ * Copyright 2013 Twitter, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12911,9 +10793,9 @@ $.fn.sortable = function(options) {
 
 }(window.jQuery);/* ============================================================
  * bootstrap-dropdown.js v2.3.2
- * http://twitter.github.com/bootstrap/javascript.html#dropdowns
+ * http://getbootstrap.com/2.3.2/javascript.html#dropdowns
  * ============================================================
- * Copyright 2012 Twitter, Inc.
+ * Copyright 2013 Twitter, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13080,9 +10962,9 @@ $.fn.sortable = function(options) {
 }(window.jQuery);
 /* =========================================================
  * bootstrap-modal.js v2.3.2
- * http://twitter.github.com/bootstrap/javascript.html#modals
+ * http://getbootstrap.com/2.3.2/javascript.html#modals
  * =========================================================
- * Copyright 2012 Twitter, Inc.
+ * Copyright 2013 Twitter, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13327,10 +11209,10 @@ $.fn.sortable = function(options) {
 }(window.jQuery);
 /* ===========================================================
  * bootstrap-tooltip.js v2.3.2
- * http://twitter.github.com/bootstrap/javascript.html#tooltips
+ * http://getbootstrap.com/2.3.2/javascript.html#tooltips
  * Inspired by the original jQuery.tipsy by Jason Frame
  * ===========================================================
- * Copyright 2012 Twitter, Inc.
+ * Copyright 2013 Twitter, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13688,9 +11570,9 @@ $.fn.sortable = function(options) {
 }(window.jQuery);
 /* ===========================================================
  * bootstrap-popover.js v2.3.2
- * http://twitter.github.com/bootstrap/javascript.html#popovers
+ * http://getbootstrap.com/2.3.2/javascript.html#popovers
  * ===========================================================
- * Copyright 2012 Twitter, Inc.
+ * Copyright 2013 Twitter, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13802,9 +11684,9 @@ $.fn.sortable = function(options) {
 }(window.jQuery);
 /* =============================================================
  * bootstrap-scrollspy.js v2.3.2
- * http://twitter.github.com/bootstrap/javascript.html#scrollspy
+ * http://getbootstrap.com/2.3.2/javascript.html#scrollspy
  * =============================================================
- * Copyright 2012 Twitter, Inc.
+ * Copyright 2013 Twitter, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13963,9 +11845,9 @@ $.fn.sortable = function(options) {
 
 }(window.jQuery);/* ========================================================
  * bootstrap-tab.js v2.3.2
- * http://twitter.github.com/bootstrap/javascript.html#tabs
+ * http://getbootstrap.com/2.3.2/javascript.html#tabs
  * ========================================================
- * Copyright 2012 Twitter, Inc.
+ * Copyright 2013 Twitter, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14106,9 +11988,9 @@ $.fn.sortable = function(options) {
 
 }(window.jQuery);/* =============================================================
  * bootstrap-typeahead.js v2.3.2
- * http://twitter.github.com/bootstrap/javascript.html#typeahead
+ * http://getbootstrap.com/2.3.2/javascript.html#typeahead
  * =============================================================
- * Copyright 2012 Twitter, Inc.
+ * Copyright 2013 Twitter, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14441,9 +12323,9 @@ $.fn.sortable = function(options) {
 }(window.jQuery);
 /* ==========================================================
  * bootstrap-affix.js v2.3.2
- * http://twitter.github.com/bootstrap/javascript.html#affix
+ * http://getbootstrap.com/2.3.2/javascript.html#affix
  * ==========================================================
- * Copyright 2012 Twitter, Inc.
+ * Copyright 2013 Twitter, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14555,4 +12437,5020 @@ $.fn.sortable = function(options) {
   })
 
 
-}(window.jQuery);
+}(window.jQuery);;/**
+ * EpicEditor - An Embeddable JavaScript Markdown Editor (https://github.com/OscarGodson/EpicEditor)
+ * Copyright (c) 2011-2012, Oscar Godson. (MIT Licensed)
+ */
+
+(function (window, undefined) {
+  /**
+   * Applies attributes to a DOM object
+   * @param  {object} context The DOM obj you want to apply the attributes to
+   * @param  {object} attrs A key/value pair of attributes you want to apply
+   * @returns {undefined}
+   */
+  function _applyAttrs(context, attrs) {
+    for (var attr in attrs) {
+      if (attrs.hasOwnProperty(attr)) {
+        context[attr] = attrs[attr];
+      }
+    }
+  }
+
+  /**
+   * Applies styles to a DOM object
+   * @param  {object} context The DOM obj you want to apply the attributes to
+   * @param  {object} attrs A key/value pair of attributes you want to apply
+   * @returns {undefined}
+   */
+  function _applyStyles(context, attrs) {
+    for (var attr in attrs) {
+      if (attrs.hasOwnProperty(attr)) {
+        context.style[attr] = attrs[attr];
+      }
+    }
+  }
+
+  /**
+   * Returns a DOM objects computed style
+   * @param  {object} el The element you want to get the style from
+   * @param  {string} styleProp The property you want to get from the element
+   * @returns {string} Returns a string of the value. If property is not set it will return a blank string
+   */
+  function _getStyle(el, styleProp) {
+    var x = el
+      , y = null;
+    if (window.getComputedStyle) {
+      y = document.defaultView.getComputedStyle(x, null).getPropertyValue(styleProp);
+    }
+    else if (x.currentStyle) {
+      y = x.currentStyle[styleProp];
+    }
+    return y;
+  }
+
+  /**
+   * Saves the current style state for the styles requested, then applies styles
+   * to overwrite the existing one. The old styles are returned as an object so
+   * you can pass it back in when you want to revert back to the old style
+   * @param   {object} el     The element to get the styles of
+   * @param   {string} type   Can be "save" or "apply". apply will just apply styles you give it. Save will write styles
+   * @param   {object} styles Key/value style/property pairs
+   * @returns {object}
+   */
+  function _saveStyleState(el, type, styles) {
+    var returnState = {}
+      , style;
+    if (type === 'save') {
+      for (style in styles) {
+        if (styles.hasOwnProperty(style)) {
+          returnState[style] = _getStyle(el, style);
+        }
+      }
+      // After it's all done saving all the previous states, change the styles
+      _applyStyles(el, styles);
+    }
+    else if (type === 'apply') {
+      _applyStyles(el, styles);
+    }
+    return returnState;
+  }
+
+  /**
+   * Gets an elements total width including it's borders and padding
+   * @param  {object} el The element to get the total width of
+   * @returns {int}
+   */
+  function _outerWidth(el) {
+    var b = parseInt(_getStyle(el, 'border-left-width'), 10) + parseInt(_getStyle(el, 'border-right-width'), 10)
+      , p = parseInt(_getStyle(el, 'padding-left'), 10) + parseInt(_getStyle(el, 'padding-right'), 10)
+      , w = el.offsetWidth
+      , t;
+    // For IE in case no border is set and it defaults to "medium"
+    if (isNaN(b)) { b = 0; }
+    t = b + p + w;
+    return t;
+  }
+
+  /**
+   * Gets an elements total height including it's borders and padding
+   * @param  {object} el The element to get the total width of
+   * @returns {int}
+   */
+  function _outerHeight(el) {
+    var b = parseInt(_getStyle(el, 'border-top-width'), 10) + parseInt(_getStyle(el, 'border-bottom-width'), 10)
+      , p = parseInt(_getStyle(el, 'padding-top'), 10) + parseInt(_getStyle(el, 'padding-bottom'), 10)
+      , w = parseInt(_getStyle(el, 'height'), 10)
+      , t;
+    // For IE in case no border is set and it defaults to "medium"
+    if (isNaN(b)) { b = 0; }
+    t = b + p + w;
+    return t;
+  }
+
+  /**
+   * Inserts a <link> tag specifically for CSS
+   * @param  {string} path The path to the CSS file
+   * @param  {object} context In what context you want to apply this to (document, iframe, etc)
+   * @param  {string} id An id for you to reference later for changing properties of the <link>
+   * @returns {undefined}
+   */
+  function _insertCSSLink(path, context, id) {
+    id = id || '';
+    var headID = context.getElementsByTagName("head")[0]
+      , cssNode = context.createElement('link');
+    
+    _applyAttrs(cssNode, {
+      type: 'text/css'
+    , id: id
+    , rel: 'stylesheet'
+    , href: path
+    , name: path
+    , media: 'screen'
+    });
+
+    headID.appendChild(cssNode);
+  }
+
+  // Simply replaces a class (o), to a new class (n) on an element provided (e)
+  function _replaceClass(e, o, n) {
+    e.className = e.className.replace(o, n);
+  }
+
+  // Feature detects an iframe to get the inner document for writing to
+  function _getIframeInnards(el) {
+    return el.contentDocument || el.contentWindow.document;
+  }
+
+  // Grabs the text from an element and preserves whitespace
+  function _getText(el) {
+    var theText;
+    // Make sure to check for type of string because if the body of the page
+    // doesn't have any text it'll be "" which is falsey and will go into
+    // the else which is meant for Firefox and shit will break
+    if (typeof document.body.innerText == 'string') {
+      theText = el.innerText;
+    }
+    else {
+      // First replace <br>s before replacing the rest of the HTML
+      theText = el.innerHTML.replace(/<br>/gi, "\n");
+      // Now we can clean the HTML
+      theText = theText.replace(/<(?:.|\n)*?>/gm, '');
+      // Now fix HTML entities
+      theText = theText.replace(/&lt;/gi, '<');
+      theText = theText.replace(/&gt;/gi, '>');
+    }
+    return theText;
+  }
+
+  function _setText(el, content) {
+    // Don't convert lt/gt characters as HTML when viewing the editor window
+    // TODO: Write a test to catch regressions for this
+    content = content.replace(/</g, '&lt;');
+    content = content.replace(/>/g, '&gt;');
+    content = content.replace(/\n/g, '<br>');
+    
+    // Make sure to there aren't two spaces in a row (replace one with &nbsp;)
+    // If you find and replace every space with a &nbsp; text will not wrap.
+    // Hence the name (Non-Breaking-SPace).
+    // TODO: Probably need to test this somehow...
+    content = content.replace(/<br>\s/g, '<br>&nbsp;')
+    content = content.replace(/\s\s\s/g, '&nbsp; &nbsp;')
+    content = content.replace(/\s\s/g, '&nbsp; ')
+    content = content.replace(/^ /, '&nbsp;')
+
+    el.innerHTML = content;
+    return true;
+  }
+
+  /**
+   * Converts the 'raw' format of a file's contents into plaintext
+   * @param   {string} content Contents of the file
+   * @returns {string} the sanitized content
+   */
+  function _sanitizeRawContent(content) {
+    // Get this, 2 spaces in a content editable actually converts to:
+    // 0020 00a0, meaning, "space no-break space". So, manually convert
+    // no-break spaces to spaces again before handing to marked.
+    // Also, WebKit converts no-break to unicode equivalent and FF HTML.
+    return content.replace(/\u00a0/g, ' ').replace(/&nbsp;/g, ' ');
+  }
+
+  /**
+   * Will return the version number if the browser is IE. If not will return -1
+   * TRY NEVER TO USE THIS AND USE FEATURE DETECTION IF POSSIBLE
+   * @returns {Number} -1 if false or the version number if true
+   */
+  function _isIE() {
+    var rv = -1 // Return value assumes failure.
+      , ua = navigator.userAgent
+      , re;
+    if (navigator.appName == 'Microsoft Internet Explorer') {
+      re = /MSIE ([0-9]{1,}[\.0-9]{0,})/;
+      if (re.exec(ua) != null) {
+        rv = parseFloat(RegExp.$1, 10);
+      }
+    }
+    return rv;
+  }
+
+  /**
+   * Same as the isIE(), but simply returns a boolean
+   * THIS IS TERRIBLE AND IS ONLY USED BECAUSE FULLSCREEN IN SAFARI IS BORKED
+   * If some other engine uses WebKit and has support for fullscreen they
+   * probably wont get native fullscreen until Safari's fullscreen is fixed
+   * @returns {Boolean} true if Safari
+   */
+  function _isSafari() {
+    var n = window.navigator;
+    return n.userAgent.indexOf('Safari') > -1 && n.userAgent.indexOf('Chrome') == -1;
+  }
+
+  /**
+   * Same as the isIE(), but simply returns a boolean
+   * THIS IS TERRIBLE ONLY USE IF ABSOLUTELY NEEDED
+   * @returns {Boolean} true if Safari
+   */
+  function _isFirefox() {
+    var n = window.navigator;
+    return n.userAgent.indexOf('Firefox') > -1 && n.userAgent.indexOf('Seamonkey') == -1;
+  }
+
+  /**
+   * Determines if supplied value is a function
+   * @param {object} object to determine type
+   */
+  function _isFunction(functionToCheck) {
+    var getType = {};
+    return functionToCheck && getType.toString.call(functionToCheck) === '[object Function]';
+  }
+
+  /**
+   * Overwrites obj1's values with obj2's and adds obj2's if non existent in obj1
+   * @param {boolean} [deepMerge=false] If true, will deep merge meaning it will merge sub-objects like {obj:obj2{foo:'bar'}}
+   * @param {object} first object
+   * @param {object} second object
+   * @returnss {object} a new object based on obj1 and obj2
+   */
+  function _mergeObjs() {
+    // copy reference to target object
+    var target = arguments[0] || {}
+      , i = 1
+      , length = arguments.length
+      , deep = false
+      , options
+      , name
+      , src
+      , copy
+
+    // Handle a deep copy situation
+    if (typeof target === "boolean") {
+      deep = target;
+      target = arguments[1] || {};
+      // skip the boolean and the target
+      i = 2;
+    }
+
+    // Handle case when target is a string or something (possible in deep copy)
+    if (typeof target !== "object" && !_isFunction(target)) {
+      target = {};
+    }
+    // extend jQuery itself if only one argument is passed
+    if (length === i) {
+      target = this;
+      --i;
+    }
+
+    for (; i < length; i++) {
+      // Only deal with non-null/undefined values
+      if ((options = arguments[i]) != null) {
+        // Extend the base object
+        for (name in options) {
+          // @NOTE: added hasOwnProperty check
+          if (options.hasOwnProperty(name)) {
+            src = target[name];
+            copy = options[name];
+            // Prevent never-ending loop
+            if (target === copy) {
+              continue;
+            }
+            // Recurse if we're merging object values
+            if (deep && copy && typeof copy === "object" && !copy.nodeType) {
+              target[name] = _mergeObjs(deep,
+                // Never move original objects, clone them
+                src || (copy.length != null ? [] : {})
+                , copy);
+            } else if (copy !== undefined) { // Don't bring in undefined values
+              target[name] = copy;
+            }
+          }
+        }
+      }
+    }
+
+    // Return the modified object
+    return target;
+  }
+
+  /**
+   * Initiates the EpicEditor object and sets up offline storage as well
+   * @class Represents an EpicEditor instance
+   * @param {object} options An optional customization object
+   * @returns {object} EpicEditor will be returned
+   */
+  function EpicEditor(options) {
+    // Default settings will be overwritten/extended by options arg
+    var self = this
+      , opts = options || {}
+      , _defaultFileSchema
+      , _defaultFile
+      , defaults = { container: 'epiceditor'
+        , basePath: 'epiceditor'
+        , textarea: undefined
+        , clientSideStorage: true
+        , localStorageName: 'epiceditor'
+        , useNativeFullscreen: true
+        , file: { name: null
+        , defaultContent: ''
+          , autoSave: 100 // Set to false for no auto saving
+          }
+        , theme: { base: '/themes/base/epiceditor.css'
+          , preview: '/themes/preview/github.css'
+          , editor: '/themes/editor/epic-dark.css'
+          }
+        , focusOnLoad: false
+        , shortcut: { modifier: 18 // alt keycode
+          , fullscreen: 70 // f keycode
+          , preview: 80 // p keycode
+          }
+        , string: { togglePreview: 'Toggle Preview Mode'
+          , toggleEdit: 'Toggle Edit Mode'
+          , toggleFullscreen: 'Enter Fullscreen'
+          }
+        , parser: typeof marked == 'function' ? marked : null
+        , autogrow: false
+        , button: { fullscreen: true
+          , preview: true
+          , bar: "auto"
+          }
+        }
+      , defaultStorage
+      , autogrowDefaults = { minHeight: 80
+        , maxHeight: false
+        , scroll: true
+        };
+
+    self.settings = _mergeObjs(true, defaults, opts);
+    
+    var buttons = self.settings.button;
+    self._fullscreenEnabled = typeof(buttons) === 'object' ? typeof buttons.fullscreen === 'undefined' || buttons.fullscreen : buttons === true;
+    self._editEnabled = typeof(buttons) === 'object' ? typeof buttons.edit === 'undefined' || buttons.edit : buttons === true;
+    self._previewEnabled = typeof(buttons) === 'object' ? typeof buttons.preview === 'undefined' || buttons.preview : buttons === true;
+
+    if (!(typeof self.settings.parser == 'function' && typeof self.settings.parser('TEST') == 'string')) {
+      self.settings.parser = function (str) {
+        return str;
+      }
+    }
+
+    if (self.settings.autogrow) {
+      if (self.settings.autogrow === true) {
+        self.settings.autogrow = autogrowDefaults;
+      }
+      else {
+        self.settings.autogrow = _mergeObjs(true, autogrowDefaults, self.settings.autogrow);
+      }
+      self._oldHeight = -1;
+    }
+
+    // If you put an absolute link as the path of any of the themes ignore the basePath
+    // preview theme
+    if (!self.settings.theme.preview.match(/^https?:\/\//)) {
+      self.settings.theme.preview = self.settings.basePath + self.settings.theme.preview;
+    }
+    // editor theme
+    if (!self.settings.theme.editor.match(/^https?:\/\//)) {
+      self.settings.theme.editor = self.settings.basePath + self.settings.theme.editor;
+    }
+    // base theme
+    if (!self.settings.theme.base.match(/^https?:\/\//)) {
+      self.settings.theme.base = self.settings.basePath + self.settings.theme.base;
+    }
+
+    // Grab the container element and save it to self.element
+    // if it's a string assume it's an ID and if it's an object
+    // assume it's a DOM element
+    if (typeof self.settings.container == 'string') {
+      self.element = document.getElementById(self.settings.container);
+    }
+    else if (typeof self.settings.container == 'object') {
+      self.element = self.settings.container;
+    }
+    
+    // Figure out the file name. If no file name is given we'll use the ID.
+    // If there's no ID either we'll use a namespaced file name that's incremented
+    // based on the calling order. As long as it doesn't change, drafts will be saved.
+    if (!self.settings.file.name) {
+      if (typeof self.settings.container == 'string') {
+        self.settings.file.name = self.settings.container;
+      }
+      else if (typeof self.settings.container == 'object') {
+        if (self.element.id) {
+          self.settings.file.name = self.element.id;
+        }
+        else {
+          if (!EpicEditor._data.unnamedEditors) {
+            EpicEditor._data.unnamedEditors = [];
+          }
+          EpicEditor._data.unnamedEditors.push(self);
+          self.settings.file.name = '__epiceditor-untitled-' + EpicEditor._data.unnamedEditors.length;
+        }
+      }
+    }
+
+    if (self.settings.button.bar === "show") {
+      self.settings.button.bar = true;
+    }
+
+    if (self.settings.button.bar === "hide") {
+      self.settings.button.bar = false;
+    }
+
+    // Protect the id and overwrite if passed in as an option
+    // TODO: Put underscrore to denote that this is private
+    self._instanceId = 'epiceditor-' + Math.round(Math.random() * 100000);
+    self._storage = {};
+    self._canSave = true;
+
+    // Setup local storage of files
+    self._defaultFileSchema = function () {
+      return {
+        content: self.settings.file.defaultContent
+      , created: new Date()
+      , modified: new Date()
+      }
+    }
+
+    if (localStorage && self.settings.clientSideStorage) {
+      this._storage = localStorage;
+      if (this._storage[self.settings.localStorageName] && self.getFiles(self.settings.file.name) === undefined) {
+        _defaultFile = self._defaultFileSchema();
+        _defaultFile.content = self.settings.file.defaultContent;
+      }
+    }
+
+    if (!this._storage[self.settings.localStorageName]) {
+      defaultStorage = {};
+      defaultStorage[self.settings.file.name] = self._defaultFileSchema();
+      defaultStorage = JSON.stringify(defaultStorage);
+      this._storage[self.settings.localStorageName] = defaultStorage;
+    }
+
+    // A string to prepend files with to save draft versions of files
+    // and reset all preview drafts on each load!
+    self._previewDraftLocation = '__draft-';
+    self._storage[self._previewDraftLocation + self.settings.localStorageName] = self._storage[self.settings.localStorageName];
+
+    // This needs to replace the use of classes to check the state of EE
+    self._eeState = {
+      fullscreen: false
+    , preview: false
+    , edit: false
+    , loaded: false
+    , unloaded: false
+    }
+
+    // Now that it exists, allow binding of events if it doesn't exist yet
+    if (!self.events) {
+      self.events = {};
+    }
+
+    return this;
+  }
+
+  /**
+   * Inserts the EpicEditor into the DOM via an iframe and gets it ready for editing and previewing
+   * @returns {object} EpicEditor will be returned
+   */
+  EpicEditor.prototype.load = function (callback) {
+
+    // Get out early if it's already loaded
+    if (this.is('loaded')) { return this; }
+
+    // TODO: Gotta get the privates with underscores!
+    // TODO: Gotta document what these are for...
+    var self = this
+      , _HtmlTemplates
+      , iframeElement
+      , baseTag
+      , utilBtns
+      , utilBar
+      , utilBarTimer
+      , keypressTimer
+      , mousePos = { y: -1, x: -1 }
+      , _elementStates
+      , _isInEdit
+      , nativeFs = false
+      , nativeFsWebkit = false
+      , nativeFsMoz = false
+      , nativeFsW3C = false
+      , fsElement
+      , isMod = false
+      , isCtrl = false
+      , eventableIframes
+      , i // i is reused for loops
+      , boundAutogrow;
+
+    // Startup is a way to check if this EpicEditor is starting up. Useful for
+    // checking and doing certain things before EpicEditor emits a load event.
+    self._eeState.startup = true;
+
+    if (self.settings.useNativeFullscreen) {
+      nativeFsWebkit = document.body.webkitRequestFullScreen ? true : false;
+      nativeFsMoz = document.body.mozRequestFullScreen ? true : false;
+      nativeFsW3C = document.body.requestFullscreen ? true : false;
+      nativeFs = nativeFsWebkit || nativeFsMoz || nativeFsW3C;
+    }
+
+    // Fucking Safari's native fullscreen works terribly
+    // REMOVE THIS IF SAFARI 7 WORKS BETTER
+    if (_isSafari()) {
+      nativeFs = false;
+      nativeFsWebkit = false;
+    }
+
+    // It opens edit mode by default (for now);
+    if (!self.is('edit') && !self.is('preview')) {
+      self._eeState.edit = true;
+    }
+
+    callback = callback || function () {};
+
+    // The editor HTML
+    // TODO: edit-mode class should be dynamically added
+    _HtmlTemplates = {
+      // This is wrapping iframe element. It contains the other two iframes and the utilbar
+      chrome:   '<div id="epiceditor-wrapper" class="epiceditor-edit-mode">' +
+                  '<iframe frameborder="0" id="epiceditor-editor-frame"></iframe>' +
+                  '<iframe frameborder="0" id="epiceditor-previewer-frame"></iframe>' +
+                  '<div id="epiceditor-utilbar">' +
+                    (self._previewEnabled ? '<button title="' + this.settings.string.togglePreview + '" class="epiceditor-toggle-btn epiceditor-toggle-preview-btn"></button> ' : '') +
+                    (self._editEnabled ? '<button title="' + this.settings.string.toggleEdit + '" class="epiceditor-toggle-btn epiceditor-toggle-edit-btn"></button> ' : '') +
+                    (self._fullscreenEnabled ? '<button title="' + this.settings.string.toggleFullscreen + '" class="epiceditor-fullscreen-btn"></button>' : '') +
+                  '</div>' +
+                '</div>'
+    
+    // The previewer is just an empty box for the generated HTML to go into
+    , previewer: '<div id="epiceditor-preview"></div>'
+    , editor: '<!doctype HTML>'
+    };
+
+    // Write an iframe and then select it for the editor
+    self.element.innerHTML = '<iframe scrolling="no" frameborder="0" id= "' + self._instanceId + '"></iframe>';
+
+    // Because browsers add things like invisible padding and margins and stuff
+    // to iframes, we need to set manually set the height so that the height
+    // doesn't keep increasing (by 2px?) every time reflow() is called.
+    // FIXME: Figure out how to fix this without setting this
+    self.element.style.height = self.element.offsetHeight + 'px';
+
+    iframeElement = document.getElementById(self._instanceId);
+    
+    // Store a reference to the iframeElement itself
+    self.iframeElement = iframeElement;
+
+    // Grab the innards of the iframe (returns the document.body)
+    // TODO: Change self.iframe to self.iframeDocument
+    self.iframe = _getIframeInnards(iframeElement);
+    self.iframe.open();
+    self.iframe.write(_HtmlTemplates.chrome);
+
+    // Now that we got the innards of the iframe, we can grab the other iframes
+    self.editorIframe = self.iframe.getElementById('epiceditor-editor-frame')
+    self.previewerIframe = self.iframe.getElementById('epiceditor-previewer-frame');
+
+    // Setup the editor iframe
+    self.editorIframeDocument = _getIframeInnards(self.editorIframe);
+    self.editorIframeDocument.open();
+    // Need something for... you guessed it, Firefox
+    self.editorIframeDocument.write(_HtmlTemplates.editor);
+    self.editorIframeDocument.close();
+    
+    // Setup the previewer iframe
+    self.previewerIframeDocument = _getIframeInnards(self.previewerIframe);
+    self.previewerIframeDocument.open();
+    self.previewerIframeDocument.write(_HtmlTemplates.previewer);
+
+    // Base tag is added so that links will open a new tab and not inside of the iframes
+    baseTag = self.previewerIframeDocument.createElement('base');
+    baseTag.target = '_blank';
+    self.previewerIframeDocument.getElementsByTagName('head')[0].appendChild(baseTag);
+
+    self.previewerIframeDocument.close();
+
+    self.reflow();
+
+    // Insert Base Stylesheet
+    _insertCSSLink(self.settings.theme.base, self.iframe, 'theme');
+    
+    // Insert Editor Stylesheet
+    _insertCSSLink(self.settings.theme.editor, self.editorIframeDocument, 'theme');
+    
+    // Insert Previewer Stylesheet
+    _insertCSSLink(self.settings.theme.preview, self.previewerIframeDocument, 'theme');
+
+    // Add a relative style to the overall wrapper to keep CSS relative to the editor
+    self.iframe.getElementById('epiceditor-wrapper').style.position = 'relative';
+
+    // Set the position to relative so we hide them with left: -999999px
+    self.editorIframe.style.position = 'absolute';
+    self.previewerIframe.style.position = 'absolute';
+
+    // Now grab the editor and previewer for later use
+    self.editor = self.editorIframeDocument.body;
+    self.previewer = self.previewerIframeDocument.getElementById('epiceditor-preview');
+   
+    self.editor.contentEditable = true;
+ 
+    // Firefox's <body> gets all fucked up so, to be sure, we need to hardcode it
+    self.iframe.body.style.height = this.element.offsetHeight + 'px';
+
+    // Should actually check what mode it's in!
+    self.previewerIframe.style.left = '-999999px';
+
+    // Keep long lines from being longer than the editor
+    this.editorIframeDocument.body.style.wordWrap = 'break-word';
+
+    // FIXME figure out why it needs +2 px
+    if (_isIE() > -1) {
+      this.previewer.style.height = parseInt(_getStyle(this.previewer, 'height'), 10) + 2;
+    }
+
+    // If there is a file to be opened with that filename and it has content...
+    this.open(self.settings.file.name);
+
+    if (self.settings.focusOnLoad) {
+      // We need to wait until all three iframes are done loading by waiting until the parent
+      // iframe's ready state == complete, then we can focus on the contenteditable
+      self.iframe.addEventListener('readystatechange', function () {
+        if (self.iframe.readyState == 'complete') {
+          self.focus();
+        }
+      });
+    }
+
+    // Because IE scrolls the whole window to hash links, we need our own
+    // method of scrolling the iframe to an ID from clicking a hash
+    self.previewerIframeDocument.addEventListener('click', function (e) {
+      var el = e.target
+        , body = self.previewerIframeDocument.body;
+      if (el.nodeName == 'A') {
+        // Make sure the link is a hash and the link is local to the iframe
+        if (el.hash && el.hostname == window.location.hostname) {
+          // Prevent the whole window from scrolling
+          e.preventDefault();
+          // Prevent opening a new window
+          el.target = '_self';
+          // Scroll to the matching element, if an element exists
+          if (body.querySelector(el.hash)) {
+            body.scrollTop = body.querySelector(el.hash).offsetTop;
+          }
+        }
+      }
+    });
+
+    utilBtns = self.iframe.getElementById('epiceditor-utilbar');
+
+    // TODO: Move into fullscreen setup function (_setupFullscreen)
+    _elementStates = {}
+    self._goFullscreen = function (el) {
+      this._fixScrollbars('auto');
+
+      if (self.is('fullscreen')) {
+        self._exitFullscreen(el);
+        return;
+      }
+
+      if (nativeFs) {
+        if (nativeFsWebkit) {
+          el.webkitRequestFullScreen();
+        }
+        else if (nativeFsMoz) {
+          el.mozRequestFullScreen();
+        }
+        else if (nativeFsW3C) {
+          el.requestFullscreen();
+        }
+      }
+
+      _isInEdit = self.is('edit');
+
+      // Set the state of EE in fullscreen
+      // We set edit and preview to true also because they're visible
+      // we might want to allow fullscreen edit mode without preview (like a "zen" mode)
+      self._eeState.fullscreen = true;
+      self._eeState.edit = true;
+      self._eeState.preview = true;
+
+      // Cache calculations
+      var windowInnerWidth = window.innerWidth
+        , windowInnerHeight = window.innerHeight
+        , windowOuterWidth = window.outerWidth
+        , windowOuterHeight = window.outerHeight;
+
+      // Without this the scrollbars will get hidden when scrolled to the bottom in faux fullscreen (see #66)
+      if (!nativeFs) {
+        windowOuterHeight = window.innerHeight;
+      }
+
+      // This MUST come first because the editor is 100% width so if we change the width of the iframe or wrapper
+      // the editor's width wont be the same as before
+      _elementStates.editorIframe = _saveStyleState(self.editorIframe, 'save', {
+        'width': windowOuterWidth / 2 + 'px'
+      , 'height': windowOuterHeight + 'px'
+      , 'float': 'left' // Most browsers
+      , 'cssFloat': 'left' // FF
+      , 'styleFloat': 'left' // Older IEs
+      , 'display': 'block'
+      , 'position': 'static'
+      , 'left': ''
+      });
+
+      // the previewer
+      _elementStates.previewerIframe = _saveStyleState(self.previewerIframe, 'save', {
+        'width': windowOuterWidth / 2 + 'px'
+      , 'height': windowOuterHeight + 'px'
+      , 'float': 'right' // Most browsers
+      , 'cssFloat': 'right' // FF
+      , 'styleFloat': 'right' // Older IEs
+      , 'display': 'block'
+      , 'position': 'static'
+      , 'left': ''
+      });
+
+      // Setup the containing element CSS for fullscreen
+      _elementStates.element = _saveStyleState(self.element, 'save', {
+        'position': 'fixed'
+      , 'top': '0'
+      , 'left': '0'
+      , 'width': '100%'
+      , 'z-index': '9999' // Most browsers
+      , 'zIndex': '9999' // Firefox
+      , 'border': 'none'
+      , 'margin': '0'
+      // Should use the base styles background!
+      , 'background': _getStyle(self.editor, 'background-color') // Try to hide the site below
+      , 'height': windowInnerHeight + 'px'
+      });
+
+      // The iframe element
+      _elementStates.iframeElement = _saveStyleState(self.iframeElement, 'save', {
+        'width': windowOuterWidth + 'px'
+      , 'height': windowInnerHeight + 'px'
+      });
+
+      // ...Oh, and hide the buttons and prevent scrolling
+      utilBtns.style.visibility = 'hidden';
+
+      if (!nativeFs) {
+        document.body.style.overflow = 'hidden';
+      }
+
+      self.preview();
+
+      self.focus();
+
+      self.emit('fullscreenenter');
+    };
+
+    self._exitFullscreen = function (el) {
+      this._fixScrollbars();
+
+      _saveStyleState(self.element, 'apply', _elementStates.element);
+      _saveStyleState(self.iframeElement, 'apply', _elementStates.iframeElement);
+      _saveStyleState(self.editorIframe, 'apply', _elementStates.editorIframe);
+      _saveStyleState(self.previewerIframe, 'apply', _elementStates.previewerIframe);
+
+      // We want to always revert back to the original styles in the CSS so,
+      // if it's a fluid width container it will expand on resize and not get
+      // stuck at a specific width after closing fullscreen.
+      self.element.style.width = self._eeState.reflowWidth ? self._eeState.reflowWidth : '';
+      self.element.style.height = self._eeState.reflowHeight ? self._eeState.reflowHeight : '';
+
+      utilBtns.style.visibility = 'visible';
+
+      // Put the editor back in the right state
+      // TODO: This is ugly... how do we make this nicer?
+      // setting fullscreen to false here prevents the
+      // native fs callback from calling this function again
+      self._eeState.fullscreen = false;
+
+      if (!nativeFs) {
+        document.body.style.overflow = 'auto';
+      }
+      else {
+        if (nativeFsWebkit) {
+          document.webkitCancelFullScreen();
+        }
+        else if (nativeFsMoz) {
+          document.mozCancelFullScreen();
+        }
+        else if (nativeFsW3C) {
+          document.exitFullscreen();
+        }
+      }
+
+      if (_isInEdit) {
+        self.edit();
+      }
+      else {
+        self.preview();
+      }
+
+      self.reflow();
+
+      self.emit('fullscreenexit');
+    };
+
+    // This setups up live previews by triggering preview() IF in fullscreen on keyup
+    self.editor.addEventListener('keyup', function () {
+      if (keypressTimer) {
+        window.clearTimeout(keypressTimer);
+      }
+      keypressTimer = window.setTimeout(function () {
+        if (self.is('fullscreen')) {
+          self.preview();
+        }
+      }, 250);
+    });
+    
+    fsElement = self.iframeElement;
+
+    // Sets up the onclick event on utility buttons
+    utilBtns.addEventListener('click', function (e) {
+      var targetClass = e.target.className;
+      if (targetClass.indexOf('epiceditor-toggle-preview-btn') > -1) {
+        self.preview();
+      }
+      else if (targetClass.indexOf('epiceditor-toggle-edit-btn') > -1) {
+        self.edit();
+      }
+      else if (targetClass.indexOf('epiceditor-fullscreen-btn') > -1) {
+        self._goFullscreen(fsElement);
+      }
+    });
+
+    // Sets up the NATIVE fullscreen editor/previewer for WebKit
+    if (nativeFsWebkit) {
+      document.addEventListener('webkitfullscreenchange', function () {
+        if (!document.webkitIsFullScreen && self._eeState.fullscreen) {
+          self._exitFullscreen(fsElement);
+        }
+      }, false);
+    }
+    else if (nativeFsMoz) {
+      document.addEventListener('mozfullscreenchange', function () {
+        if (!document.mozFullScreen && self._eeState.fullscreen) {
+          self._exitFullscreen(fsElement);
+        }
+      }, false);
+    }
+    else if (nativeFsW3C) {
+      document.addEventListener('fullscreenchange', function () {
+        if (document.fullscreenElement == null && self._eeState.fullscreen) {
+          self._exitFullscreen(fsElement);
+        }
+      }, false);
+    }
+
+    // TODO: Move utilBar stuff into a utilBar setup function (_setupUtilBar)
+    utilBar = self.iframe.getElementById('epiceditor-utilbar');
+
+    // Hide it at first until they move their mouse
+    if (self.settings.button.bar !== true) {
+      utilBar.style.display = 'none';
+    }
+
+    utilBar.addEventListener('mouseover', function () {
+      if (utilBarTimer) {
+        clearTimeout(utilBarTimer);
+      }
+    });
+
+    function utilBarHandler(e) {
+      if (self.settings.button.bar !== "auto") {
+        return;
+      }
+      // Here we check if the mouse has moves more than 5px in any direction before triggering the mousemove code
+      // we do this for 2 reasons:
+      // 1. On Mac OS X lion when you scroll and it does the iOS like "jump" when it hits the top/bottom of the page itll fire off
+      //    a mousemove of a few pixels depending on how hard you scroll
+      // 2. We give a slight buffer to the user in case he barely touches his touchpad or mouse and not trigger the UI
+      if (Math.abs(mousePos.y - e.pageY) >= 5 || Math.abs(mousePos.x - e.pageX) >= 5) {
+        utilBar.style.display = 'block';
+        // if we have a timer already running, kill it out
+        if (utilBarTimer) {
+          clearTimeout(utilBarTimer);
+        }
+
+        // begin a new timer that hides our object after 1000 ms
+        utilBarTimer = window.setTimeout(function () {
+          utilBar.style.display = 'none';
+        }, 1000);
+      }
+      mousePos = { y: e.pageY, x: e.pageX };
+    }
+ 
+    // Add keyboard shortcuts for convenience.
+    function shortcutHandler(e) {
+      if (e.keyCode == self.settings.shortcut.modifier) { isMod = true } // check for modifier press(default is alt key), save to var
+      if (e.keyCode == 17) { isCtrl = true } // check for ctrl/cmnd press, in order to catch ctrl/cmnd + s
+
+      // Check for alt+p and make sure were not in fullscreen - default shortcut to switch to preview
+      if (isMod === true && e.keyCode == self.settings.shortcut.preview && !self.is('fullscreen')) {
+        e.preventDefault();
+        if (self.is('edit') && self._previewEnabled) {
+          self.preview();
+        }
+        else if (self._editEnabled) {
+          self.edit();
+        }
+      }
+      // Check for alt+f - default shortcut to make editor fullscreen
+      if (isMod === true && e.keyCode == self.settings.shortcut.fullscreen && self._fullscreenEnabled) {
+        e.preventDefault();
+        self._goFullscreen(fsElement);
+      }
+
+      // Set the modifier key to false once *any* key combo is completed
+      // or else, on Windows, hitting the alt key will lock the isMod state to true (ticket #133)
+      if (isMod === true && e.keyCode !== self.settings.shortcut.modifier) {
+        isMod = false;
+      }
+
+      // When a user presses "esc", revert everything!
+      if (e.keyCode == 27 && self.is('fullscreen')) {
+        self._exitFullscreen(fsElement);
+      }
+
+      // Check for ctrl + s (since a lot of people do it out of habit) and make it do nothing
+      if (isCtrl === true && e.keyCode == 83) {
+        self.save();
+        e.preventDefault();
+        isCtrl = false;
+      }
+
+      // Do the same for Mac now (metaKey == cmd).
+      if (e.metaKey && e.keyCode == 83) {
+        self.save();
+        e.preventDefault();
+      }
+
+    }
+    
+    function shortcutUpHandler(e) {
+      if (e.keyCode == self.settings.shortcut.modifier) { isMod = false }
+      if (e.keyCode == 17) { isCtrl = false }
+    }
+
+    function pasteHandler(e) {
+      var content;
+      if (e.clipboardData) {
+        //FF 22, Webkit, "standards"
+        e.preventDefault();
+        content = e.clipboardData.getData("text/plain");
+        self.editorIframeDocument.execCommand("insertText", false, content);
+      }
+      else if (window.clipboardData) {
+        //IE, "nasty"
+        e.preventDefault();
+        content = window.clipboardData.getData("Text");
+        content = content.replace(/</g, '&lt;');
+        content = content.replace(/>/g, '&gt;');
+        content = content.replace(/\n/g, '<br>');
+        content = content.replace(/\r/g, ''); //fuck you, ie!
+        content = content.replace(/<br>\s/g, '<br>&nbsp;')
+        content = content.replace(/\s\s\s/g, '&nbsp; &nbsp;')
+        content = content.replace(/\s\s/g, '&nbsp; ')
+        self.editorIframeDocument.selection.createRange().pasteHTML(content);
+      }
+    }
+
+    // Hide and show the util bar based on mouse movements
+    eventableIframes = [self.previewerIframeDocument, self.editorIframeDocument];
+    
+    for (i = 0; i < eventableIframes.length; i++) {
+      eventableIframes[i].addEventListener('mousemove', function (e) {
+        utilBarHandler(e);
+      });
+      eventableIframes[i].addEventListener('scroll', function (e) {
+        utilBarHandler(e);
+      });
+      eventableIframes[i].addEventListener('keyup', function (e) {
+        shortcutUpHandler(e);
+      });
+      eventableIframes[i].addEventListener('keydown', function (e) {
+        shortcutHandler(e);
+      });
+      eventableIframes[i].addEventListener('paste', function (e) {
+        pasteHandler(e);
+      });
+    }
+
+    // Save the document every 100ms by default
+    // TODO: Move into autosave setup function (_setupAutoSave)
+    if (self.settings.file.autoSave) {
+      self._saveIntervalTimer = window.setInterval(function () {
+        if (!self._canSave) {
+          return;
+        }
+        self.save(false, true);
+      }, self.settings.file.autoSave);
+    }
+
+    // Update a textarea automatically if a textarea is given so you don't need
+    // AJAX to submit a form and instead fall back to normal form behavior
+    if (self.settings.textarea) {
+      self._setupTextareaSync();
+    }
+
+    window.addEventListener('resize', function () {
+      // If NOT webkit, and in fullscreen, we need to account for browser resizing
+      // we don't care about webkit because you can't resize in webkit's fullscreen
+      if (self.is('fullscreen')) {
+        _applyStyles(self.iframeElement, {
+          'width': window.outerWidth + 'px'
+        , 'height': window.innerHeight + 'px'
+        });
+
+        _applyStyles(self.element, {
+          'height': window.innerHeight + 'px'
+        });
+
+        _applyStyles(self.previewerIframe, {
+          'width': window.outerWidth / 2 + 'px'
+        , 'height': window.innerHeight + 'px'
+        });
+
+        _applyStyles(self.editorIframe, {
+          'width': window.outerWidth / 2 + 'px'
+        , 'height': window.innerHeight + 'px'
+        });
+      }
+      // Makes the editor support fluid width when not in fullscreen mode
+      else if (!self.is('fullscreen')) {
+        self.reflow();
+      }
+    });
+
+    // Set states before flipping edit and preview modes
+    self._eeState.loaded = true;
+    self._eeState.unloaded = false;
+
+    if (self.is('preview')) {
+      self.preview();
+    }
+    else {
+      self.edit();
+    }
+
+    self.iframe.close();
+    self._eeState.startup = false;
+
+    if (self.settings.autogrow) {
+      self._fixScrollbars();
+
+      boundAutogrow = function () {
+        setTimeout(function () {
+          self._autogrow();
+        }, 1);
+      };
+
+      //for if autosave is disabled or very slow
+      ['keydown', 'keyup', 'paste', 'cut'].forEach(function (ev) {
+        self.getElement('editor').addEventListener(ev, boundAutogrow);
+      });
+      
+      self.on('__update', boundAutogrow);
+      self.on('edit', function () {
+        setTimeout(boundAutogrow, 50)
+      });
+      self.on('preview', function () {
+        setTimeout(boundAutogrow, 50)
+      });
+
+      //for browsers that have rendering delays
+      setTimeout(boundAutogrow, 50);
+      boundAutogrow();
+    }
+
+    // The callback and call are the same thing, but different ways to access them
+    callback.call(this);
+    this.emit('load');
+    return this;
+  }
+
+  EpicEditor.prototype._setupTextareaSync = function () {
+    var self = this
+      , textareaFileName = self.settings.file.name
+      , _syncTextarea;
+
+    // Even if autoSave is false, we want to make sure to keep the textarea synced
+    // with the editor's content. One bad thing about this tho is that we're
+    // creating two timers now in some configurations. We keep the textarea synced
+    // by saving and opening the textarea content from the draft file storage.
+    self._textareaSaveTimer = window.setInterval(function () {
+      if (!self._canSave) {
+        return;
+      }
+      self.save(true);
+    }, 100);
+
+    _syncTextarea = function () {
+      // TODO: Figure out root cause for having to do this ||.
+      // This only happens for draft files. Probably has something to do with
+      // the fact draft files haven't been saved by the time this is called.
+      // TODO: Add test for this case.
+      self._textareaElement.value = self.exportFile(textareaFileName, 'text', true) || self.settings.file.defaultContent;
+    }
+
+    if (typeof self.settings.textarea == 'string') {
+      self._textareaElement = document.getElementById(self.settings.textarea);
+    }
+    else if (typeof self.settings.textarea == 'object') {
+      self._textareaElement = self.settings.textarea;
+    }
+
+    // On page load, if there's content in the textarea that means one of two
+    // different things:
+    //
+    // 1. The editor didn't load and the user was writing in the textarea and
+    // now he refreshed the page or the JS loaded and the textarea now has
+    // content. If this is the case the user probably expects his content is
+    // moved into the editor and not lose what he typed.
+    //
+    // 2. The developer put content in the textarea from some server side
+    // code. In this case, the textarea will take precedence.
+    //
+    // If the developer wants drafts to be recoverable they should check if
+    // the local file in localStorage's modified date is newer than the server.
+    if (self._textareaElement.value !== '') {
+      self.importFile(textareaFileName, self._textareaElement.value);
+
+      // manually save draft after import so there is no delay between the
+      // import and exporting in _syncTextarea. Without this, _syncTextarea
+      // will pull the saved data from localStorage which will be <=100ms old.
+      self.save(true);
+    }
+
+    // Update the textarea on load and pull from drafts
+    _syncTextarea();
+
+    // Make sure to keep it updated
+    self.on('__update', _syncTextarea);
+  }
+
+  /**
+   * Will NOT focus the editor if the editor is still starting up AND
+   * focusOnLoad is set to false. This allows you to place this in code that
+   * gets fired during .load() without worrying about it overriding the user's
+   * option. For example use cases see preview() and edit().
+   * @returns {undefined}
+   */
+
+  // Prevent focus when the user sets focusOnLoad to false by checking if the
+  // editor is starting up AND if focusOnLoad is true
+  EpicEditor.prototype._focusExceptOnLoad = function () {
+    var self = this;
+    if ((self._eeState.startup && self.settings.focusOnLoad) || !self._eeState.startup) {
+      self.focus();
+    }
+  }
+
+  /**
+   * Will remove the editor, but not offline files
+   * @returns {object} EpicEditor will be returned
+   */
+  EpicEditor.prototype.unload = function (callback) {
+
+    // Make sure the editor isn't already unloaded.
+    if (this.is('unloaded')) {
+      throw new Error('Editor isn\'t loaded');
+    }
+
+    var self = this
+      , editor = window.parent.document.getElementById(self._instanceId);
+
+    editor.parentNode.removeChild(editor);
+    self._eeState.loaded = false;
+    self._eeState.unloaded = true;
+    callback = callback || function () {};
+
+    if (self.settings.textarea) {
+      self._textareaElement.value = "";
+      self.removeListener('__update');
+    }
+
+    if (self._saveIntervalTimer) {
+      window.clearInterval(self._saveIntervalTimer);
+    }
+    if (self._textareaSaveTimer) {
+      window.clearInterval(self._textareaSaveTimer);
+    }
+
+    callback.call(this);
+    self.emit('unload');
+    return self;
+  }
+
+  /**
+   * reflow allows you to dynamically re-fit the editor in the parent without
+   * having to unload and then reload the editor again.
+   *
+   * reflow will also emit a `reflow` event and will return the new dimensions.
+   * If it's called without params it'll return the new width and height and if
+   * it's called with just width or just height it'll just return the width or
+   * height. It's returned as an object like: { width: '100px', height: '1px' }
+   *
+   * @param {string|null} kind Can either be 'width' or 'height' or null
+   * if null, both the height and width will be resized
+   * @param {function} callback A function to fire after the reflow is finished.
+   * Will return the width / height in an obj as the first param of the callback.
+   * @returns {object} EpicEditor will be returned
+   */
+  EpicEditor.prototype.reflow = function (kind, callback) {
+    var self = this
+      , widthDiff = _outerWidth(self.element) - self.element.offsetWidth
+      , heightDiff = _outerHeight(self.element) - self.element.offsetHeight
+      , elements = [self.iframeElement, self.editorIframe, self.previewerIframe]
+      , eventData = {}
+      , newWidth
+      , newHeight;
+
+    if (typeof kind == 'function') {
+      callback = kind;
+      kind = null;
+    }
+
+    if (!callback) {
+      callback = function () {};
+    }
+
+    for (var x = 0; x < elements.length; x++) {
+      if (!kind || kind == 'width') {
+        newWidth = self.element.offsetWidth - widthDiff + 'px';
+        elements[x].style.width = newWidth;
+        self._eeState.reflowWidth = newWidth;
+        eventData.width = newWidth;
+      }
+      if (!kind || kind == 'height') {
+        newHeight = self.element.offsetHeight - heightDiff + 'px';
+        elements[x].style.height = newHeight;
+        self._eeState.reflowHeight = newHeight
+        eventData.height = newHeight;
+      }
+    }
+
+    self.emit('reflow', eventData);
+    callback.call(this, eventData);
+    return self;
+  }
+
+  /**
+   * Will take the markdown and generate a preview view based on the theme
+   * @returns {object} EpicEditor will be returned
+   */
+  EpicEditor.prototype.preview = function () {
+    var self = this
+      , x
+      , theme = self.settings.theme.preview
+      , anchors;
+
+    _replaceClass(self.getElement('wrapper'), 'epiceditor-edit-mode', 'epiceditor-preview-mode');
+
+    // Check if no CSS theme link exists
+    if (!self.previewerIframeDocument.getElementById('theme')) {
+      _insertCSSLink(theme, self.previewerIframeDocument, 'theme');
+    }
+    else if (self.previewerIframeDocument.getElementById('theme').name !== theme) {
+      self.previewerIframeDocument.getElementById('theme').href = theme;
+    }
+
+    // Save a preview draft since it might not be saved to the real file yet
+    self.save(true);
+
+    // Add the generated draft HTML into the previewer
+    self.previewer.innerHTML = self.exportFile(null, 'html', true);
+
+    // Hide the editor and display the previewer
+    if (!self.is('fullscreen')) {
+      self.editorIframe.style.left = '-999999px';
+      self.previewerIframe.style.left = '';
+      self._eeState.preview = true;
+      self._eeState.edit = false;
+      self._focusExceptOnLoad();
+    }
+
+    self.emit('preview');
+    return self;
+  }
+
+  /**
+   * Helper to focus on the editor iframe. Will figure out which iframe to
+   * focus on based on which one is active and will handle the cross browser
+   * issues with focusing on the iframe vs the document body.
+   * @returns {object} EpicEditor will be returned
+   */
+  EpicEditor.prototype.focus = function (pageload) {
+    var self = this
+      , isPreview = self.is('preview')
+      , focusElement = isPreview ? self.previewerIframeDocument.body
+        : self.editorIframeDocument.body;
+
+    if (_isFirefox() && isPreview) {
+      focusElement = self.previewerIframe;
+    }
+
+    focusElement.focus();
+    return this;
+  }
+
+  /**
+   * Puts the editor into fullscreen mode
+   * @returns {object} EpicEditor will be returned
+   */
+  EpicEditor.prototype.enterFullscreen = function () {
+    if (this.is('fullscreen')) { return this; }
+    this._goFullscreen(this.iframeElement);
+    return this;
+  }
+
+  /**
+   * Closes fullscreen mode if opened
+   * @returns {object} EpicEditor will be returned
+   */
+  EpicEditor.prototype.exitFullscreen = function () {
+    if (!this.is('fullscreen')) { return this; }
+    this._exitFullscreen(this.iframeElement);
+    return this;
+  }
+
+  /**
+   * Hides the preview and shows the editor again
+   * @returns {object} EpicEditor will be returned
+   */
+  EpicEditor.prototype.edit = function () {
+    var self = this;
+    _replaceClass(self.getElement('wrapper'), 'epiceditor-preview-mode', 'epiceditor-edit-mode');
+    self._eeState.preview = false;
+    self._eeState.edit = true;
+    self.editorIframe.style.left = '';
+    self.previewerIframe.style.left = '-999999px';
+    self._focusExceptOnLoad();
+    self.emit('edit');
+    return this;
+  }
+
+  /**
+   * Grabs a specificed HTML node. Use it as a shortcut to getting the iframe contents
+   * @param   {String} name The name of the node (can be document, body, editor, previewer, or wrapper)
+   * @returns {Object|Null}
+   */
+  EpicEditor.prototype.getElement = function (name) {
+    var available = {
+      "container": this.element
+    , "wrapper": this.iframe.getElementById('epiceditor-wrapper')
+    , "wrapperIframe": this.iframeElement
+    , "editor": this.editorIframeDocument
+    , "editorIframe": this.editorIframe
+    , "previewer": this.previewerIframeDocument
+    , "previewerIframe": this.previewerIframe
+    }
+
+    // Check that the given string is a possible option and verify the editor isn't unloaded
+    // without this, you'd be given a reference to an object that no longer exists in the DOM
+    if (!available[name] || this.is('unloaded')) {
+      return null;
+    }
+    else {
+      return available[name];
+    }
+  }
+
+  /**
+   * Returns a boolean of each "state" of the editor. For example "editor.is('loaded')" // returns true/false
+   * @param {String} what the state you want to check for
+   * @returns {Boolean}
+   */
+  EpicEditor.prototype.is = function (what) {
+    var self = this;
+    switch (what) {
+    case 'loaded':
+      return self._eeState.loaded;
+    case 'unloaded':
+      return self._eeState.unloaded
+    case 'preview':
+      return self._eeState.preview
+    case 'edit':
+      return self._eeState.edit;
+    case 'fullscreen':
+      return self._eeState.fullscreen;
+   // TODO: This "works", but the tests are saying otherwise. Come back to this
+   // and figure out how to fix it.
+   // case 'focused':
+   //   return document.activeElement == self.iframeElement;
+    default:
+      return false;
+    }
+  }
+
+  /**
+   * Opens a file
+   * @param   {string} name The name of the file you want to open
+   * @returns {object} EpicEditor will be returned
+   */
+  EpicEditor.prototype.open = function (name) {
+    var self = this
+      , defaultContent = self.settings.file.defaultContent
+      , fileObj;
+    name = name || self.settings.file.name;
+    self.settings.file.name = name;
+    if (this._storage[self.settings.localStorageName]) {
+      fileObj = self.exportFile(name);
+      if (fileObj !== undefined) {
+        _setText(self.editor, fileObj);
+        self.emit('read');
+      }
+      else {
+        _setText(self.editor, defaultContent);
+        self.save(); // ensure a save
+        self.emit('create');
+      }
+      self.previewer.innerHTML = self.exportFile(null, 'html');
+      self.emit('open');
+    }
+    return this;
+  }
+
+  /**
+   * Saves content for offline use
+   * @returns {object} EpicEditor will be returned
+   */
+  EpicEditor.prototype.save = function (_isPreviewDraft, _isAuto) {
+    var self = this
+      , storage
+      , isUpdate = false
+      , file = self.settings.file.name
+      , previewDraftName = ''
+      , data = this._storage[previewDraftName + self.settings.localStorageName]
+      , content = _getText(this.editor);
+
+    if (_isPreviewDraft) {
+      previewDraftName = self._previewDraftLocation;
+    }
+
+    // This could have been false but since we're manually saving
+    // we know it's save to start autoSaving again
+    this._canSave = true;
+
+    // Guard against storage being wiped out without EpicEditor knowing
+    // TODO: Emit saving error - storage seems to have been wiped
+    if (data) {
+      storage = JSON.parse(this._storage[previewDraftName + self.settings.localStorageName]);
+
+      // If the file doesn't exist we need to create it
+      if (storage[file] === undefined) {
+        storage[file] = self._defaultFileSchema();
+      }
+
+      // If it does, we need to check if the content is different and
+      // if it is, send the update event and update the timestamp
+      else if (content !== storage[file].content) {
+        storage[file].modified = new Date();
+        isUpdate = true;
+      }
+      //don't bother autosaving if the content hasn't actually changed
+      else if (_isAuto) {
+        return;
+      }
+
+      storage[file].content = content;
+      this._storage[previewDraftName + self.settings.localStorageName] = JSON.stringify(storage);
+
+      // After the content is actually changed, emit update so it emits the updated content
+      if (isUpdate) {
+        self.emit('update');
+        // Emit a private update event so it can't get accidentally removed
+        self.emit('__update');
+      }
+
+      if (_isAuto) {
+        this.emit('autosave');
+      }
+      else if (!_isPreviewDraft) {
+        this.emit('save');
+      }
+    }
+
+    return this;
+  }
+
+  /**
+   * Removes a page
+   * @param   {string} name The name of the file you want to remove from localStorage
+   * @returns {object} EpicEditor will be returned
+   */
+  EpicEditor.prototype.remove = function (name) {
+    var self = this
+      , s;
+    name = name || self.settings.file.name;
+
+    // If you're trying to delete a page you have open, block saving
+    if (name == self.settings.file.name) {
+      self._canSave = false;
+    }
+
+    s = JSON.parse(this._storage[self.settings.localStorageName]);
+    delete s[name];
+    this._storage[self.settings.localStorageName] = JSON.stringify(s);
+    this.emit('remove');
+    return this;
+  };
+
+  /**
+   * Renames a file
+   * @param   {string} oldName The old file name
+   * @param   {string} newName The new file name
+   * @returns {object} EpicEditor will be returned
+   */
+  EpicEditor.prototype.rename = function (oldName, newName) {
+    var self = this
+      , s = JSON.parse(this._storage[self.settings.localStorageName]);
+    s[newName] = s[oldName];
+    delete s[oldName];
+    this._storage[self.settings.localStorageName] = JSON.stringify(s);
+    self.open(newName);
+    return this;
+  };
+
+  /**
+   * Imports a file and it's contents and opens it
+   * @param   {string} name The name of the file you want to import (will overwrite existing files!)
+   * @param   {string} content Content of the file you want to import
+   * @param   {string} kind The kind of file you want to import (TBI)
+   * @param   {object} meta Meta data you want to save with your file.
+   * @returns {object} EpicEditor will be returned
+   */
+  EpicEditor.prototype.importFile = function (name, content, kind, meta) {
+    var self = this
+      , isNew = false;
+
+    name = name || self.settings.file.name;
+    content = content || '';
+    kind = kind || 'md';
+    meta = meta || {};
+  
+    if (JSON.parse(this._storage[self.settings.localStorageName])[name] === undefined) {
+      isNew = true;
+    }
+
+    // Set our current file to the new file and update the content
+    self.settings.file.name = name;
+    _setText(self.editor, content);
+
+    if (isNew) {
+      self.emit('create');
+    }
+
+    self.save();
+
+    if (self.is('fullscreen')) {
+      self.preview();
+    }
+
+    //firefox has trouble with importing and working out the size right away
+    if (self.settings.autogrow) {
+      setTimeout(function () {
+        self._autogrow();
+      }, 50);
+    }
+
+    return this;
+  };
+
+  /**
+   * Gets the local filestore
+   * @param   {string} name Name of the file in the store
+   * @returns {object|undefined} the local filestore, or a specific file in the store, if a name is given
+   */
+  EpicEditor.prototype._getFileStore = function (name, _isPreviewDraft) {
+    var previewDraftName = ''
+      , store;
+    if (_isPreviewDraft) {
+      previewDraftName = this._previewDraftLocation;
+    }
+    store = JSON.parse(this._storage[previewDraftName + this.settings.localStorageName]);
+    if (name) {
+      return store[name];
+    }
+    else {
+      return store;
+    }
+  }
+
+  /**
+   * Exports a file as a string in a supported format
+   * @param   {string} name Name of the file you want to export (case sensitive)
+   * @param   {string} kind Kind of file you want the content in (currently supports html and text, default is the format the browser "wants")
+   * @returns {string|undefined}  The content of the file in the content given or undefined if it doesn't exist
+   */
+  EpicEditor.prototype.exportFile = function (name, kind, _isPreviewDraft) {
+    var self = this
+      , file
+      , content;
+
+    name = name || self.settings.file.name;
+    kind = kind || 'text';
+   
+    file = self._getFileStore(name, _isPreviewDraft);
+
+    // If the file doesn't exist just return early with undefined
+    if (file === undefined) {
+      return;
+    }
+
+    content = file.content;
+   
+    switch (kind) {
+    case 'html':
+      content = _sanitizeRawContent(content);
+      return self.settings.parser(content);
+    case 'text':
+      return _sanitizeRawContent(content);
+    case 'json':
+      file.content = _sanitizeRawContent(file.content);
+      return JSON.stringify(file);
+    case 'raw':
+      return content;
+    default:
+      return content;
+    }
+  }
+
+  /**
+   * Gets the contents and metadata for files
+   * @param   {string} name Name of the file whose data you want (case sensitive)
+   * @param   {boolean} excludeContent whether the contents of files should be excluded
+   * @returns {object} An object with the names and data of every file, or just the data of one file if a name was given
+   */
+  EpicEditor.prototype.getFiles = function (name, excludeContent) {
+    var file
+      , data = this._getFileStore(name);
+    
+    if (name) {
+      if (data !== undefined) {
+        if (excludeContent) {
+          delete data.content;
+        }
+        else {
+          data.content = _sanitizeRawContent(data.content);
+        }
+      }
+      return data;
+    }
+    else {
+      for (file in data) {
+        if (data.hasOwnProperty(file)) {
+          if (excludeContent) {
+            delete data[file].content;
+          }
+          else {
+            data[file].content = _sanitizeRawContent(data[file].content);
+          }
+        }
+      }
+      return data;
+    }
+  }
+
+  // EVENTS
+  // TODO: Support for namespacing events like "preview.foo"
+  /**
+   * Sets up an event handler for a specified event
+   * @param  {string} ev The event name
+   * @param  {function} handler The callback to run when the event fires
+   * @returns {object} EpicEditor will be returned
+   */
+  EpicEditor.prototype.on = function (ev, handler) {
+    var self = this;
+    if (!this.events[ev]) {
+      this.events[ev] = [];
+    }
+    this.events[ev].push(handler);
+    return self;
+  };
+
+  /**
+   * This will emit or "trigger" an event specified
+   * @param  {string} ev The event name
+   * @param  {any} data Any data you want to pass into the callback
+   * @returns {object} EpicEditor will be returned
+   */
+  EpicEditor.prototype.emit = function (ev, data) {
+    var self = this
+      , x;
+
+    data = data || self.getFiles(self.settings.file.name);
+
+    if (!this.events[ev]) {
+      return;
+    }
+
+    function invokeHandler(handler) {
+      handler.call(self, data);
+    }
+
+    for (x = 0; x < self.events[ev].length; x++) {
+      invokeHandler(self.events[ev][x]);
+    }
+
+    return self;
+  };
+
+  /**
+   * Will remove any listeners added from EpicEditor.on()
+   * @param  {string} ev The event name
+   * @param  {function} handler Handler to remove
+   * @returns {object} EpicEditor will be returned
+   */
+  EpicEditor.prototype.removeListener = function (ev, handler) {
+    var self = this;
+    if (!handler) {
+      this.events[ev] = [];
+      return self;
+    }
+    if (!this.events[ev]) {
+      return self;
+    }
+    // Otherwise a handler and event exist, so take care of it
+    this.events[ev].splice(this.events[ev].indexOf(handler), 1);
+    return self;
+  }
+
+  /**
+   * Handles autogrowing the editor
+   */
+  EpicEditor.prototype._autogrow = function () {
+    var editorHeight
+      , newHeight
+      , minHeight
+      , maxHeight
+      , el
+      , style
+      , maxedOut = false;
+
+    //autogrow in fullscreen is nonsensical
+    if (!this.is('fullscreen')) {
+      if (this.is('edit')) {
+        el = this.getElement('editor').documentElement;
+      }
+      else {
+        el = this.getElement('previewer').documentElement;
+      }
+
+      editorHeight = _outerHeight(el);
+      newHeight = editorHeight;
+
+      //handle minimum
+      minHeight = this.settings.autogrow.minHeight;
+      if (typeof minHeight === 'function') {
+        minHeight = minHeight(this);
+      }
+
+      if (minHeight && newHeight < minHeight) {
+        newHeight = minHeight;
+      }
+
+      //handle maximum
+      maxHeight = this.settings.autogrow.maxHeight;
+      if (typeof maxHeight === 'function') {
+        maxHeight = maxHeight(this);
+      }
+
+      if (maxHeight && newHeight > maxHeight) {
+        newHeight = maxHeight;
+        maxedOut = true;
+      }
+
+      if (maxedOut) {
+        this._fixScrollbars('auto');
+      } else {
+        this._fixScrollbars('hidden');
+      }
+
+      //actual resize
+      if (newHeight != this.oldHeight) {
+        this.getElement('container').style.height = newHeight + 'px';
+        this.reflow();
+        if (this.settings.autogrow.scroll) {
+          window.scrollBy(0, newHeight - this.oldHeight);
+        }
+        this.oldHeight = newHeight;
+      }
+    }
+  }
+
+  /**
+   * Shows or hides scrollbars based on the autogrow setting
+   * @param {string} forceSetting a value to force the overflow to
+   */
+  EpicEditor.prototype._fixScrollbars = function (forceSetting) {
+    var setting;
+    if (this.settings.autogrow) {
+      setting = 'hidden';
+    }
+    else {
+      setting = 'auto';
+    }
+    setting = forceSetting || setting;
+    this.getElement('editor').documentElement.style.overflow = setting;
+    this.getElement('previewer').documentElement.style.overflow = setting;
+  }
+
+  EpicEditor.version = '0.2.2';
+
+  // Used to store information to be shared across editors
+  EpicEditor._data = {};
+
+  window.EpicEditor = EpicEditor;
+})(window);
+
+/**
+ * marked - a markdown parser
+ * Copyright (c) 2011-2013, Christopher Jeffrey. (MIT Licensed)
+ * https://github.com/chjj/marked
+ */
+
+;(function() {
+
+/**
+ * Block-Level Grammar
+ */
+
+var block = {
+  newline: /^\n+/,
+  code: /^( {4}[^\n]+\n*)+/,
+  fences: noop,
+  hr: /^( *[-*_]){3,} *(?:\n+|$)/,
+  heading: /^ *(#{1,6}) *([^\n]+?) *#* *(?:\n+|$)/,
+  nptable: noop,
+  lheading: /^([^\n]+)\n *(=|-){3,} *\n*/,
+  blockquote: /^( *>[^\n]+(\n[^\n]+)*\n*)+/,
+  list: /^( *)(bull) [\s\S]+?(?:hr|\n{2,}(?! )(?!\1bull )\n*|\s*$)/,
+  html: /^ *(?:comment|closed|closing) *(?:\n{2,}|\s*$)/,
+  def: /^ *\[([^\]]+)\]: *([^\s]+)(?: +["(]([^\n]+)[")])? *(?:\n+|$)/,
+  table: noop,
+  paragraph: /^([^\n]+\n?(?!hr|heading|lheading|blockquote|tag|def))+\n*/,
+  text: /^[^\n]+/
+};
+
+block.bullet = /(?:[*+-]|\d+\.)/;
+block.item = /^( *)(bull) [^\n]*(?:\n(?!\1bull )[^\n]*)*/;
+block.item = replace(block.item, 'gm')
+  (/bull/g, block.bullet)
+  ();
+
+block.list = replace(block.list)
+  (/bull/g, block.bullet)
+  ('hr', /\n+(?=(?: *[-*_]){3,} *(?:\n+|$))/)
+  ();
+
+block._tag = '(?!(?:'
+  + 'a|em|strong|small|s|cite|q|dfn|abbr|data|time|code'
+  + '|var|samp|kbd|sub|sup|i|b|u|mark|ruby|rt|rp|bdi|bdo'
+  + '|span|br|wbr|ins|del|img)\\b)\\w+(?!:/|@)\\b';
+
+block.html = replace(block.html)
+  ('comment', /<!--[\s\S]*?-->/)
+  ('closed', /<(tag)[\s\S]+?<\/\1>/)
+  ('closing', /<tag(?:"[^"]*"|'[^']*'|[^'">])*?>/)
+  (/tag/g, block._tag)
+  ();
+
+block.paragraph = replace(block.paragraph)
+  ('hr', block.hr)
+  ('heading', block.heading)
+  ('lheading', block.lheading)
+  ('blockquote', block.blockquote)
+  ('tag', '<' + block._tag)
+  ('def', block.def)
+  ();
+
+/**
+ * Normal Block Grammar
+ */
+
+block.normal = merge({}, block);
+
+/**
+ * GFM Block Grammar
+ */
+
+block.gfm = merge({}, block.normal, {
+  fences: /^ *(`{3,}|~{3,}) *(\w+)? *\n([\s\S]+?)\s*\1 *(?:\n+|$)/,
+  paragraph: /^/
+});
+
+block.gfm.paragraph = replace(block.paragraph)
+  ('(?!', '(?!' + block.gfm.fences.source.replace('\\1', '\\2') + '|')
+  ();
+
+/**
+ * GFM + Tables Block Grammar
+ */
+
+block.tables = merge({}, block.gfm, {
+  nptable: /^ *(\S.*\|.*)\n *([-:]+ *\|[-| :]*)\n((?:.*\|.*(?:\n|$))*)\n*/,
+  table: /^ *\|(.+)\n *\|( *[-:]+[-| :]*)\n((?: *\|.*(?:\n|$))*)\n*/
+});
+
+/**
+ * Block Lexer
+ */
+
+function Lexer(options) {
+  this.tokens = [];
+  this.tokens.links = {};
+  this.options = options || marked.defaults;
+  this.rules = block.normal;
+
+  if (this.options.gfm) {
+    if (this.options.tables) {
+      this.rules = block.tables;
+    } else {
+      this.rules = block.gfm;
+    }
+  }
+}
+
+/**
+ * Expose Block Rules
+ */
+
+Lexer.rules = block;
+
+/**
+ * Static Lex Method
+ */
+
+Lexer.lex = function(src, options) {
+  var lexer = new Lexer(options);
+  return lexer.lex(src);
+};
+
+/**
+ * Preprocessing
+ */
+
+Lexer.prototype.lex = function(src) {
+  src = src
+    .replace(/\r\n|\r/g, '\n')
+    .replace(/\t/g, '    ')
+    .replace(/\u00a0/g, ' ')
+    .replace(/\u2424/g, '\n');
+
+  return this.token(src, true);
+};
+
+/**
+ * Lexing
+ */
+
+Lexer.prototype.token = function(src, top) {
+  var src = src.replace(/^ +$/gm, '')
+    , next
+    , loose
+    , cap
+    , item
+    , space
+    , i
+    , l;
+
+  while (src) {
+    // newline
+    if (cap = this.rules.newline.exec(src)) {
+      src = src.substring(cap[0].length);
+      if (cap[0].length > 1) {
+        this.tokens.push({
+          type: 'space'
+        });
+      }
+    }
+
+    // code
+    if (cap = this.rules.code.exec(src)) {
+      src = src.substring(cap[0].length);
+      cap = cap[0].replace(/^ {4}/gm, '');
+      this.tokens.push({
+        type: 'code',
+        text: !this.options.pedantic
+          ? cap.replace(/\n+$/, '')
+          : cap
+      });
+      continue;
+    }
+
+    // fences (gfm)
+    if (cap = this.rules.fences.exec(src)) {
+      src = src.substring(cap[0].length);
+      this.tokens.push({
+        type: 'code',
+        lang: cap[2],
+        text: cap[3]
+      });
+      continue;
+    }
+
+    // heading
+    if (cap = this.rules.heading.exec(src)) {
+      src = src.substring(cap[0].length);
+      this.tokens.push({
+        type: 'heading',
+        depth: cap[1].length,
+        text: cap[2]
+      });
+      continue;
+    }
+
+    // table no leading pipe (gfm)
+    if (top && (cap = this.rules.nptable.exec(src))) {
+      src = src.substring(cap[0].length);
+
+      item = {
+        type: 'table',
+        header: cap[1].replace(/^ *| *\| *$/g, '').split(/ *\| */),
+        align: cap[2].replace(/^ *|\| *$/g, '').split(/ *\| */),
+        cells: cap[3].replace(/\n$/, '').split('\n')
+      };
+
+      for (i = 0; i < item.align.length; i++) {
+        if (/^ *-+: *$/.test(item.align[i])) {
+          item.align[i] = 'right';
+        } else if (/^ *:-+: *$/.test(item.align[i])) {
+          item.align[i] = 'center';
+        } else if (/^ *:-+ *$/.test(item.align[i])) {
+          item.align[i] = 'left';
+        } else {
+          item.align[i] = null;
+        }
+      }
+
+      for (i = 0; i < item.cells.length; i++) {
+        item.cells[i] = item.cells[i].split(/ *\| */);
+      }
+
+      this.tokens.push(item);
+
+      continue;
+    }
+
+    // lheading
+    if (cap = this.rules.lheading.exec(src)) {
+      src = src.substring(cap[0].length);
+      this.tokens.push({
+        type: 'heading',
+        depth: cap[2] === '=' ? 1 : 2,
+        text: cap[1]
+      });
+      continue;
+    }
+
+    // hr
+    if (cap = this.rules.hr.exec(src)) {
+      src = src.substring(cap[0].length);
+      this.tokens.push({
+        type: 'hr'
+      });
+      continue;
+    }
+
+    // blockquote
+    if (cap = this.rules.blockquote.exec(src)) {
+      src = src.substring(cap[0].length);
+
+      this.tokens.push({
+        type: 'blockquote_start'
+      });
+
+      cap = cap[0].replace(/^ *> ?/gm, '');
+
+      // Pass `top` to keep the current
+      // "toplevel" state. This is exactly
+      // how markdown.pl works.
+      this.token(cap, top);
+
+      this.tokens.push({
+        type: 'blockquote_end'
+      });
+
+      continue;
+    }
+
+    // list
+    if (cap = this.rules.list.exec(src)) {
+      src = src.substring(cap[0].length);
+
+      this.tokens.push({
+        type: 'list_start',
+        ordered: isFinite(cap[2])
+      });
+
+      // Get each top-level item.
+      cap = cap[0].match(this.rules.item);
+
+      next = false;
+      l = cap.length;
+      i = 0;
+
+      for (; i < l; i++) {
+        item = cap[i];
+
+        // Remove the list item's bullet
+        // so it is seen as the next token.
+        space = item.length;
+        item = item.replace(/^ *([*+-]|\d+\.) +/, '');
+
+        // Outdent whatever the
+        // list item contains. Hacky.
+        if (~item.indexOf('\n ')) {
+          space -= item.length;
+          item = !this.options.pedantic
+            ? item.replace(new RegExp('^ {1,' + space + '}', 'gm'), '')
+            : item.replace(/^ {1,4}/gm, '');
+        }
+
+        // Determine whether item is loose or not.
+        // Use: /(^|\n)(?! )[^\n]+\n\n(?!\s*$)/
+        // for discount behavior.
+        loose = next || /\n\n(?!\s*$)/.test(item);
+        if (i !== l - 1) {
+          next = item[item.length-1] === '\n';
+          if (!loose) loose = next;
+        }
+
+        this.tokens.push({
+          type: loose
+            ? 'loose_item_start'
+            : 'list_item_start'
+        });
+
+        // Recurse.
+        this.token(item, false);
+
+        this.tokens.push({
+          type: 'list_item_end'
+        });
+      }
+
+      this.tokens.push({
+        type: 'list_end'
+      });
+
+      continue;
+    }
+
+    // html
+    if (cap = this.rules.html.exec(src)) {
+      src = src.substring(cap[0].length);
+      this.tokens.push({
+        type: this.options.sanitize
+          ? 'paragraph'
+          : 'html',
+        pre: cap[1] === 'pre',
+        text: cap[0]
+      });
+      continue;
+    }
+
+    // def
+    if (top && (cap = this.rules.def.exec(src))) {
+      src = src.substring(cap[0].length);
+      this.tokens.links[cap[1].toLowerCase()] = {
+        href: cap[2],
+        title: cap[3]
+      };
+      continue;
+    }
+
+    // table (gfm)
+    if (top && (cap = this.rules.table.exec(src))) {
+      src = src.substring(cap[0].length);
+
+      item = {
+        type: 'table',
+        header: cap[1].replace(/^ *| *\| *$/g, '').split(/ *\| */),
+        align: cap[2].replace(/^ *|\| *$/g, '').split(/ *\| */),
+        cells: cap[3].replace(/(?: *\| *)?\n$/, '').split('\n')
+      };
+
+      for (i = 0; i < item.align.length; i++) {
+        if (/^ *-+: *$/.test(item.align[i])) {
+          item.align[i] = 'right';
+        } else if (/^ *:-+: *$/.test(item.align[i])) {
+          item.align[i] = 'center';
+        } else if (/^ *:-+ *$/.test(item.align[i])) {
+          item.align[i] = 'left';
+        } else {
+          item.align[i] = null;
+        }
+      }
+
+      for (i = 0; i < item.cells.length; i++) {
+        item.cells[i] = item.cells[i]
+          .replace(/^ *\| *| *\| *$/g, '')
+          .split(/ *\| */);
+      }
+
+      this.tokens.push(item);
+
+      continue;
+    }
+
+    // top-level paragraph
+    if (top && (cap = this.rules.paragraph.exec(src))) {
+      src = src.substring(cap[0].length);
+      this.tokens.push({
+        type: 'paragraph',
+        text: cap[0]
+      });
+      continue;
+    }
+
+    // text
+    if (cap = this.rules.text.exec(src)) {
+      // Top-level should never reach here.
+      src = src.substring(cap[0].length);
+      this.tokens.push({
+        type: 'text',
+        text: cap[0]
+      });
+      continue;
+    }
+
+    if (src) {
+      throw new
+        Error('Infinite loop on byte: ' + src.charCodeAt(0));
+    }
+  }
+
+  return this.tokens;
+};
+
+/**
+ * Inline-Level Grammar
+ */
+
+var inline = {
+  escape: /^\\([\\`*{}\[\]()#+\-.!_>|])/,
+  autolink: /^<([^ >]+(@|:\/)[^ >]+)>/,
+  url: noop,
+  tag: /^<!--[\s\S]*?-->|^<\/?\w+(?:"[^"]*"|'[^']*'|[^'">])*?>/,
+  link: /^!?\[(inside)\]\(href\)/,
+  reflink: /^!?\[(inside)\]\s*\[([^\]]*)\]/,
+  nolink: /^!?\[((?:\[[^\]]*\]|[^\[\]])*)\]/,
+  strong: /^__([\s\S]+?)__(?!_)|^\*\*([\s\S]+?)\*\*(?!\*)/,
+  em: /^\b_((?:__|[\s\S])+?)_\b|^\*((?:\*\*|[\s\S])+?)\*(?!\*)/,
+  code: /^(`+)([\s\S]*?[^`])\1(?!`)/,
+  br: /^ {2,}\n(?!\s*$)/,
+  del: noop,
+  text: /^[\s\S]+?(?=[\\<!\[_*`]| {2,}\n|$)/
+};
+
+inline._inside = /(?:\[[^\]]*\]|[^\]]|\](?=[^\[]*\]))*/;
+inline._href = /\s*<?([^\s]*?)>?(?:\s+['"]([\s\S]*?)['"])?\s*/;
+
+inline.link = replace(inline.link)
+  ('inside', inline._inside)
+  ('href', inline._href)
+  ();
+
+inline.reflink = replace(inline.reflink)
+  ('inside', inline._inside)
+  ();
+
+/**
+ * Normal Inline Grammar
+ */
+
+inline.normal = merge({}, inline);
+
+/**
+ * Pedantic Inline Grammar
+ */
+
+inline.pedantic = merge({}, inline.normal, {
+  strong: /^__(?=\S)([\s\S]*?\S)__(?!_)|^\*\*(?=\S)([\s\S]*?\S)\*\*(?!\*)/,
+  em: /^_(?=\S)([\s\S]*?\S)_(?!_)|^\*(?=\S)([\s\S]*?\S)\*(?!\*)/
+});
+
+/**
+ * GFM Inline Grammar
+ */
+
+inline.gfm = merge({}, inline.normal, {
+  escape: replace(inline.escape)('])', '~])')(),
+  url: /^(https?:\/\/[^\s]+[^.,:;"')\]\s])/,
+  del: /^~{2,}([\s\S]+?)~{2,}/,
+  text: replace(inline.text)
+    (']|', '~]|')
+    ('|', '|https?://|')
+    ()
+});
+
+/**
+ * GFM + Line Breaks Inline Grammar
+ */
+
+inline.breaks = merge({}, inline.gfm, {
+  br: replace(inline.br)('{2,}', '*')(),
+  text: replace(inline.gfm.text)('{2,}', '*')()
+});
+
+/**
+ * Inline Lexer & Compiler
+ */
+
+function InlineLexer(links, options) {
+  this.options = options || marked.defaults;
+  this.links = links;
+  this.rules = inline.normal;
+
+  if (!this.links) {
+    throw new
+      Error('Tokens array requires a `links` property.');
+  }
+
+  if (this.options.gfm) {
+    if (this.options.breaks) {
+      this.rules = inline.breaks;
+    } else {
+      this.rules = inline.gfm;
+    }
+  } else if (this.options.pedantic) {
+    this.rules = inline.pedantic;
+  }
+}
+
+/**
+ * Expose Inline Rules
+ */
+
+InlineLexer.rules = inline;
+
+/**
+ * Static Lexing/Compiling Method
+ */
+
+InlineLexer.output = function(src, links, opt) {
+  var inline = new InlineLexer(links, opt);
+  return inline.output(src);
+};
+
+/**
+ * Lexing/Compiling
+ */
+
+InlineLexer.prototype.output = function(src) {
+  var out = ''
+    , link
+    , text
+    , href
+    , cap;
+
+  while (src) {
+    // escape
+    if (cap = this.rules.escape.exec(src)) {
+      src = src.substring(cap[0].length);
+      out += cap[1];
+      continue;
+    }
+
+    // autolink
+    if (cap = this.rules.autolink.exec(src)) {
+      src = src.substring(cap[0].length);
+      if (cap[2] === '@') {
+        text = cap[1][6] === ':'
+          ? this.mangle(cap[1].substring(7))
+          : this.mangle(cap[1]);
+        href = this.mangle('mailto:') + text;
+      } else {
+        text = escape(cap[1]);
+        href = text;
+      }
+      out += '<a href="'
+        + href
+        + '">'
+        + text
+        + '</a>';
+      continue;
+    }
+
+    // url (gfm)
+    if (cap = this.rules.url.exec(src)) {
+      src = src.substring(cap[0].length);
+      text = escape(cap[1]);
+      href = text;
+      out += '<a href="'
+        + href
+        + '">'
+        + text
+        + '</a>';
+      continue;
+    }
+
+    // tag
+    if (cap = this.rules.tag.exec(src)) {
+      src = src.substring(cap[0].length);
+      out += this.options.sanitize
+        ? escape(cap[0])
+        : cap[0];
+      continue;
+    }
+
+    // link
+    if (cap = this.rules.link.exec(src)) {
+      src = src.substring(cap[0].length);
+      out += this.outputLink(cap, {
+        href: cap[2],
+        title: cap[3]
+      });
+      continue;
+    }
+
+    // reflink, nolink
+    if ((cap = this.rules.reflink.exec(src))
+        || (cap = this.rules.nolink.exec(src))) {
+      src = src.substring(cap[0].length);
+      link = (cap[2] || cap[1]).replace(/\s+/g, ' ');
+      link = this.links[link.toLowerCase()];
+      if (!link || !link.href) {
+        out += cap[0][0];
+        src = cap[0].substring(1) + src;
+        continue;
+      }
+      out += this.outputLink(cap, link);
+      continue;
+    }
+
+    // strong
+    if (cap = this.rules.strong.exec(src)) {
+      src = src.substring(cap[0].length);
+      out += '<strong>'
+        + this.output(cap[2] || cap[1])
+        + '</strong>';
+      continue;
+    }
+
+    // em
+    if (cap = this.rules.em.exec(src)) {
+      src = src.substring(cap[0].length);
+      out += '<em>'
+        + this.output(cap[2] || cap[1])
+        + '</em>';
+      continue;
+    }
+
+    // code
+    if (cap = this.rules.code.exec(src)) {
+      src = src.substring(cap[0].length);
+      out += '<code>'
+        + escape(cap[2], true)
+        + '</code>';
+      continue;
+    }
+
+    // br
+    if (cap = this.rules.br.exec(src)) {
+      src = src.substring(cap[0].length);
+      out += '<br>';
+      continue;
+    }
+
+    // del (gfm)
+    if (cap = this.rules.del.exec(src)) {
+      src = src.substring(cap[0].length);
+      out += '<del>'
+        + this.output(cap[1])
+        + '</del>';
+      continue;
+    }
+
+    // text
+    if (cap = this.rules.text.exec(src)) {
+      src = src.substring(cap[0].length);
+      out += escape(cap[0]);
+      continue;
+    }
+
+    if (src) {
+      throw new
+        Error('Infinite loop on byte: ' + src.charCodeAt(0));
+    }
+  }
+
+  return out;
+};
+
+/**
+ * Compile Link
+ */
+
+InlineLexer.prototype.outputLink = function(cap, link) {
+  if (cap[0][0] !== '!') {
+    return '<a href="'
+      + escape(link.href)
+      + '"'
+      + (link.title
+      ? ' title="'
+      + escape(link.title)
+      + '"'
+      : '')
+      + '>'
+      + this.output(cap[1])
+      + '</a>';
+  } else {
+    return '<img src="'
+      + escape(link.href)
+      + '" alt="'
+      + escape(cap[1])
+      + '"'
+      + (link.title
+      ? ' title="'
+      + escape(link.title)
+      + '"'
+      : '')
+      + '>';
+  }
+};
+
+/**
+ * Mangle Links
+ */
+
+InlineLexer.prototype.mangle = function(text) {
+  var out = ''
+    , l = text.length
+    , i = 0
+    , ch;
+
+  for (; i < l; i++) {
+    ch = text.charCodeAt(i);
+    if (Math.random() > 0.5) {
+      ch = 'x' + ch.toString(16);
+    }
+    out += '&#' + ch + ';';
+  }
+
+  return out;
+};
+
+/**
+ * Parsing & Compiling
+ */
+
+function Parser(options) {
+  this.tokens = [];
+  this.token = null;
+  this.options = options || marked.defaults;
+}
+
+/**
+ * Static Parse Method
+ */
+
+Parser.parse = function(src, options) {
+  var parser = new Parser(options);
+  return parser.parse(src);
+};
+
+/**
+ * Parse Loop
+ */
+
+Parser.prototype.parse = function(src) {
+  this.inline = new InlineLexer(src.links, this.options);
+  this.tokens = src.reverse();
+
+  var out = '';
+  while (this.next()) {
+    out += this.tok();
+  }
+
+  return out;
+};
+
+/**
+ * Next Token
+ */
+
+Parser.prototype.next = function() {
+  return this.token = this.tokens.pop();
+};
+
+/**
+ * Preview Next Token
+ */
+
+Parser.prototype.peek = function() {
+  return this.tokens[this.tokens.length-1] || 0;
+};
+
+/**
+ * Parse Text Tokens
+ */
+
+Parser.prototype.parseText = function() {
+  var body = this.token.text;
+
+  while (this.peek().type === 'text') {
+    body += '\n' + this.next().text;
+  }
+
+  return this.inline.output(body);
+};
+
+/**
+ * Parse Current Token
+ */
+
+Parser.prototype.tok = function() {
+  switch (this.token.type) {
+    case 'space': {
+      return '';
+    }
+    case 'hr': {
+      return '<hr>\n';
+    }
+    case 'heading': {
+      return '<h'
+        + this.token.depth
+        + '>'
+        + this.inline.output(this.token.text)
+        + '</h'
+        + this.token.depth
+        + '>\n';
+    }
+    case 'code': {
+      if (this.options.highlight) {
+        var code = this.options.highlight(this.token.text, this.token.lang);
+        if (code != null && code !== this.token.text) {
+          this.token.escaped = true;
+          this.token.text = code;
+        }
+      }
+
+      if (!this.token.escaped) {
+        this.token.text = escape(this.token.text, true);
+      }
+
+      return '<pre><code'
+        + (this.token.lang
+        ? ' class="lang-'
+        + this.token.lang
+        + '"'
+        : '')
+        + '>'
+        + this.token.text
+        + '</code></pre>\n';
+    }
+    case 'table': {
+      var body = ''
+        , heading
+        , i
+        , row
+        , cell
+        , j;
+
+      // header
+      body += '<thead>\n<tr>\n';
+      for (i = 0; i < this.token.header.length; i++) {
+        heading = this.inline.output(this.token.header[i]);
+        body += this.token.align[i]
+          ? '<th align="' + this.token.align[i] + '">' + heading + '</th>\n'
+          : '<th>' + heading + '</th>\n';
+      }
+      body += '</tr>\n</thead>\n';
+
+      // body
+      body += '<tbody>\n'
+      for (i = 0; i < this.token.cells.length; i++) {
+        row = this.token.cells[i];
+        body += '<tr>\n';
+        for (j = 0; j < row.length; j++) {
+          cell = this.inline.output(row[j]);
+          body += this.token.align[j]
+            ? '<td align="' + this.token.align[j] + '">' + cell + '</td>\n'
+            : '<td>' + cell + '</td>\n';
+        }
+        body += '</tr>\n';
+      }
+      body += '</tbody>\n';
+
+      return '<table>\n'
+        + body
+        + '</table>\n';
+    }
+    case 'blockquote_start': {
+      var body = '';
+
+      while (this.next().type !== 'blockquote_end') {
+        body += this.tok();
+      }
+
+      return '<blockquote>\n'
+        + body
+        + '</blockquote>\n';
+    }
+    case 'list_start': {
+      var type = this.token.ordered ? 'ol' : 'ul'
+        , body = '';
+
+      while (this.next().type !== 'list_end') {
+        body += this.tok();
+      }
+
+      return '<'
+        + type
+        + '>\n'
+        + body
+        + '</'
+        + type
+        + '>\n';
+    }
+    case 'list_item_start': {
+      var body = '';
+
+      while (this.next().type !== 'list_item_end') {
+        body += this.token.type === 'text'
+          ? this.parseText()
+          : this.tok();
+      }
+
+      return '<li>'
+        + body
+        + '</li>\n';
+    }
+    case 'loose_item_start': {
+      var body = '';
+
+      while (this.next().type !== 'list_item_end') {
+        body += this.tok();
+      }
+
+      return '<li>'
+        + body
+        + '</li>\n';
+    }
+    case 'html': {
+      return !this.token.pre && !this.options.pedantic
+        ? this.inline.output(this.token.text)
+        : this.token.text;
+    }
+    case 'paragraph': {
+      return '<p>'
+        + this.inline.output(this.token.text)
+        + '</p>\n';
+    }
+    case 'text': {
+      return '<p>'
+        + this.parseText()
+        + '</p>\n';
+    }
+  }
+};
+
+/**
+ * Helpers
+ */
+
+function escape(html, encode) {
+  return html
+    .replace(!encode ? /&(?!#?\w+;)/g : /&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function replace(regex, opt) {
+  regex = regex.source;
+  opt = opt || '';
+  return function self(name, val) {
+    if (!name) return new RegExp(regex, opt);
+    val = val.source || val;
+    val = val.replace(/(^|[^\[])\^/g, '$1');
+    regex = regex.replace(name, val);
+    return self;
+  };
+}
+
+function noop() {}
+noop.exec = noop;
+
+function merge(obj) {
+  var i = 1
+    , target
+    , key;
+
+  for (; i < arguments.length; i++) {
+    target = arguments[i];
+    for (key in target) {
+      if (Object.prototype.hasOwnProperty.call(target, key)) {
+        obj[key] = target[key];
+      }
+    }
+  }
+
+  return obj;
+}
+
+/**
+ * Marked
+ */
+
+function marked(src, opt) {
+  try {
+    return Parser.parse(Lexer.lex(src, opt), opt);
+  } catch (e) {
+    e.message += '\nPlease report this to https://github.com/chjj/marked.';
+    if ((opt || marked.defaults).silent) {
+      return 'An error occured:\n' + e.message;
+    }
+    throw e;
+  }
+}
+
+/**
+ * Options
+ */
+
+marked.options =
+marked.setOptions = function(opt) {
+  marked.defaults = opt;
+  return marked;
+};
+
+marked.defaults = {
+  gfm: true,
+  tables: true,
+  breaks: false,
+  pedantic: false,
+  sanitize: false,
+  silent: false,
+  highlight: null
+};
+
+/**
+ * Expose
+ */
+
+marked.Parser = Parser;
+marked.parser = Parser.parse;
+
+marked.Lexer = Lexer;
+marked.lexer = Lexer.lex;
+
+marked.InlineLexer = InlineLexer;
+marked.inlineLexer = InlineLexer.output;
+
+marked.parse = marked;
+
+if (typeof module !== 'undefined') {
+  module.exports = marked;
+} else if (typeof define === 'function' && define.amd) {
+  define(function() { return marked; });
+} else {
+  this.marked = marked;
+}
+
+}).call(function() {
+  return this || (typeof window !== 'undefined' ? window : global);
+}());
+;/*! Swig https://paularmstrong.github.com/swig | https://github.com/paularmstrong/swig/blob/master/LICENSE */
+/*! Cross-Browser Split 1.0.1 (c) Steven Levithan <stevenlevithan.com>; MIT License An ECMA-compliant, uniform cross-browser split method */
+/*! Underscore.js (c) 2011 Jeremy Ashkenas | https://github.com/documentcloud/underscore/blob/master/LICENSE */
+/*! DateZ (c) 2011 Tomo Universalis | https://github.com/TomoUniversalis/DateZ/blob/master/LISENCE */(function () {
+  var str = '{{ a }}',
+    splitter;
+  if (str.split(/(\{\{.*?\}\})/).length === 0) {
+
+    /** Repurposed from Steven Levithan's
+     *  Cross-Browser Split 1.0.1 (c) Steven Levithan <stevenlevithan.com>; MIT License An ECMA-compliant, uniform cross-browser split method
+     */
+    splitter = function (str, separator, limit) {
+      if (Object.prototype.toString.call(separator) !== '[object RegExp]') {
+        return splitter._nativeSplit.call(str, separator, limit);
+      }
+
+      var output = [],
+        lastLastIndex = 0,
+        flags = (separator.ignoreCase ? 'i' : '') + (separator.multiline ? 'm' : '') + (separator.sticky ? 'y' : ''),
+        separator2,
+        match,
+        lastIndex,
+        lastLength;
+
+      separator = RegExp(separator.source, flags + 'g');
+
+      str = str.toString();
+      if (!splitter._compliantExecNpcg) {
+        separator2 = RegExp('^' + separator.source + '$(?!\\s)', flags);
+      }
+
+      if (limit === undefined || limit < 0) {
+        limit = Infinity;
+      } else {
+        limit = Math.floor(+limit);
+        if (!limit) {
+          return [];
+        }
+      }
+
+      function fixExec() {
+        var i = 1;
+        for (i; i < arguments.length - 2; i += 1) {
+          if (arguments[i] === undefined) {
+            match[i] = undefined;
+          }
+        }
+      }
+
+      match = separator.exec(str);
+      while (match) {
+        lastIndex = match.index + match[0].length;
+
+        if (lastIndex > lastLastIndex) {
+          output.push(str.slice(lastLastIndex, match.index));
+
+          if (!splitter._compliantExecNpcg && match.length > 1) {
+            match[0].replace(separator2, fixExec);
+          }
+
+          if (match.length > 1 && match.index < str.length) {
+            Array.prototype.push.apply(output, match.slice(1));
+          }
+
+          lastLength = match[0].length;
+          lastLastIndex = lastIndex;
+
+          if (output.length >= limit) {
+            break;
+          }
+        }
+
+        if (separator.lastIndex === match.index) {
+          separator.lastIndex += 1; // avoid an infinite loop
+        }
+        match = separator.exec(str);
+      }
+
+      if (lastLastIndex === str.length) {
+        if (lastLength || !separator.test('')) {
+          output.push('');
+        }
+      } else {
+        output.push(str.slice(lastLastIndex));
+      }
+
+      return output.length > limit ? output.slice(0, limit) : output;
+    };
+
+    splitter._compliantExecNpcg = /()??/.exec('')[1] === undefined;
+    splitter._nativeSplit = String.prototype.split;
+
+    String.prototype.split = function (separator, limit) {
+      return splitter(this, separator, limit);
+    };
+  }
+}());
+swig = (function () {
+var swig = {},
+dateformat = {},
+filters = {},
+helpers = {},
+parser = {},
+tags = {};
+(function (exports) {
+
+
+
+var config = {
+    allowErrors: false,
+    autoescape: true,
+    cache: true,
+    encoding: 'utf8',
+    filters: filters,
+    root: '/',
+    tags: tags,
+    extensions: {},
+    tzOffset: 0
+  },
+  _config = _.extend({}, config),
+  CACHE = {};
+
+// Call this before using the templates
+exports.init = function (options) {
+  CACHE = {};
+  _config = _.extend({}, config, options);
+  _config.filters = _.extend(filters, options.filters);
+  _config.tags = _.extend(tags, options.tags);
+
+  dateformat.defaultTZOffset = _config.tzOffset;
+};
+
+function TemplateError(error) {
+  return { render: function () {
+    return '<pre>' + error.stack + '</pre>';
+  }};
+}
+
+function createRenderFunc(code) {
+  // The compiled render function - this is all we need
+  return new Function('_context', '_parents', '_filters', '_', '_ext', [
+    '_parents = _parents ? _parents.slice() : [];',
+    '_context = _context || {};',
+    // Prevents circular includes (which will crash node without warning)
+    'var j = _parents.length,',
+    '  _output = "",',
+    '  _this = this;',
+    // Note: this loop averages much faster than indexOf across all cases
+    'while (j--) {',
+    '   if (_parents[j] === this.id) {',
+    '     return "Circular import of template " + this.id + " in " + _parents[_parents.length-1];',
+    '   }',
+    '}',
+    // Add this template as a parent to all includes in its scope
+    '_parents.push(this.id);',
+    code,
+    'return _output;'
+  ].join(''));
+}
+
+function createTemplate(data, id) {
+  var template = {
+      // Allows us to include templates from the compiled code
+      compileFile: exports.compileFile,
+      // These are the blocks inside the template
+      blocks: {},
+      // Distinguish from other tokens
+      type: parser.TEMPLATE,
+      // The template ID (path relative to template dir)
+      id: id
+    },
+    tokens,
+    code,
+    render;
+
+  // The template token tree before compiled into javascript
+  if (_config.allowErrors) {
+    tokens = parser.parse.call(template, data, _config.tags, _config.autoescape);
+  } else {
+    try {
+      tokens = parser.parse.call(template, data, _config.tags, _config.autoescape);
+    } catch (e) {
+      return new TemplateError(e);
+    }
+  }
+
+  template.tokens = tokens;
+
+  // The raw template code
+  code = parser.compile.call(template);
+
+  if (code !== false) {
+    render = createRenderFunc(code);
+  } else {
+    render = function (_context, _parents, _filters, _, _ext) {
+      template.tokens = tokens;
+      code = parser.compile.call(template, '', _context);
+      var fn = createRenderFunc(code);
+      return fn.call(this, _context, _parents, _filters, _, _ext);
+    };
+  }
+
+  template.render = function (context, parents) {
+    if (_config.allowErrors) {
+      return render.call(this, context, parents, _config.filters, _, _config.extensions);
+    }
+    try {
+      return render.call(this, context, parents, _config.filters, _, _config.extensions);
+    } catch (e) {
+      return new TemplateError(e);
+    }
+  };
+
+  return template;
+}
+
+function getTemplate(source, options) {
+  var key = options.filename || source;
+  if (_config.cache || options.cache) {
+    if (!CACHE.hasOwnProperty(key)) {
+      CACHE[key] = createTemplate(source, key);
+    }
+
+    return CACHE[key];
+  }
+
+  return createTemplate(source, key);
+}
+
+exports.compileFile = function (filepath, forceAllowErrors) {
+  var tpl, get;
+
+  if (_config.cache && CACHE.hasOwnProperty(filepath)) {
+    return CACHE[filepath];
+  }
+
+  if (typeof window !== 'undefined') {
+    throw new TemplateError({ stack: 'You must pre-compile all templates in-browser. Use `swig.compile(template);`.' });
+  }
+
+  get = function () {
+    var excp,
+      getSingle,
+      c;
+    getSingle = function (prefix) {
+      var file = ((/^\//).test(filepath) || (/^.:/).test(filepath)) ? filepath : prefix + '/' + filepath,
+        data;
+      try {
+        data = fs.readFileSync(file, config.encoding);
+        tpl = getTemplate(data, { filename: filepath });
+      } catch (e) {
+        excp = e;
+      }
+    };
+    if (typeof _config.root === "string") {
+      getSingle(_config.root);
+    }
+    if (_config.root instanceof Array) {
+      c = 0;
+      while (tpl === undefined && c < _config.root.length) {
+        getSingle(_config.root[c]);
+        c = c + 1;
+      }
+    }
+    if (tpl === undefined) {
+      throw excp;
+    }
+  };
+
+  if (_config.allowErrors || forceAllowErrors) {
+    get();
+  } else {
+    try {
+      get();
+    } catch (error) {
+      tpl = new TemplateError(error);
+    }
+  }
+  return tpl;
+};
+
+exports.compile = function (source, options) {
+  var tmpl = getTemplate(source, options || {});
+
+  return function (source, options) {
+    return tmpl.render(source, options);
+  };
+};
+})(swig);
+(function (exports) {
+
+// Javascript keywords can't be a name: 'for.is_invalid' as well as 'for' but not 'for_' or '_for'
+var KEYWORDS = /^(Array|ArrayBuffer|Boolean|Date|Error|eval|EvalError|Function|Infinity|Iterator|JSON|Math|Namespace|NaN|Number|Object|QName|RangeError|ReferenceError|RegExp|StopIteration|String|SyntaxError|TypeError|undefined|uneval|URIError|XML|XMLList|break|case|catch|continue|debugger|default|delete|do|else|finally|for|function|if|in|instanceof|new|return|switch|this|throw|try|typeof|var|void|while|with)(?=(\.|$))/;
+
+// Returns TRUE if the passed string is a valid javascript string literal
+exports.isStringLiteral = function (string) {
+  if (typeof string !== 'string') {
+    return false;
+  }
+
+  var first = string.substring(0, 1),
+    last = string.charAt(string.length - 1, 1),
+    teststr;
+
+  if ((first === last) && (first === "'" || first === '"')) {
+    teststr = string.substr(1, string.length - 2).split('').reverse().join('');
+
+    if ((first === "'" && (/'(?!\\)/).test(teststr)) || (last === '"' && (/"(?!\\)/).test(teststr))) {
+      throw new Error('Invalid string literal. Unescaped quote (' + string[0] + ') found.');
+    }
+
+    return true;
+  }
+
+  return false;
+};
+
+// Returns TRUE if the passed string is a valid javascript number or string literal
+exports.isLiteral = function (string) {
+  var literal = false;
+
+  // Check if it's a number literal
+  if ((/^\d+([.]\d+)?$/).test(string)) {
+    literal = true;
+  } else if (exports.isStringLiteral(string)) {
+    literal = true;
+  }
+
+  return literal;
+};
+
+// Variable names starting with __ are reserved.
+exports.isValidName = function (string) {
+  return ((typeof string === 'string')
+    && string.substr(0, 2) !== '__'
+    && (/^([$A-Za-z_]+[$A-Za-z_0-9]*)(\.?([$A-Za-z_]+[$A-Za-z_0-9]*))*$/).test(string)
+    && !KEYWORDS.test(string));
+};
+
+// Variable names starting with __ are reserved.
+exports.isValidShortName = function (string) {
+  return string.substr(0, 2) !== '__' && (/^[$A-Za-z_]+[$A-Za-z_0-9]*$/).test(string) && !KEYWORDS.test(string);
+};
+
+// Checks if a name is a vlaid block name
+exports.isValidBlockName = function (string) {
+  return (/^[A-Za-z]+[A-Za-z_0-9]*$/).test(string);
+};
+
+function stripWhitespace(input) {
+  return input.replace(/^\s+|\s+$/g, '');
+}
+exports.stripWhitespace = stripWhitespace;
+
+// the varname is split on (/(\.|\[|\])/) but it may contain keys with dots,
+// e.g. obj['hello.there']
+// this function searches for these and preserves the literal parts
+function filterVariablePath(props) {
+
+	var filtered = [],
+		literal = '',
+		i = 0;
+	for (i; i < props.length; i += 1) {
+		if (props[i] && props[i].charAt(0) !== props[i].charAt(props[i].length - 1) &&
+				(props[i].indexOf('"') === 0 || props[i].indexOf("'") === 0)) {
+			literal = props[i];
+			continue;
+		}
+		if (props[i] === '.' && literal) {
+			literal += '.';
+			continue;
+		}
+		if (props[i].indexOf('"') === props[i].length - 1 || props[i].indexOf("'") === props[i].length - 1) {
+			literal += props[i];
+			filtered.push(literal);
+			literal = '';
+		} else {
+			filtered.push(props[i]);
+		}
+	}
+	return _.compact(filtered);
+}
+
+/**
+* Returns a valid javascript code that will
+* check if a variable (or property chain) exists
+* in the evaled context. For example:
+*  check('foo.bar.baz')
+* will return the following string:
+*  typeof foo !== 'undefined' && typeof foo.bar !== 'undefined' && typeof foo.bar.baz !== 'undefined'
+*/
+function check(variable, context) {
+  if (_.isArray(variable)) {
+    return '(true)';
+  }
+
+  variable = variable.replace(/^this/, '_this.__currentContext');
+
+  if (exports.isLiteral(variable)) {
+    return '(true)';
+  }
+
+  var props = variable.split(/(\.|\[|\])/),
+    chain = '',
+    output = [],
+    inArr = false,
+    prevDot = false;
+
+  if (typeof context === 'string' && context.length) {
+    props.unshift(context);
+  }
+
+  props = _.reject(props, function (val) {
+    return val === '';
+  });
+
+  props = filterVariablePath(props);
+
+  _.each(props, function (prop) {
+    if (prop === '.') {
+      prevDot = true;
+      return;
+    }
+
+    if (prop === '[') {
+      inArr = true;
+      return;
+    }
+
+    if (prop === ']') {
+      inArr = false;
+      return;
+    }
+
+    if (!chain) {
+      chain = prop;
+    } else if (inArr) {
+      if (!exports.isStringLiteral(prop)) {
+        if (prevDot) {
+          output[output.length - 1] = _.last(output).replace(/\] !== "undefined"$/, '_' + prop + '] !== "undefined"');
+          chain = chain.replace(/\]$/, '_' + prop + ']');
+          return;
+        }
+        chain += '[___' + prop + ']';
+      } else {
+        chain += '[' + prop + ']';
+      }
+    } else {
+      chain += '.' + prop;
+    }
+    prevDot = false;
+    output.push('typeof ' + chain + ' !== "undefined"');
+  });
+
+  return '(' + output.join(' && ') + ')';
+}
+exports.check = check;
+
+/**
+* Returns an escaped string (safe for evaling). If context is passed
+* then returns a concatenation of context and the escaped variable name.
+*/
+exports.escapeVarName = function (variable, context) {
+  if (_.isArray(variable)) {
+    _.each(variable, function (val, key) {
+      variable[key] = exports.escapeVarName(val, context);
+    });
+    return variable;
+  }
+
+  variable = variable.replace(/^this/, '_this.__currentContext');
+
+  if (exports.isLiteral(variable)) {
+    return variable;
+  }
+  if (typeof context === 'string' && context.length) {
+    variable = context + '.' + variable;
+  }
+
+  var chain = '',
+    props = variable.split(/(\.|\[|\])/),
+    inArr = false,
+    prevDot = false;
+
+  props = _.reject(props, function (val) {
+    return val === '';
+  });
+
+  props = filterVariablePath(props);
+
+  _.each(props, function (prop) {
+    if (prop === '.') {
+      prevDot = true;
+      return;
+    }
+
+    if (prop === '[') {
+      inArr = true;
+      return;
+    }
+
+    if (prop === ']') {
+      inArr = false;
+      return;
+    }
+
+    if (!chain) {
+      chain = prop;
+    } else if (inArr) {
+      if (!exports.isStringLiteral(prop)) {
+        if (prevDot) {
+          chain = chain.replace(/\]$/, '_' + prop + ']');
+        } else {
+          chain += '[___' + prop + ']';
+        }
+      } else {
+        chain += '[' + prop + ']';
+      }
+    } else {
+      chain += '.' + prop;
+    }
+    prevDot = false;
+  });
+
+  return chain;
+};
+
+exports.wrapMethod = function (variable, filter, context) {
+  var output = '(function () {\n',
+    args;
+
+  variable = variable || '""';
+
+  if (!filter) {
+    return variable;
+  }
+
+  args = filter.args.split(',');
+  args = _.map(args, function (value) {
+    var varname,
+      stripped = value.replace(/^\s+|\s+$/g, '');
+
+    try {
+      varname = '__' + parser.parseVariable(stripped).name.replace(/\W/g, '_');
+    } catch (e) {
+      return value;
+    }
+
+    if (exports.isValidName(stripped)) {
+      output += exports.setVar(varname, parser.parseVariable(stripped));
+      return varname;
+    }
+
+    return value;
+  });
+
+  args = (args && args.length) ? args.join(',') : '""';
+  output += 'return ';
+  output += (context) ? context + '["' : '';
+  output += filter.name;
+  output += (context) ? '"]' : '';
+  output += '.call(this';
+  output += (args.length) ? ', ' + args : '';
+  output += ');\n';
+
+  return output + '})()';
+};
+
+exports.wrapFilter = function (variable, filter) {
+  var output = '',
+    args = '';
+
+  variable = variable || '""';
+
+  if (!filter) {
+    return variable;
+  }
+
+  if (filters.hasOwnProperty(filter.name)) {
+    args = (filter.args) ? variable + ', ' + filter.args : variable;
+    output += exports.wrapMethod(variable, { name: filter.name, args: args }, '_filters');
+  } else {
+    throw new Error('Filter "' + filter.name + '" not found');
+  }
+
+  return output;
+};
+
+exports.wrapFilters = function (variable, filters, context, escape) {
+  var output = exports.escapeVarName(variable, context);
+
+  if (filters && filters.length > 0) {
+    _.each(filters, function (filter) {
+      switch (filter.name) {
+      case 'raw':
+        escape = false;
+        return;
+      case 'e':
+      case 'escape':
+        escape = filter.args || escape;
+        return;
+      default:
+        output = exports.wrapFilter(output, filter, '_filters');
+        break;
+      }
+    });
+  }
+
+  output = output || '""';
+  if (escape) {
+    output = '_filters.escape.call(this, ' + output + ', ' + escape + ')';
+  }
+
+  return output;
+};
+
+exports.setVar = function (varName, argument) {
+  var out = '',
+    props,
+    output,
+    inArr;
+  if ((/\[/).test(argument.name)) {
+    props = argument.name.split(/(\[|\])/);
+    output = [];
+    inArr = false;
+
+    _.each(props, function (prop) {
+      if (prop === '') {
+        return;
+      }
+
+      if (prop === '[') {
+        inArr = true;
+        return;
+      }
+
+      if (prop === ']') {
+        inArr = false;
+        return;
+      }
+
+      if (inArr && !exports.isStringLiteral(prop)) {
+        out += exports.setVar('___' + prop.replace(/\W/g, '_'), { name: prop, filters: [], escape: true });
+      }
+    });
+  }
+  out += 'var ' + varName + ' = "";\n' +
+    'if (' + check(argument.name, '_context') + ') {\n' +
+    '  ' + varName + ' = ' + exports.wrapFilters(argument.name, argument.filters, '_context', argument.escape) + ';\n' +
+    '} else if (' + check(argument.name) + ') {\n' +
+    '  ' + varName + ' = ' + exports.wrapFilters(argument.name, argument.filters, null, argument.escape)  + ';\n' +
+    '}\n';
+
+  if (argument.filters.length) {
+    out += ' else if (true) {\n';
+    out += '  ' + varName + ' = ' + exports.wrapFilters('', argument.filters, null, argument.escape) + ';\n';
+    out += '}\n';
+  }
+
+  return out;
+};
+
+exports.parseIfArgs = function (args, parser) {
+  var operators = ['==', '<', '>', '!=', '<=', '>=', '===', '!==', '&&', '||', 'in', 'and', 'or', 'mod', '%'],
+    errorString = 'Bad if-syntax in `{% if ' + args.join(' ') + ' %}...',
+    startParen = /^\(+/,
+    endParen = /\)+$/,
+    tokens = [],
+    prevType,
+    last,
+    closing = 0;
+
+  _.each(args, function (value, index) {
+    var endsep = 0,
+      startsep = 0,
+      operand;
+
+    if (startParen.test(value)) {
+      startsep = value.match(startParen)[0].length;
+      closing += startsep;
+      value = value.replace(startParen, '');
+
+      while (startsep) {
+        startsep -= 1;
+        tokens.push({ type: 'separator', value: '(' });
+      }
+    }
+
+    if ((/^\![^=]/).test(value) || (value === 'not')) {
+      if (value === 'not') {
+        value = '';
+      } else {
+        value = value.substr(1);
+      }
+      tokens.push({ type: 'operator', value: '!' });
+    }
+
+    if (endParen.test(value) && value.indexOf('(') === -1) {
+      if (!closing) {
+        throw new Error(errorString);
+      }
+      endsep = value.match(endParen)[0].length;
+      value = value.replace(endParen, '');
+      closing -= endsep;
+    }
+
+    if (value === 'in') {
+      last = tokens.pop();
+      prevType = 'inindex';
+    } else if (_.indexOf(operators, value) !== -1) {
+      if (prevType === 'operator') {
+        throw new Error(errorString);
+      }
+      value = value.replace('and', '&&').replace('or', '||').replace('mod', '%');
+      tokens.push({
+        value: value
+      });
+      prevType = 'operator';
+    } else if (value !== '') {
+      if (prevType === 'value') {
+        throw new Error(errorString);
+      }
+      operand = parser.parseVariable(value);
+
+      if (prevType === 'inindex') {
+        tokens.push({
+          preout: last.preout + exports.setVar('__op' + index, operand),
+          value: '(((_.isArray(__op' + index + ') || typeof __op' + index + ' === "string") && _.indexOf(__op' + index + ', ' + last.value + ') !== -1) || (typeof __op' + index + ' === "object" && ' + last.value + ' in __op' + index + '))'
+        });
+        last = null;
+      } else {
+        tokens.push({
+          preout: exports.setVar('__op' + index, operand),
+          value: '__op' + index
+        });
+      }
+      prevType = 'value';
+    }
+
+    while (endsep) {
+      endsep -= 1;
+      tokens.push({ type: 'separator', value: ')' });
+    }
+  });
+
+  if (closing > 0) {
+    throw new Error(errorString);
+  }
+
+  return tokens;
+};
+})(helpers);
+(function (exports) {
+
+var _months = {
+    full: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+    abbr: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+  },
+  _days = {
+    full: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+    abbr: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+    alt: {'-1': 'Yesterday', 0: 'Today', 1: 'Tomorrow'}
+  };
+
+/*
+DateZ is licensed under the MIT License:
+Copyright (c) 2011 Tomo Universalis (http://tomouniversalis.com)
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
+exports.defaultTZOffset = 0;
+exports.DateZ = function () {
+  var members = {
+      'default': ['getUTCDate', 'getUTCDay', 'getUTCFullYear', 'getUTCHours', 'getUTCMilliseconds', 'getUTCMinutes', 'getUTCMonth', 'getUTCSeconds', 'toISOString', 'toGMTString', 'toUTCString', 'valueOf', 'getTime'],
+      z: ['getDate', 'getDay', 'getFullYear', 'getHours', 'getMilliseconds', 'getMinutes', 'getMonth', 'getSeconds', 'getYear', 'toDateString', 'toLocaleDateString', 'toLocaleTimeString'],
+      'string': ['toLocaleString', 'toString', 'toTimeString'],
+      zSet: ['setDate', 'setFullYear', 'setHours', 'setMilliseconds', 'setMinutes', 'setMonth', 'setSeconds', 'setTime', 'setYear'],
+      set: ['setUTCDate', 'setUTCFullYear', 'setUTCHours', 'setUTCMilliseconds', 'setUTCMinutes', 'setUTCMonth', 'setUTCSeconds'],
+      'static': ['UTC', 'parse']
+    },
+    d = this,
+    i;
+
+  d.date = d.dateZ = (arguments.length > 1) ? new Date(Date.UTC.apply(Date, arguments) + ((new Date()).getTimezoneOffset() * 60000)) : (arguments.length === 1) ? new Date(new Date(arguments['0'])) : new Date();
+
+  d.timezoneOffset = d.dateZ.getTimezoneOffset();
+
+  function zeroPad(i) {
+    return (i < 10) ? '0' + i : i;
+  }
+  function _toTZString() {
+    var hours = zeroPad(Math.floor(Math.abs(d.timezoneOffset) / 60)),
+      minutes = zeroPad(Math.abs(d.timezoneOffset) - hours * 60),
+      prefix = (d.timezoneOffset < 0) ? '+' : '-',
+      abbr = (d.tzAbbreviation === undefined) ? '' : ' (' + d.tzAbbreviation + ')';
+
+    return 'GMT' + prefix + hours + minutes + abbr;
+  }
+
+  _.each(members.z, function (name) {
+    d[name] = function () {
+      return d.dateZ[name]();
+    };
+  });
+  _.each(members.string, function (name) {
+    d[name] = function () {
+      return d.dateZ[name].apply(d.dateZ, []).replace(/GMT[+\-]\\d{4} \\(([a-zA-Z]{3,4})\\)/, _toTZString());
+    };
+  });
+  _.each(members['default'], function (name) {
+    d[name] = function () {
+      return d.date[name]();
+    };
+  });
+  _.each(members['static'], function (name) {
+    d[name] = function () {
+      return Date[name].apply(Date, arguments);
+    };
+  });
+  _.each(members.zSet, function (name) {
+    d[name] = function () {
+      d.dateZ[name].apply(d.dateZ, arguments);
+      d.date = new Date(d.dateZ.getTime() - d.dateZ.getTimezoneOffset() * 60000 + d.timezoneOffset * 60000);
+      return d;
+    };
+  });
+  _.each(members.set, function (name) {
+    d[name] = function () {
+      d.date[name].apply(d.date, arguments);
+      d.dateZ = new Date(d.date.getTime() + d.date.getTimezoneOffset() * 60000 - d.timezoneOffset * 60000);
+      return d;
+    };
+  });
+
+  if (exports.defaultTZOffset) {
+    this.setTimezoneOffset(exports.defaultTZOffset);
+  }
+};
+exports.DateZ.prototype = {
+  getTimezoneOffset: function () {
+    return this.timezoneOffset;
+  },
+  setTimezoneOffset: function (offset, abbr) {
+    this.timezoneOffset = offset;
+    if (abbr) {
+      this.tzAbbreviation = abbr;
+    }
+    this.dateZ = new Date(this.date.getTime() + this.date.getTimezoneOffset() * 60000 - this.timezoneOffset * 60000);
+    return this;
+  }
+};
+
+// Day
+exports.d = function (input) {
+  return (input.getDate() < 10 ? '0' : '') + input.getDate();
+};
+exports.D = function (input) {
+  return _days.abbr[input.getDay()];
+};
+exports.j = function (input) {
+  return input.getDate();
+};
+exports.l = function (input) {
+  return _days.full[input.getDay()];
+};
+exports.N = function (input) {
+  var d = input.getDay();
+  return (d >= 1) ? d + 1 : 7;
+};
+exports.S = function (input) {
+  var d = input.getDate();
+  return (d % 10 === 1 && d !== 11 ? 'st' : (d % 10 === 2 && d !== 12 ? 'nd' : (d % 10 === 3 && d !== 13 ? 'rd' : 'th')));
+};
+exports.w = function (input) {
+  return input.getDay();
+};
+exports.z = function (input, offset, abbr) {
+  var year = input.getFullYear(),
+    e = new exports.DateZ(year, input.getMonth(), input.getDate(), 12, 0, 0),
+    d = new exports.DateZ(year, 0, 1, 12, 0, 0);
+
+  e.setTimezoneOffset(offset, abbr);
+  d.setTimezoneOffset(offset, abbr);
+  return Math.round((e - d) / 86400000);
+};
+
+// Week
+exports.W = function (input) {
+  var target = new Date(input.valueOf()),
+    dayNr = (input.getDay() + 6) % 7,
+    fThurs;
+
+  target.setDate(target.getDate() - dayNr + 3);
+  fThurs = target.valueOf();
+  target.setMonth(0, 1);
+  if (target.getDay() !== 4) {
+    target.setMonth(0, 1 + ((4 - target.getDay()) + 7) % 7);
+  }
+
+  return 1 + Math.ceil((fThurs - target) / 604800000);
+};
+
+// Month
+exports.F = function (input) {
+  return _months.full[input.getMonth()];
+};
+exports.m = function (input) {
+  return (input.getMonth() < 9 ? '0' : '') + (input.getMonth() + 1);
+};
+exports.M = function (input) {
+  return _months.abbr[input.getMonth()];
+};
+exports.n = function (input) {
+  return input.getMonth() + 1;
+};
+exports.t = function (input) {
+  return 32 - (new Date(input.getFullYear(), input.getMonth(), 32).getDate());
+};
+
+// Year
+exports.L = function (input) {
+  return new Date(input.getFullYear(), 1, 29).getDate() === 29;
+};
+exports.o = function (input) {
+  var target = new Date(input.valueOf());
+  target.setDate(target.getDate() - ((input.getDay() + 6) % 7) + 3);
+  return target.getFullYear();
+};
+exports.Y = function (input) {
+  return input.getFullYear();
+};
+exports.y = function (input) {
+  return (input.getFullYear().toString()).substr(2);
+};
+
+// Time
+exports.a = function (input) {
+  return input.getHours() < 12 ? 'am' : 'pm';
+};
+exports.A = function (input) {
+  return input.getHours() < 12 ? 'AM' : 'PM';
+};
+exports.B = function (input) {
+  var hours = input.getUTCHours(), beats;
+  hours = (hours === 23) ? 0 : hours + 1;
+  beats = Math.abs(((((hours * 60) + input.getUTCMinutes()) * 60) + input.getUTCSeconds()) / 86.4).toFixed(0);
+  return ('000'.concat(beats).slice(beats.length));
+};
+exports.g = function (input) {
+  var h = input.getHours();
+  return h === 0 ? 12 : (h > 12 ? h - 12 : h);
+};
+exports.G = function (input) {
+  return input.getHours();
+};
+exports.h = function (input) {
+  var h = input.getHours();
+  return ((h < 10 || (12 < h && 22 > h)) ? '0' : '') + ((h < 12) ? h : h - 12);
+};
+exports.H = function (input) {
+  var h = input.getHours();
+  return (h < 10 ? '0' : '') + h;
+};
+exports.i = function (input) {
+  var m = input.getMinutes();
+  return (m < 10 ? '0' : '') + m;
+};
+exports.s = function (input) {
+  var s = input.getSeconds();
+  return (s < 10 ? '0' : '') + s;
+};
+//u = function () { return ''; },
+
+// Timezone
+//e = function () { return ''; },
+//I = function () { return ''; },
+exports.O = function (input) {
+  var tz = input.getTimezoneOffset();
+  return (tz < 0 ? '-' : '+') + (tz / 60 < 10 ? '0' : '') + Math.abs((tz / 60)) + '00';
+};
+//T = function () { return ''; },
+exports.Z = function (input) {
+  return input.getTimezoneOffset() * 60;
+};
+
+// Full Date/Time
+exports.c = function (input) {
+  return input.toISOString();
+};
+exports.r = function (input) {
+  return input.toUTCString();
+};
+exports.U = function (input) {
+  return input.getTime() / 1000;
+};
+})(dateformat);
+(function (exports) {
+
+exports.add = function (input, addend) {
+  if (_.isArray(input) && _.isArray(addend)) {
+    return input.concat(addend);
+  }
+
+  if (typeof input === 'object' && typeof addend === 'object') {
+    return _.extend(input, addend);
+  }
+
+  if (_.isNumber(input) && _.isNumber(addend)) {
+    return input + addend;
+  }
+
+  return input + addend;
+};
+
+exports.addslashes = function (input) {
+  if (typeof input === 'object') {
+    _.each(input, function (value, key) {
+      input[key] = exports.addslashes(value);
+    });
+    return input;
+  }
+  return input.replace(/\\/g, '\\\\').replace(/\'/g, "\\'").replace(/\"/g, '\\"');
+};
+
+exports.capitalize = function (input) {
+  if (typeof input === 'object') {
+    _.each(input, function (value, key) {
+      input[key] = exports.capitalize(value);
+    });
+    return input;
+  }
+  return input.toString().charAt(0).toUpperCase() + input.toString().substr(1).toLowerCase();
+};
+
+exports.date = function (input, format, offset, abbr) {
+  var l = format.length,
+    date = new dateformat.DateZ(input),
+    cur,
+    i = 0,
+    out = '';
+
+  if (offset) {
+    date.setTimezoneOffset(offset, abbr);
+  }
+
+  for (i; i < l; i += 1) {
+    cur = format.charAt(i);
+    if (dateformat.hasOwnProperty(cur)) {
+      out += dateformat[cur](date, offset, abbr);
+    } else {
+      out += cur;
+    }
+  }
+  return out;
+};
+
+exports['default'] = function (input, def) {
+  return (typeof input !== 'undefined' && (input || typeof input === 'number')) ? input : def;
+};
+
+exports.escape = exports.e = function (input, type) {
+  type = type || 'html';
+  if (typeof input === 'string') {
+    if (type === 'js') {
+      var i = 0,
+        code,
+        out = '';
+
+      input = input.replace(/\\/g, '\\u005C');
+
+      for (i; i < input.length; i += 1) {
+        code = input.charCodeAt(i);
+        if (code < 32) {
+          code = code.toString(16).toUpperCase();
+          code = (code.length < 2) ? '0' + code : code;
+          out += '\\u00' + code;
+        } else {
+          out += input[i];
+        }
+      }
+
+      return out.replace(/&/g, '\\u0026')
+        .replace(/</g, '\\u003C')
+        .replace(/>/g, '\\u003E')
+        .replace(/\'/g, '\\u0027')
+        .replace(/"/g, '\\u0022')
+        .replace(/\=/g, '\\u003D')
+        .replace(/-/g, '\\u002D')
+        .replace(/;/g, '\\u003B');
+    }
+    return input.replace(/&(?!amp;|lt;|gt;|quot;|#39;)/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+  return input;
+};
+
+exports.first = function (input) {
+  if (typeof input === 'object' && !_.isArray(input)) {
+    return '';
+  }
+
+  if (typeof input === 'string') {
+    return input.substr(0, 1);
+  }
+
+  return _.first(input);
+};
+
+exports.join = function (input, separator) {
+  if (_.isArray(input)) {
+    return input.join(separator);
+  }
+
+  if (typeof input === 'object') {
+    var out = [];
+    _.each(input, function (value, key) {
+      out.push(value);
+    });
+    return out.join(separator);
+  }
+  return input;
+};
+
+exports.json_encode = function (input, indent) {
+  return JSON.stringify(input, null, indent || 0);
+};
+
+exports.last = function (input) {
+  if (typeof input === 'object' && !_.isArray(input)) {
+    return '';
+  }
+
+  if (typeof input === 'string') {
+    return input.charAt(input.length - 1);
+  }
+
+  return _.last(input);
+};
+
+exports.length = function (input) {
+  if (typeof input === 'object') {
+    return _.keys(input).length;
+  }
+  return input.length;
+};
+
+exports.lower = function (input) {
+  if (typeof input === 'object') {
+    _.each(input, function (value, key) {
+      input[key] = exports.lower(value);
+    });
+    return input;
+  }
+  return input.toString().toLowerCase();
+};
+
+exports.replace = function (input, search, replacement, flags) {
+  var r = new RegExp(search, flags);
+  return input.replace(r, replacement);
+};
+
+exports.reverse = function (input) {
+  if (_.isArray(input)) {
+    return input.reverse();
+  }
+  return input;
+};
+
+exports.striptags = function (input) {
+  if (typeof input === 'object') {
+    _.each(input, function (value, key) {
+      input[key] = exports.striptags(value);
+    });
+    return input;
+  }
+  return input.toString().replace(/(<([^>]+)>)/ig, '');
+};
+
+exports.title = function (input) {
+  if (typeof input === 'object') {
+    _.each(input, function (value, key) {
+      input[key] = exports.title(value);
+    });
+    return input;
+  }
+  return input.toString().replace(/\w\S*/g, function (str) {
+    return str.charAt(0).toUpperCase() + str.substr(1).toLowerCase();
+  });
+};
+
+exports.uniq = function (input) {
+  return _.uniq(input);
+};
+
+exports.upper = function (input) {
+  if (typeof input === 'object') {
+    _.each(input, function (value, key) {
+      input[key] = exports.upper(value);
+    });
+    return input;
+  }
+  return input.toString().toUpperCase();
+};
+
+exports.url_encode = function (input) {
+  return encodeURIComponent(input);
+};
+
+exports.url_decode = function (input) {
+  return decodeURIComponent(input);
+};
+})(filters);
+(function (exports) {
+
+var variableRegexp  = /^\{\{[^\r]*?\}\}$/,
+  logicRegexp   = /^\{%[^\r]*?%\}$/,
+  commentRegexp   = /^\{#[^\r]*?#\}$/,
+
+  TEMPLATE = exports.TEMPLATE = 0,
+  LOGIC_TOKEN = 1,
+  VAR_TOKEN   = 2;
+
+exports.TOKEN_TYPES = {
+  TEMPLATE: TEMPLATE,
+  LOGIC: LOGIC_TOKEN,
+  VAR: VAR_TOKEN
+};
+
+function getMethod(input) {
+  return helpers.stripWhitespace(input).match(/^[\w\.]+/)[0];
+}
+
+function doubleEscape(input) {
+  return input.replace(/\\/g, '\\\\');
+}
+
+function getArgs(input) {
+  return doubleEscape(helpers.stripWhitespace(input).replace(/^[\w\.]+\(|\)$/g, ''));
+}
+
+function getContextVar(varName, context) {
+  var a = varName.split(".");
+  while (a.length) {
+    context = context[a.splice(0, 1)[0]];
+  }
+  return context;
+}
+
+function getTokenArgs(token, parts) {
+  parts = _.map(parts, doubleEscape);
+
+  var i = 0,
+    l = parts.length,
+    arg,
+    ender,
+    out = [];
+
+  function concat(from, ending) {
+    var end = new RegExp('\\' + ending + '$'),
+      i = from,
+      out = '';
+
+    while (!(end).test(out) && i < parts.length) {
+      out += ' ' + parts[i];
+      parts[i] = null;
+      i += 1;
+    }
+
+    if (!end.test(out)) {
+      throw new Error('Malformed arguments ' + out + ' sent to tag.');
+    }
+
+    return out.replace(/^ /, '');
+  }
+
+  for (i; i < l; i += 1) {
+    arg = parts[i];
+    if (arg === null || (/^\s+$/).test(arg)) {
+      continue;
+    }
+
+    if (
+      ((/^\"/).test(arg) && !(/\"[\]\}]?$/).test(arg))
+        || ((/^\'/).test(arg) && !(/\'[\]\}]?$/).test(arg))
+        || ((/^\{/).test(arg) && !(/\}$/).test(arg))
+        || ((/^\[/).test(arg) && !(/\]$/).test(arg))
+    ) {
+      switch (arg.substr(0, 1)) {
+      case "'":
+        ender = "'";
+        break;
+      case '"':
+        ender = '"';
+        break;
+      case '[':
+        ender = ']';
+        break;
+      case '{':
+        ender = '}';
+        break;
+      }
+      out.push(concat(i, ender));
+      continue;
+    }
+
+    out.push(arg);
+  }
+
+  return out;
+}
+
+function findSubBlocks(topToken, blocks) {
+  _.each(topToken.tokens, function (token, index) {
+    if (token.name === 'block') {
+      blocks[token.args[0]] = token;
+      findSubBlocks(token, blocks);
+    }
+  });
+}
+
+function getParentBlock(token) {
+  var block;
+
+  if (token.parentBlock) {
+    block = token.parentBlock;
+  } else if (token.parent) {
+    block = getParentBlock(_.last(token.parent));
+  }
+
+  return block;
+}
+
+exports.parseVariable = function (token, escape) {
+  if (!token) {
+    return {
+      type: null,
+      name: '',
+      filters: [],
+      escape: escape
+    };
+  }
+
+  var filters = [],
+    parts = token.replace(/^\{\{\s*|\s*\}\}$/g, '').split('|'),
+    varname = parts.shift(),
+    args = null,
+    part;
+
+  if ((/\(/).test(varname)) {
+    args = getArgs(varname.replace(/^\w+\./, ''));
+    varname = getMethod(varname);
+  }
+
+  _.each(parts, function (part, i) {
+    if (part && ((/^[\w\.]+\(/).test(part) || (/\)$/).test(part)) && !(/^[\w\.]+\([^\)]*\)$/).test(part)) {
+      parts[i] += ((parts[i + 1]) ? '|' + parts[i + 1] : '');
+      parts[i + 1] = false;
+    }
+  });
+  parts = _.without(parts, false);
+
+  _.each(parts, function (part) {
+    var filter_name = getMethod(part);
+    if ((/\(/).test(part)) {
+      filters.push({
+        name: filter_name,
+        args: getArgs(part)
+      });
+    } else {
+      filters.push({ name: filter_name, args: '' });
+    }
+  });
+
+  return {
+    type: VAR_TOKEN,
+    name: varname,
+    args: args,
+    filters: filters,
+    escape: escape
+  };
+};
+
+exports.parse = function (data, tags, autoescape) {
+  var rawtokens = helpers.stripWhitespace(data).split(/(\{%[^\r]*?%\}|\{\{.*?\}\}|\{#[^\r]*?#\})/),
+    escape = !!autoescape,
+    last_escape = escape,
+    stack = [[]],
+    index = 0,
+    i = 0,
+    j = rawtokens.length,
+    token,
+    parts,
+    tagname,
+    lines = 1,
+    curline = 1,
+    newlines = null,
+    lastToken,
+    rawStart = /^\{\% *raw *\%\}/,
+    rawEnd = /\{\% *endraw *\%\}$/,
+    inRaw = false,
+    stripAfter = false,
+    stripBefore = false,
+    stripStart = false,
+    stripEnd = false;
+
+  for (i; i < j; i += 1) {
+    token = rawtokens[i];
+    curline = lines;
+    newlines = token.match(/\n/g);
+    stripAfter = false;
+    stripBefore = false;
+    stripStart = false;
+    stripEnd = false;
+
+    if (newlines) {
+      lines += newlines.length;
+    }
+
+    if (inRaw !== false && !rawEnd.test(token)) {
+      inRaw += token;
+      continue;
+    }
+
+    // Ignore empty strings and comments
+    if (token.length === 0 || commentRegexp.test(token)) {
+      continue;
+    } else if (/^\s+$/.test(token)) {
+      token = token.replace(/ +/, ' ').replace(/\n+/, '\n');
+    } else if (variableRegexp.test(token)) {
+      token = exports.parseVariable(token, escape);
+    } else if (logicRegexp.test(token)) {
+      if (rawEnd.test(token)) {
+        // Don't care about the content in a raw tag, so end tag may not start correctly
+        token = inRaw + token.replace(rawEnd, '');
+        inRaw = false;
+        stack[index].push(token);
+        continue;
+      }
+
+      if (rawStart.test(token)) {
+        // Have to check the whole token directly, not just parts, as the tag may not end correctly while in raw
+        inRaw = token.replace(rawStart, '');
+        continue;
+      }
+
+      parts = token.replace(/^\{%\s*|\s*%\}$/g, '').split(' ');
+      if (parts[0] === '-') {
+        stripBefore = true;
+        parts.shift();
+      }
+      tagname = parts.shift();
+      if (_.last(parts) === '-') {
+        stripAfter = true;
+        parts.pop();
+      }
+
+      if (index > 0 && (/^end/).test(tagname)) {
+        lastToken = _.last(stack[stack.length - 2]);
+        if ('end' + lastToken.name === tagname) {
+          if (lastToken.name === 'autoescape') {
+            escape = last_escape;
+          }
+          lastToken.strip.end = stripBefore;
+          lastToken.strip.after = stripAfter;
+          stack.pop();
+          index -= 1;
+          continue;
+        }
+
+        throw new Error('Expected end tag for "' + lastToken.name + '", but found "' + tagname + '" at line ' + lines + '.');
+      }
+
+      if (!tags.hasOwnProperty(tagname)) {
+        throw new Error('Unknown logic tag at line ' + lines + ': "' + tagname + '".');
+      }
+
+      if (tagname === 'autoescape') {
+        last_escape = escape;
+        escape = (!parts.length || parts[0] === 'true') ? ((parts.length >= 2) ? parts[1] : true) : false;
+      }
+
+      token = {
+        type: LOGIC_TOKEN,
+        line: curline,
+        name: tagname,
+        compile: tags[tagname],
+        parent: _.uniq(stack[stack.length - 2] || []),
+        strip: {
+          before: stripBefore,
+          after: stripAfter,
+          start: false,
+          end: false
+        }
+      };
+      token.args = getTokenArgs(token, parts);
+
+      if (tags[tagname].ends) {
+        token.strip.after = false;
+        token.strip.start = stripAfter;
+        stack[index].push(token);
+        stack.push(token.tokens = []);
+        index += 1;
+        continue;
+      }
+    }
+
+    // Everything else is treated as a string
+    stack[index].push(token);
+  }
+
+  if (inRaw !== false) {
+    throw new Error('Missing expected end tag for "raw" on line ' + curline + '.');
+  }
+
+  if (index !== 0) {
+    lastToken = _.last(stack[stack.length - 2]);
+    throw new Error('Missing end tag for "' + lastToken.name + '" that was opened on line ' + lastToken.line + '.');
+  }
+
+  return stack[index];
+};
+
+function precompile(indent, context) {
+  var filepath,
+    extendsHasVar,
+    preservedTokens = [];
+
+  // Precompile - extract blocks and create hierarchy based on 'extends' tags
+  // TODO: make block and extends tags accept context variables
+
+  // Only precompile at the template level
+  if (this.type === TEMPLATE) {
+
+    _.each(this.tokens, function (token, index) {
+
+      if (!extendsHasVar) {
+        // Load the parent template
+        if (token.name === 'extends') {
+          filepath = token.args[0];
+
+          if (!helpers.isStringLiteral(filepath)) {
+
+            if (!context) {
+              extendsHasVar = true;
+              return;
+            }
+            filepath = "\"" + getContextVar(filepath, context) + "\"";
+          }
+
+          if (!helpers.isStringLiteral(filepath) || token.args.length > 1) {
+            throw new Error('Extends tag on line ' + token.line + ' accepts exactly one string literal as an argument.');
+          }
+          if (index > 0) {
+            throw new Error('Extends tag must be the first tag in the template, but "extends" found on line ' + token.line + '.');
+          }
+          token.template = this.compileFile(filepath.replace(/['"]/g, ''), true);
+          this.parent = token.template;
+
+          // inherit tokens/blocks from parent.
+          this.blocks = _.extend({}, this.parent.blocks, this.blocks);
+
+        } else if (token.name === 'block') { // Make a list of blocks
+          var blockname = token.args[0],
+            parentBlockIndex;
+
+          if (!helpers.isValidBlockName(blockname) || token.args.length !== 1) {
+            throw new Error('Invalid block tag name "' + blockname + '" on line ' + token.line + '.');
+          }
+
+          // store blocks as flat reference list on top-level
+          // template object
+          this.blocks[blockname] = token;
+
+          // child tokens may contain more blocks at this template
+          // level - apply to flat this.blocks object
+          findSubBlocks(token, this.blocks);
+
+          // search parent list for a matching block, replacing the
+          // parent template block tokens with the derived token.
+          if (this.parent) {
+
+            // Store parent token object on a derived block
+            token.parentBlock = this.parent.blocks[blockname];
+
+            // this will return -1 for a nested block
+            parentBlockIndex = _.indexOf(this.parent.tokens,
+                this.parent.blocks[blockname]);
+            if (parentBlockIndex >= 0) {
+              this.parent.tokens[parentBlockIndex] = token;
+            }
+
+          }
+        } else if (token.type === LOGIC_TOKEN) {
+          // Preserve any template logic from the extended template.
+          preservedTokens.push(token);
+        }
+        // else, discard any tokens that are not under a LOGIC_TOKEN
+        // or VAR_TOKEN (for example, static strings).
+
+      }
+    }, this);
+
+
+    // If extendsHasVar == true, then we know {% extends %} is not using a string literal, thus we can't
+    // compile until render is called, so we return false.
+    if (extendsHasVar) {
+      return false;
+    }
+
+    if (this.parent && this.parent.tokens) {
+      this.tokens = preservedTokens.concat(this.parent.tokens);
+    }
+  }
+}
+
+exports.compile = function compile(indent, context, template) {
+  var code = '',
+    wrappedInMethod,
+    blockname,
+    parentBlock;
+
+  indent = indent || '';
+
+  // Template parameter is optional (not used at the top-level), initialize
+  if (this.type === TEMPLATE) {
+    template = this;
+  }
+
+  // Initialize blocks
+  if (!this.blocks) {
+    this.blocks = {};
+  }
+
+  // Precompile step - process block inheritence into true token hierarchy
+  if (precompile.call(this, indent, context) === false) {
+    return false;
+  }
+
+  // If this is not a template then just iterate through its tokens
+  _.each(this.tokens, function (token, index) {
+    var name, key, args, prev, next;
+    if (typeof token === 'string') {
+      prev = this.tokens[index - 1];
+      next = this.tokens[index + 1];
+      if (prev && prev.strip && prev.strip.after) {
+        token = token.replace(/^\s+/, '');
+      }
+      if (next && next.strip && next.strip.before) {
+        token = token.replace(/\s+$/, '');
+      }
+      code += '_output += "' + doubleEscape(token).replace(/\n/g, '\\n').replace(/\r/g, '\\r').replace(/"/g, '\\"') + '";\n';
+      return code;
+    }
+
+    if (typeof token !== 'object') {
+      return; // Tokens can be either strings or objects
+    }
+
+    if (token.type === VAR_TOKEN) {
+      name = token.name.replace(/\W/g, '_');
+      key = (helpers.isLiteral(name)) ? '["' + name + '"]' : '.' + name;
+      args = (token.args && token.args.length) ? token.args : '';
+
+      code += 'if (typeof _context !== "undefined" && typeof _context' + key + ' === "function") {\n';
+      wrappedInMethod = helpers.wrapMethod('', { name: name, args: args }, '_context');
+      code += '  _output = (typeof _output === "undefined") ? ' + wrappedInMethod + ': _output + ' + wrappedInMethod + ';\n';
+      if (helpers.isValidName(name)) {
+        code += '} else if (typeof ' + name + ' === "function") {\n';
+        wrappedInMethod = helpers.wrapMethod('', { name: name, args: args });
+        code += '  _output = (typeof _output === "undefined") ? ' + wrappedInMethod + ': _output + ' + wrappedInMethod + ';\n';
+      }
+      code += '} else {\n';
+      code += helpers.setVar('__' + name, token);
+      code += '  _output = (typeof _output === "undefined") ? __' + name + ': _output + __' + name + ';\n';
+      code += '}\n';
+    }
+
+    if (token.type !== LOGIC_TOKEN) {
+      return; // Tokens can be either VAR_TOKEN or LOGIC_TOKEN
+    }
+
+    if (token.name === 'block') {
+      blockname = token.args[0];
+
+      // Sanity check - the template should be in the flat block list.
+      if (!template.blocks.hasOwnProperty(blockname)) {
+        throw new Error('Unrecognized nested block.  Block \"' + blockname +
+                '\" at line ' + token.line + ' of \"' + template.id +
+                '\" is not in template block list.');
+      }
+
+      code += compile.call(template.blocks[token.args[0]], indent + '  ', context, template);
+    } else if (token.name === 'parent') {
+      parentBlock = getParentBlock(token);
+      if (!parentBlock) {
+        throw new Error('No parent block found for parent tag at line ' +
+                token.line + '.');
+      }
+
+      code += compile.call(parentBlock, indent + '  ', context);
+    } else if (token.hasOwnProperty("compile")) {
+      if (token.strip.start && token.tokens.length && typeof token.tokens[0] === 'string') {
+        token.tokens[0] = token.tokens[0].replace(/^\s+/, '');
+      }
+      if (token.strip.end && token.tokens.length && typeof _.last(token.tokens) === 'string') {
+        token.tokens[token.tokens.length - 1] = _.last(token.tokens).replace(/\s+$/, '');
+      }
+      code += token.compile(indent + '  ', exports);
+    } else {
+      code += compile.call(token, indent + '  ', context);
+    }
+
+  }, this);
+
+  return code;
+};
+
+})(parser);
+tags['autoescape'] = (function () {
+module = {};
+/**
+ * autoescape
+ * Special handling hardcoded into the parser to determine whether variable output should be escaped or not
+ */
+module.exports = function (indent, parser) {
+  return parser.compile.apply(this, [indent]);
+};
+module.exports.ends = true;
+return module.exports;
+})();
+tags['block'] = (function () {
+module = {};
+/**
+ * block
+ */
+module.exports = { ends: true };
+return module.exports;
+})();
+tags['else'] = (function () {
+module = {};
+
+/**
+ * else
+ */
+module.exports = function (indent, parser) {
+  var last = _.last(this.parent).name,
+    thisArgs = _.clone(this.args),
+    ifarg,
+    args,
+    out;
+
+  if (last === 'for') {
+    if (thisArgs.length) {
+      throw new Error('"else" tag cannot accept arguments in the "for" context.');
+    }
+    return '} if (__loopLength === 0) {\n';
+  }
+
+  if (last !== 'if') {
+    throw new Error('Cannot call else tag outside of "if" or "for" context.');
+  }
+
+  ifarg = thisArgs.shift();
+  args = (helpers.parseIfArgs(thisArgs, parser));
+  out = '';
+
+  if (ifarg) {
+    out += '} else if (\n';
+    out += '  (function () {\n';
+
+    _.each(args, function (token) {
+      if (token.hasOwnProperty('preout') && token.preout) {
+        out += token.preout + '\n';
+      }
+    });
+
+    out += 'return (\n';
+    _.each(args, function (token) {
+      out += token.value + ' ';
+    });
+    out += ');\n';
+
+    out += '  })()\n';
+    out += ') {\n';
+
+    return out;
+  }
+
+  return indent + '\n} else {\n';
+};
+return module.exports;
+})();
+tags['extends'] = (function () {
+module = {};
+/**
+ * extends
+ */
+module.exports = {};
+return module.exports;
+})();
+tags['filter'] = (function () {
+module = {};
+
+/**
+ * filter
+ */
+module.exports = function (indent, parser) {
+  var thisArgs = _.clone(this.args),
+    name = thisArgs.shift(),
+    args = (thisArgs.length) ? thisArgs.join(', ') : '',
+    value = '(function () {\n';
+  value += '  var _output = "";\n';
+  value += parser.compile.apply(this, [indent + '  ']) + '\n';
+  value += '  return _output;\n';
+  value += '})()\n';
+
+  return '_output += ' + helpers.wrapFilter(value.replace(/\n/g, ''), { name: name, args: args }) + ';\n';
+};
+module.exports.ends = true;
+return module.exports;
+})();
+tags['for'] = (function () {
+module = {};
+
+/**
+* for
+*/
+module.exports = function (indent, parser) {
+  var thisArgs = _.clone(this.args),
+    operand1 = thisArgs[0],
+    operator = thisArgs[1],
+    operand2 = parser.parseVariable(thisArgs[2]),
+    out = '',
+    loopShared;
+
+  indent = indent || '';
+
+  if (typeof operator !== 'undefined' && operator !== 'in') {
+    throw new Error('Invalid syntax in "for" tag');
+  }
+
+  if (!helpers.isValidShortName(operand1)) {
+    throw new Error('Invalid arguments (' + operand1 + ') passed to "for" tag');
+  }
+
+  if (!helpers.isValidName(operand2.name)) {
+    throw new Error('Invalid arguments (' + operand2.name + ') passed to "for" tag');
+  }
+
+  operand1 = helpers.escapeVarName(operand1);
+
+  loopShared = 'loop.index = __loopIndex + 1;\n' +
+    'loop.index0 = __loopIndex;\n' +
+    'loop.revindex = __loopLength - loop.index0;\n' +
+    'loop.revindex0 = loop.revindex - 1;\n' +
+    'loop.first = (__loopIndex === 0);\n' +
+    'loop.last = (__loopIndex === __loopLength - 1);\n' +
+    '_context["' + operand1 + '"] = __loopIter[loop.key];\n' +
+    parser.compile.apply(this, [indent + '   ']);
+
+  out = '(function () {\n' +
+    '  var loop = {}, __loopKey, __loopIndex = 0, __loopLength = 0, __keys = [],' +
+    '    __ctx_operand = _context["' + operand1 + '"],\n' +
+    '    loop_cycle = function() {\n' +
+    '      var args = _.toArray(arguments), i = loop.index0 % args.length;\n' +
+    '      return args[i];\n' +
+    '    };\n' +
+    helpers.setVar('__loopIter', operand2) +
+    '  else {\n' +
+    '    return;\n' +
+    '  }\n' +
+    // Basic for loops are MUCH faster than for...in. Prefer this arrays.
+    '  if (_.isArray(__loopIter)) {\n' +
+    '    __loopIndex = 0; __loopLength = __loopIter.length;\n' +
+    '    for (; __loopIndex < __loopLength; __loopIndex += 1) {\n' +
+    '       loop.key = __loopIndex;\n' +
+    loopShared +
+    '    }\n' +
+    '  } else if (typeof __loopIter === "object") {\n' +
+    '    __keys = _.keys(__loopIter);\n' +
+    '    __loopLength = __keys.length;\n' +
+    '    __loopIndex = 0;\n' +
+    '    for (; __loopIndex < __loopLength; __loopIndex += 1) {\n' +
+    '       loop.key = __keys[__loopIndex];\n' +
+    loopShared +
+    '    }\n' +
+    '  }\n' +
+    '  _context["' + operand1 + '"] = __ctx_operand;\n' +
+    '})();\n';
+
+  return out;
+};
+module.exports.ends = true;
+return module.exports;
+})();
+tags['if'] = (function () {
+module = {};
+
+/**
+ * if
+ */
+module.exports = function (indent, parser) {
+  var thisArgs = _.clone(this.args),
+    args = (helpers.parseIfArgs(thisArgs, parser)),
+    out = '(function () {\n';
+
+  _.each(args, function (token) {
+    if (token.hasOwnProperty('preout') && token.preout) {
+      out += token.preout + '\n';
+    }
+  });
+
+  out += '\nif (\n';
+  _.each(args, function (token) {
+    out += token.value + ' ';
+  });
+  out += ') {\n';
+  out += parser.compile.apply(this, [indent + '  ']);
+  out += '\n}\n';
+  out += '})();\n';
+
+  return out;
+};
+module.exports.ends = true;
+return module.exports;
+})();
+tags['import'] = (function () {
+module = {};
+
+/**
+ * import
+ */
+module.exports = function (indent, parser) {
+  if (this.args.length !== 3) {
+  }
+
+  var thisArgs = _.clone(this.args),
+    file = thisArgs[0],
+    as = thisArgs[1],
+    name = thisArgs[2],
+    out = '';
+
+  if (!helpers.isLiteral(file) && !helpers.isValidName(file)) {
+    throw new Error('Invalid attempt to import "' + file  + '".');
+  }
+
+  if (as !== 'as') {
+    throw new Error('Invalid syntax {% import "' + file + '" ' + as + ' ' + name + ' %}');
+  }
+
+  out += '_.extend(_context, (function () {\n';
+
+  out += 'var _context = {}, __ctx = {}, _output = "";\n' +
+    helpers.setVar('__template', parser.parseVariable(file)) +
+    '_this.compileFile(__template).render(__ctx, _parents);\n' +
+    '_.each(__ctx, function (item, key) {\n' +
+    '  if (typeof item === "function") {\n' +
+    '    _context["' + name + '_" + key] = item;\n' +
+    '  }\n' +
+    '});\n' +
+    'return _context;\n';
+
+  out += '})());\n';
+
+  return out;
+};
+return module.exports;
+})();
+tags['include'] = (function () {
+module = {};
+
+/**
+ * include
+ */
+module.exports = function (indent, parser) {
+  var args = _.clone(this.args),
+    template = args.shift(),
+    context = '_context',
+    ignore = false,
+    out = '',
+    ctx;
+
+  indent = indent || '';
+
+  if (!helpers.isLiteral(template) && !helpers.isValidName(template)) {
+    throw new Error('Invalid arguments passed to \'include\' tag.');
+  }
+
+  if (args.length) {
+    if (_.last(args) === 'only') {
+      context = '{}';
+      args.pop();
+    }
+
+    if (args.length > 1 && args[0] === 'ignore' & args[1] === 'missing') {
+      args.shift();
+      args.shift();
+      ignore = true;
+    }
+
+    if (args.length && args[0] !== 'with') {
+      throw new Error('Invalid arguments passed to \'include\' tag.');
+    }
+
+    if (args[0] === 'with') {
+      args.shift();
+      if (!args.length) {
+        throw new Error('Context for \'include\' tag not provided, but expected after \'with\' token.');
+      }
+
+      ctx = args.shift();
+
+      context = '_context["' + ctx + '"] || ' + ctx;
+    }
+  }
+
+  out = '(function () {\n' +
+    helpers.setVar('__template', parser.parseVariable(template)) + '\n' +
+    '  var includeContext = ' + context + ';\n';
+
+  if (ignore) {
+    out += 'try {\n';
+  }
+
+  out += '  if (typeof __template === "string") {\n';
+  out += '    _output += _this.compileFile(__template).render(includeContext, _parents);\n';
+  out += '  }\n';
+
+  if (ignore) {
+    out += '} catch (e) {}\n';
+  }
+  out += '})();\n';
+
+  return out;
+};
+return module.exports;
+})();
+tags['macro'] = (function () {
+module = {};
+
+/**
+ * macro
+ */
+module.exports = function (indent, parser) {
+  var thisArgs = _.clone(this.args),
+    macro = thisArgs.shift(),
+    args = '',
+    out = '';
+
+  if (thisArgs.length) {
+    args = JSON.stringify(thisArgs).replace(/^\[|\'|\"|\]$/g, '');
+  }
+
+  out += '_context.' + macro + ' = function (' + args + ') {\n';
+  out += '  var _output = "";\n';
+  out += parser.compile.apply(this, [indent + '  ']);
+  out += '  return _output;\n';
+  out += '};\n';
+
+  return out;
+};
+module.exports.ends = true;
+return module.exports;
+})();
+tags['parent'] = (function () {
+module = {};
+/**
+* parent
+*/
+module.exports = {};
+
+return module.exports;
+})();
+tags['raw'] = (function () {
+module = {};
+/**
+ * raw
+ */
+module.exports = { ends: true };
+return module.exports;
+})();
+tags['set'] = (function () {
+module = {};
+
+/**
+ * set
+ */
+module.exports = function (indent, parser) {
+  var thisArgs = _.clone(this.args),
+    varname = helpers.escapeVarName(thisArgs.shift(), '_context'),
+    value;
+
+  // remove '='
+  if (thisArgs.shift() !== '=') {
+    throw new Error('Invalid token "' + thisArgs[1] + '" in {% set ' + thisArgs[0] + ' %}. Missing "=".');
+  }
+
+  value = thisArgs[0];
+  if (helpers.isLiteral(value) || (/^\{|^\[/).test(value) || value === 'true' || value === 'false') {
+    return ' ' + varname + ' = ' + value + ';';
+  }
+
+  value = parser.parseVariable(value);
+  return ' ' + varname + ' = ' +
+    '(function () {\n' +
+    '  var _output;\n' +
+    parser.compile.apply({ tokens: [value] }, [indent]) + '\n' +
+    '  return _output;\n' +
+    '})();\n';
+};
+return module.exports;
+})();
+return swig;
+})();
