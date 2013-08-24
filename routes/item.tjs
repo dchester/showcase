@@ -139,9 +139,11 @@ exports.initialize = function(app) {
 
 		var entity_id = req.params.entity_id;
 		var entity_item_id = req.params.entity_item_id;
+		var status = req.body._status;
 
 		Item.update({
 			id: entity_item_id,
+			status: status,
 			data: req.body,
 			error: req.error,
 			invalid: function(item) {
@@ -195,9 +197,11 @@ exports.initialize = function(app) {
 	app.post("/admin/entities/:id/items/new", save_files, function(req, res) {
 
 		var entity_id = req.params.id;
+		var status = req.body._status;
 
 		Item.create({
 			entity_id: entity_id,
+			status: status,
 			data: req.body,
 			error: req.error,
 			invalid: function(item) {
