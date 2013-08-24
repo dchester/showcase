@@ -93,3 +93,9 @@
 	max-height: 90%;
 	overflow: auto;
 }
+.no-fields {
+	display: none;
+}
+.error-no-fields .no-fields {
+	display: block;
+}

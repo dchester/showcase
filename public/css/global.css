@@ -108,6 +108,18 @@ code {
 	box-shadow: none;
 	margin-right: 5px;
 }
+.btn-secondary {
+	background: #a4c7d6;
+	color: white;
+}
+.btn-secondary:hover {
+	background: #c2e0ea;
+	color: white;
+}
+.btn-text {
+	background: none;
+	color: #808080;
+}
 .btn-large {
 	padding: 13px 32px 13px 26px;
 }

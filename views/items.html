@@ -35,6 +35,7 @@
 						<th>{{ field.title }}</th>
 					{% endfor %}
 					<th></th>
+					<th></th>
 				</tr>
 
 				{% for item in items %}
@@ -48,18 +49,15 @@
 							<td><p class="preview">{{ item[field.name] }}</p></td>
 						{% endfor %}
 
+						<td>
+							<span class="muted">{{ item.status }}</span>
+						</td>
+
 						<td class="actions nowrap">
 							<a class="btn" href="/admin/entities/{{ entity.id }}/items/{{ item.id }}/edit">
 								<i class="icon-pencil"></i>
-								edit
+								Edit
 							</a>
-							<form action="/admin/entities/{{ entity.id }}/items/{{ item.id }}" method="post" class="delete">
-								<input type="hidden" name="_method" value="delete">
-								<button class="btn">
-									<i class="icon-remove"></i>
-									remove
-								</button>
-							</form>
 						</td>
 
 					</tr>	

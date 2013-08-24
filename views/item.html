@@ -11,13 +11,17 @@
 
 {% endblock %}
 
+{% block css %}
+	<link rel="stylesheet" href="/css/item.css">
+{% endblock %}
+
 {% block content %}
 
 	<div class="content">
 
 		<h3 class="muted">{{ entity.description }}</h3>
 
-		<form method="post" enctype="multipart/form-data">
+		<form id="item_form" method="post" enctype="multipart/form-data">
 			<table class="table">
 				{% for field in fields %}
 					<tr>
@@ -34,11 +38,50 @@
 					</tr>
 				{% endfor %}
 			</table>
-			<button class="btn btn-primary btn-large">
-				<i class="icon-ok icon-white"></i>
-				Save
-			</button>
 		</form>
+
+		{% if item.status == "published" %}
+			<button form="item_form" name="_status" value="published" class="btn btn-primary btn-large">
+				<i class="icon-ok icon-white"></i>
+				Update
+			</button>
+			<button form="item_form" name="_status" value="draft" class="btn btn-large">
+				<i class="icon-undo icon-white"></i>
+				Unpublish
+			</button>
+		{% else %}
+			<button form="item_form" name="_status" value="published" class="btn btn-primary btn-large">
+				<i class="icon-ok icon-white"></i>
+				Publish
+			</button>
+			<button form="item_form" name="_status" value="draft" class="btn btn-secondary btn-large">
+				<i class="icon-save icon-white"></i>
+				Save Draft
+			</button>
+		{% endif %}
+
+		{% if item.id %}
+			<form action="/admin/entities/{{ entity.id }}/items/{{ item.id }}" method="post" class="delete">
+				<input type="hidden" name="_method" value="delete">
+				<button class="btn btn-large btn-text">
+					<i class="icon-remove"></i>
+					Delete
+				</button>
+			</form>
+		{% endif %}
 	</div>
+
+{% endblock %}
+
+{% block footer_js %}
+
+	<script>
+		var form = document.querySelector("form.delete");
+		form.addEventListener("submit", function(e) {
+			if (!confirm("Are you sure you want to delete this item?")) {
+				e.preventDefault();
+			}
+		});
+	</script>
 
 {% endblock %}

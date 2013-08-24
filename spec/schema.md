@@ -47,9 +47,9 @@ Instances of entities; records
 
 ```
 - entity_id
-- active_status  nullable
-- create_time    default=now
-- update_time    default=now
+- status       enum=(draft|published|deleted)
+- create_time  default=now
+- update_time  default=now
 ```
 
 ### Entity Item Data
