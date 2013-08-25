@@ -28,7 +28,9 @@ DONE
 NEXT
 
 - fix type validation
+- fix not propagating fields with errors
 - new fields out-of-order
+- deal w/ high number of fields in listing
 - namespaces / workspaces
 - settings: jsonp 
 - storage engines
