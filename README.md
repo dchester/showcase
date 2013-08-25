@@ -45,7 +45,11 @@ Server listening on port 4000...
 
 ## Collections
 
-Once the server is up and running, start by creating a new collection.  A collection is a set of items that contain similar items.  Other CMSs might call a collection a "content type" or "custom post type".  Define a collection and its fields, and then use the admin interface to add items.  Also see the JSON API.
+Once the server is up and running, start by creating a new collection.  A collection is a set of like items.  Other CMSs might call a collection a "content type" or "custom post type".  In a relational database, a collection would be analogous to a table.  Define a collection and its fields, and then use the admin interface to add items.  
+
+## REST API
+
+Access and modify data in collections through the built-in RESTful API.  Visit `/admin/api` in a running instance to see details for each collection.
 
 ## License
 
