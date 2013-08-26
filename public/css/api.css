@@ -1,0 +1,29 @@
+h2 {
+	margin-top: 1.6em;
+}
+h2:first-of-type {
+	margin-top: 0.3em;
+
+}
+.resource-description {
+	margin: 12px 0 24px;
+	display: block;
+}
+.parameters {
+	width: auto;
+	min-width: auto;
+	border: 1px solid #ddd;
+}
+.parameters td,
+.parameters th {
+	border-right: 1px solid #ddd;
+}
+h5 {
+	color: #666;
+}
+.row {
+	margin-left: 0px;
+}
+.nav.nav-tabs.nav-stacked {
+	margin-top: 0.6em;
+}

@@ -197,7 +197,7 @@ exports.initialize = function(app) {
 		Entity.findAll({
 			success: function(entities) {
 
-				var resources = [];
+				var entity_resources = [];
 
 				async.forEach(entities, function(entity, cb) {
 
@@ -206,25 +206,43 @@ exports.initialize = function(app) {
 						params: { per_page: 1 },
 						success: function(items, response) {
 
+							var resources = [];
+							resources.entity = entity;
+
 							var example_response = response.body;
 							if (example_response && example_response.length > EXAMPLE_LENGTH) {
 								example_response = example_response.substring(0, EXAMPLE_LENGTH) + '...';
 							}
 
+							var route = '/api/' + entity.name;
+
 							var resource = {
 								method: 'GET',
-								route: '/api/' + entity.name,
-								description: entity.title + ' Listing',
-								example_response: example_response
+								route: route,
+								description: 'Get a listing of ' + entity.title.toLowerCase(),
+								example_response: example_response,
+								example_uri: route
 							};
 
 							resources.push(resource);
+
+							var write_resource = {
+								method: 'POST',
+								route: route,
+								description: 'Create ' + entity.title.toLowerCase(),
+								parameters: entity.fields
+							}
+
+							resources.push(write_resource);
+
+							entity_resources.push(resources);
+
 							cb();
 						}
 					});
 
 				}, function() {
-					res.render("api.html", { resources: resources });
+					res.render("api.html", { entity_resources: entity_resources });
 				});
 
 			}
