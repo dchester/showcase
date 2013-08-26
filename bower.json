@@ -2,8 +2,8 @@
   "name": "flight-cms",
   "dependencies": {
     "underscore": "*",
-    "swig": "*",
-    "bootstrap": "http://twitter.github.com/bootstrap/assets/bootstrap.zip",
+    "swig": "https://github.com/paularmstrong/swig/archive/v0.14.0.zip",
+    "bootstrap": "http://getbootstrap.com/2.3.2/assets/bootstrap.zip",
     "jquery": "*",
     "jquery-sortable": "https://github.com/farhadi/html5sortable.git",
     "font-awesome": "*",

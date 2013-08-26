@@ -12,7 +12,7 @@
     "dreamer": "https://github.com/dchester/dreamer/archive/master.tar.gz",
     "async": "*",
     "express": "*",
-    "swig": "*",
+    "swig": "= v0.14.0",
     "consolidate": "*",
     "tamejs": "*",
     "connect-flash": "*",
