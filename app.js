@@ -28,8 +28,12 @@ var errorHandler = function(req, res, next) {
 			var error = arguments[0];
 		}
 
-		var response = JSON.parse(JSON.stringify(error));
-		response.message = error.toString();
+		try {
+			var response = JSON.parse(JSON.stringify(error));
+			response.message = error.toString();
+		} catch(e) {
+			var response = {};
+		}
 
 		res.json(status, response);
 	};
