@@ -23,27 +23,33 @@ DONE
 - warn on removing items
 - support markdown
 - pills w/ counts
+- fix not propagating fields with errors
 
 
 NEXT
 
-- fix type validation
-- fix not propagating fields with errors
-- new fields out-of-order
-- deal w/ high number of fields in listing
 - namespaces / workspaces
+- fix type validation
+- new fields out-of-order
+- log all changes
 - settings: jsonp 
 - storage engines
+- references
+- bulk import/export for data
+- bulk import/export for collections schemas
+- custom fields: selects
+- custom fields: display order w/ dnd
+- file browser
+- generic files upload
 - access control / roles
 - document adding permissions for a user?
+- deal w/ high number of fields in listing
 - explain what are fields
-- log all changes
 - write tests
 - custom fields
 - zero states
 - internationalization
 - customized preview
-- references
 - oauth / user sessions
 - csrf tokens
 - soft deletes
