@@ -13,14 +13,17 @@
 	<div class="row">
 
 		<div class="span4">
-			<ul class="nav nav-tabs nav-stacked">
-				{% for resources in entity_resources %}
-					<li><a href="#{{ resources.entity.name }}">{{ resources.entity.title }}</a></li>
-				{% endfor %}
-			</ul>
+			<div class="resources-listing-nav" data-spy="affix" data-offset-top="100">
+				<h4>Resources</h4>
+				<ul class="nav nav-tabs nav-stacked">
+					{% for resources in entity_resources %}
+						<li><a href="#{{ resources.entity.name }}">{{ resources.entity.title }}</a></li>
+					{% endfor %}
+				</ul>
+			</div>
 		</div>
 
-		<div class="content content-condensed span8">
+		<div class="content content-condensed span8 resources-listing">
 
 			{% for resources in entity_resources %}
 
