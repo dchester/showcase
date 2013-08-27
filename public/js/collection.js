@@ -7,7 +7,7 @@ var InputPair = function(args) {
 		return str
 			.toLowerCase()
 			.replace(/(^\s+|\s+$)/g, '')
-			.replace(/\s/g, '_');
+			.replace(/[^a-z]+/g, '_');
 	};
 
 	if (!parseInt(this.target.getAttribute('data-autoupdate'))) return;
