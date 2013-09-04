@@ -242,7 +242,7 @@ exports.initialize = function(app) {
 					});
 
 				}, function() {
-					entity_resources = entity_resources.sort(function(a, b) { return a.entity.name.localeCompare(b.entity.name); });
+					entity_resources = entity_resources.sort(function(a, b) { return a.entity.title.localeCompare(b.entity.title); });
 					res.render("api.html", { entity_resources: entity_resources });
 				});
 
