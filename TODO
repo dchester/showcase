@@ -28,6 +28,7 @@ DONE
 
 NEXT
 
+- namespaces / workspaces
 - fix type validation
 - new fields out-of-order
 - deal w/ high number of fields in listing
@@ -41,15 +42,25 @@ NEXT
   - admin status
 - settings: jsonp 
 - storage engines
-- document adding permissions for a user?
-- explain what are fields
 - log all changes
+- settings: jsonp 
+- storage engines
+- references
+- bulk import/export for data
+- bulk import/export for collections schemas
+- custom fields: selects
+- custom fields: display order w/ dnd
+- file browser
+- generic files upload
+- access control / roles
+- document adding permissions for a user?
+- deal w/ high number of fields in listing
+- explain what are fields
 - write tests
 - custom fields
 - zero states
 - internationalization
 - customized preview
-- references
 - oauth / user sessions
 - csrf tokens
 - soft deletes

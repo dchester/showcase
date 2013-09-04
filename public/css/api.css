@@ -27,3 +27,12 @@ h5 {
 .nav.nav-tabs.nav-stacked {
 	margin-top: 0.6em;
 }
+.resources-listing-nav {
+	margin-right: 30px;
+}
+.resources-listing-nav.affix {
+	top: 32px;
+}
+.resources-listing {
+	padding-top: 20px;
+}
