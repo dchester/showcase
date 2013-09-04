@@ -23,18 +23,24 @@ DONE
 - warn on removing items
 - support markdown
 - pills w/ counts
+- fix not propagating fields with errors
 
 
 NEXT
 
 - fix type validation
-- fix not propagating fields with errors
 - new fields out-of-order
 - deal w/ high number of fields in listing
 - namespaces / workspaces
+  - field in entities form
+  - zero state: create namespace
+  - namespaces listing page
+- access control / roles
+  - user page 
+  - default permissions
+  - admin status
 - settings: jsonp 
 - storage engines
-- access control / roles
 - document adding permissions for a user?
 - explain what are fields
 - log all changes

@@ -6,6 +6,7 @@ Different types of entities or models
 - title
 - description
 - name
+- workspace_id  fk=workspaces.id
 ```
 
 ### Entity Fields
@@ -74,5 +75,27 @@ Uploaded files associated with items
 - content_type
 - meta_json          text,nullable
 - size               integer
+```
+
+### Users
+
+```
+- username
+- external_user_id
+```
+
+### User Entity Permissions
+
+```
+- user_id
+- entity_id
+- permission  enum=(editor|viewer|no_access)
+```
+
+### Workspaces
+
+```
+- name
+- description
 ```
 
