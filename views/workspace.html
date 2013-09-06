@@ -1,0 +1,66 @@
+{% extends 'layout.html' %}
+
+{% set title = 'Workspace' %}
+
+{% block page_header %}
+
+	<h1 class="pagetitle">
+		<a href="/workspaces">Workspaces</a>
+		<span class="transparent">{{ subtitle }}</span>
+	</h1>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="content">
+	<form method="post">
+		<table class="table">
+			<tr>
+				<th>
+					Title
+					<div class="muted">Required</div>
+				</th>
+				<td>
+					<input type="text" name="title" value="{{ workspace.title }}">
+					<div class="description">
+						Title of the workspace for humans
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<th>
+					Handle
+					<div class="muted">Required</div>
+				</th>
+				<td>
+					<input type="text" name="handle" value="{{ workspace.handle }}">
+					<div class="description">
+						Name of the workspace for computers (all lowercase, no spaces)
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<th>
+					Description
+					<div class="muted">Required</div>
+				</th>
+				<td>
+					<input type="text" name="description" value="{{ workspace.description }}">
+					<div class="description">
+						What material does this workspace cover?
+					</div>
+				</td>
+			</tr>
+
+
+		</table>
+
+		<button class="btn btn-primary btn-large">
+			<i class="icon-ok icon-white"></i>
+			Save
+		</button>
+	</form>
+</div>
+
+{% endblock %}

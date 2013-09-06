@@ -6,7 +6,7 @@ Different types of entities or models
 - title
 - description
 - name
-- workspace_id  fk=workspaces.id
+- workspace_handle  fk=workspaces.handle
 ```
 
 ### Entity Fields
@@ -81,7 +81,7 @@ Uploaded files associated with items
 
 ```
 - username
-- external_user_id
+- external_user_id  nullable
 ```
 
 ### User Entity Permissions
@@ -95,7 +95,9 @@ Uploaded files associated with items
 ### Workspaces
 
 ```
-- name
+- title
+- handle
 - description
 ```
+
 

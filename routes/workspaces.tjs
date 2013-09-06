@@ -1,0 +1,117 @@
+var Deferrals = require('../lib/deferrals');
+
+exports.initialize = function(app) {
+
+	var models = app.dreamer.models;
+
+	var workspaceLoader = function(req, res, next) {
+
+		var workspace_handle = req.params.workspace_handle;
+		if (!workspace_handle) return next();
+
+		models.workspaces.find({ where: { handle: workspace_handle } })
+			.error(req.error)
+			.success(function(workspace) { 
+
+				if (!workspace) return req.error("invalid workspace handle: " + workspace_handle);
+
+				res.locals.workspace = workspace;
+				req.flight = req.flight || {};
+				req.flight.workspace = workspace;
+				next();
+			});
+	};
+
+	app.get("/workspaces", function(req, res) {
+
+		var workspaces;
+
+		await {
+
+			var deferrals = new Deferrals(defer());
+
+			models.workspaces.findAll({})
+				.error(req.error)
+				.success(function(_workspaces) {
+					workspaces = _workspaces;
+					deferrals.run();
+				});
+		}
+
+		res.render("workspaces.html", { workspaces: workspaces });
+	});
+
+	app.get("/workspaces/new", function(req, res) {
+
+		var subtitle = ' › New';
+
+		res.render("workspace.html", {
+			subtitle: subtitle
+		});
+	});
+
+	app.get("/workspaces/:workspace_handle/edit", workspaceLoader, function(req, res) {
+
+		var workspace = req.flight.workspace;
+
+		var subtitle = '› ' + workspace.title + ' › Edit';
+		res.render("workspace.html", {
+			subtitle: subtitle,
+			workspace: workspace
+		});
+	});
+
+	app.post("/workspaces/new", function(req, res) {
+
+		var workspace = models.workspaces.build({
+			title: req.body.title,
+			handle: req.body.handle,
+			description: req.body.description
+		});
+
+		var errors = workspace.validate();
+
+		if (!errors) {
+
+			workspace.save()
+				.error(req.error)
+				.success(function() {
+					req.flash('info', 'Saved new workspace');
+					res.redirect("/workspaces");
+				});
+		} else {
+			req.flash('error', 'There was an error');
+			res.redirect("/workspaces/new");
+		}
+
+	});
+
+	app.post("/workspaces/:workspace_handle/edit", workspaceLoader, function(req, res) {
+
+		var workspace = req.flight.workspace;
+
+		var fields = ['title', 'handle', 'description'];
+
+		fields.forEach(function(field) {
+			workspace[field] = req.body[field];
+		});
+
+		var errors = workspace.validate();
+
+		if (!errors) {
+			workspace.save()
+				.error(req.error)
+				.success(function() {
+					req.flash('info', 'Saved new workspace');
+					res.redirect("/workspaces");
+				});
+		} else {
+			req.flash('error', 'There was an error');
+			res.redirect("/workspaces/new");
+		}
+
+	});
+
+	app.flight = app.flight || {};
+	app.flight.workspaceLoader = workspaceLoader;
+};

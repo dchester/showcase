@@ -66,7 +66,7 @@
 		{% endif %}
 
 		{% if item.id %}
-			<form action="/admin/entities/{{ entity.id }}/items/{{ item.id }}" method="post" class="delete">
+			<form action="/workspaces/{{ workspace.handle }}/collections/{{ entity.id }}/items/{{ item.id }}" method="post" class="delete">
 				<input type="hidden" name="_method" value="delete">
 				<button class="btn btn-large btn-text">
 					<i class="icon-remove"></i>

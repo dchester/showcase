@@ -5,7 +5,7 @@
 {% block page_header %}
 	<h1 class="pagetitle">
 		Collections
-		<a class="btn btn-darker btn-large" href="/admin/entities/new">
+		<a class="btn btn-darker btn-large" href="/workspaces/{{ workspace.handle }}/collections/new">
 			<i class="icon-plus icon-white"></i>
 			New Collection
 		</a>
@@ -20,17 +20,17 @@
 				{% for entity in entities %}
 					<tr>
 						<td>
-							<a href="/admin/entities/{{ entity.id }}/items">{{ entity.title }}</a>
+							<a href="/workspaces/{{ workspace.handle }}/collections/{{ entity.id }}/items">{{ entity.title }}</a>
 							<span class="badge">{{ entity_counts[entity.id]|default(0) }}</span>
 						</td>
 						<td>{{ entity.description }}</td>
 
 						<td class="nowrap actions">
-							<a class="btn" href="/admin/entities/{{ entity.id }}/edit">
+							<a class="btn" href="/workspaces/{{ workspace.handle }}/collections/{{ entity.id }}/edit">
 								<i class="icon-pencil"></i>
 								Configure
 							</a>
-							<form action="/admin/entities/{{ entity.id }}" method="post" class="delete">
+							<form action="/workspaces/{{ workspace.handle }}/collections/{{ entity.id }}" method="post" class="delete">
 								<input type="hidden" name="_method" value="delete">
 								<button class="btn">
 									<i class="icon-remove"></i>
