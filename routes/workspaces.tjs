@@ -80,7 +80,7 @@ exports.initialize = function(app) {
 					res.redirect("/workspaces");
 				});
 		} else {
-			req.flash('error', 'There was an error');
+			req.flash('danger', 'There was an error: ' + JSON.stringify(errors));
 			res.redirect("/workspaces/new");
 		}
 
@@ -106,7 +106,7 @@ exports.initialize = function(app) {
 					res.redirect("/workspaces");
 				});
 		} else {
-			req.flash('error', 'There was an error');
+			req.flash('danger', 'There was an error: ' + JSON.stringify(errors));
 			res.redirect("/workspaces/new");
 		}
 
