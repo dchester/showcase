@@ -23,25 +23,6 @@ Possible fields or attributes an entity might have
 - index         integer
 ```
 
-### Field Constraints
-
-Constraints on fields, such as being required
-
-```
-- entity_field_id
-- constraint_id
-```
-
-### Constraints
-
-Possible constraints on fields
-
-```
-- name
-- description
-- error_text
-```
-
 ### Entity Items
 
 Instances of entities; records
@@ -81,15 +62,16 @@ Uploaded files associated with items
 
 ```
 - username
+- is_superuser  boolean
 - external_user_id  nullable
 ```
 
-### User Entity Permissions
+### Workspace User Permissions
 
 ```
 - user_id
-- entity_id
-- permission  enum=(editor|viewer|no_access)
+- workspace_handle
+- permission  enum=(administrator|editor|viewer)
 ```
 
 ### Workspaces

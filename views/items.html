@@ -13,7 +13,7 @@
 			{{ pagination.fromResult }}-{{ pagination.toResult }} of {{ pagination.totalResult }}
 		</div>
 
-		<a class="btn btn-darker btn-large" href="/workspaces/{{ workspace.handle }}/collections/{{ entity.id }}/items/new">
+		<a class="btn btn-darker btn-large permission-editor" href="/workspaces/{{ workspace.handle }}/collections/{{ entity.id }}/items/new">
 			<i class="icon-plus icon-white"></i>
 			Create New
 		</a>
@@ -54,7 +54,7 @@
 						</td>
 
 						<td class="actions nowrap">
-							<a class="btn" href="/workspaces/{{ workspace.handle }}/collections/{{ entity.id }}/items/{{ item.id }}/edit">
+							<a class="btn permission-editor" href="/workspaces/{{ workspace.handle }}/collections/{{ entity.id }}/items/{{ item.id }}/edit">
 								<i class="icon-pencil"></i>
 								Edit
 							</a>

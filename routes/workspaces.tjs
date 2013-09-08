@@ -22,6 +22,49 @@ exports.initialize = function(app) {
 			});
 	};
 
+	var workspacePermission = function(required_permission) {
+
+		var levels = { 'superuser': 100, 'administrator': 3, 'editor': 2 };
+		var required_level = levels[required_permission];
+
+		if (!required_level) throw new Error("Couldn't find permission level: " + required_permission);
+
+		return function(req, res, next) {
+
+			var workspace_handle = req.params.workspace_handle;
+
+			if (req.session && req.session.is_superuser) {
+				req.flight.workspace_user_permission = res.locals.workspace_user_permission = 'administrator';
+				next();
+
+			} else if (req.session && req.session.username) {
+				models.workspace_user_permissions
+					.find({ where: { user_id: req.session.user_id, workspace_handle: workspace_handle }})
+					.error(req.error)
+					.success(function(permission) {
+
+						permission = permission.permission;
+						req.flight.workspace_user_permission = res.locals.workspace_user_permission = permission;
+
+						var level = levels[permission] || 0;
+
+						if (req.method !== 'GET' && level < required_level) {
+							console.warn("bad permissions: ", req.method, permission, required_level, level);
+							req.flash('danger', "You don't have permissions to do that!");
+							res.redirect('/');
+						} else {
+							next();
+						}
+					});
+			} else {
+				req.flash('info', 'Please login...');
+				res.redirect("/admin/login");
+			}
+		};
+	};
+
+	var workspaceAdmin = workspacePermission('administrator');
+
 	app.get("/workspaces", function(req, res) {
 
 		var workspaces;
@@ -50,7 +93,7 @@ exports.initialize = function(app) {
 		});
 	});
 
-	app.get("/workspaces/:workspace_handle/edit", workspaceLoader, function(req, res) {
+	app.get("/workspaces/:workspace_handle/edit", workspaceLoader, workspaceAdmin, function(req, res) {
 
 		var workspace = req.flight.workspace;
 
@@ -86,7 +129,7 @@ exports.initialize = function(app) {
 
 	});
 
-	app.post("/workspaces/:workspace_handle/edit", workspaceLoader, function(req, res) {
+	app.post("/workspaces/:workspace_handle/edit", workspaceLoader, workspaceAdmin, function(req, res) {
 
 		var workspace = req.flight.workspace;
 
@@ -114,4 +157,5 @@ exports.initialize = function(app) {
 
 	app.flight = app.flight || {};
 	app.flight.workspaceLoader = workspaceLoader;
+	app.flight.workspacePermission = workspacePermission;
 };

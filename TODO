@@ -24,27 +24,19 @@ DONE
 - support markdown
 - pills w/ counts
 - fix not propagating fields with errors
+- namespaces / workspaces
+- access control / roles
 
 
 NEXT
 
-- namespaces / workspaces
+- use node domains for exception handling
 - fix type validation
 - new fields out-of-order
 - deal w/ high number of fields in listing
-- namespaces / workspaces
-  - field in entities form
-  - zero state: create namespace
-  - namespaces listing page
-- access control / roles
-  - user page 
-  - default permissions
-  - admin status
 - settings: jsonp 
 - storage engines
 - log all changes
-- settings: jsonp 
-- storage engines
 - references
 - bulk import/export for data
 - bulk import/export for collections schemas
@@ -52,16 +44,14 @@ NEXT
 - custom fields: display order w/ dnd
 - file browser
 - generic files upload
-- access control / roles
 - document adding permissions for a user?
-- deal w/ high number of fields in listing
 - explain what are fields
 - write tests
 - custom fields
-- zero states
 - internationalization
 - customized preview
 - oauth / user sessions
 - csrf tokens
 - soft deletes
 - custom api routes per entity
+

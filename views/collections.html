@@ -5,7 +5,7 @@
 {% block page_header %}
 	<h1 class="pagetitle">
 		Collections
-		<a class="btn btn-darker btn-large" href="/workspaces/{{ workspace.handle }}/collections/new">
+		<a class="btn btn-darker btn-large permission-administrator" href="/workspaces/{{ workspace.handle }}/collections/new">
 			<i class="icon-plus icon-white"></i>
 			New Collection
 		</a>
@@ -26,13 +26,13 @@
 						<td>{{ entity.description }}</td>
 
 						<td class="nowrap actions">
-							<a class="btn" href="/workspaces/{{ workspace.handle }}/collections/{{ entity.id }}/edit">
+							<a class="btn permission-administrator" href="/workspaces/{{ workspace.handle }}/collections/{{ entity.id }}/edit">
 								<i class="icon-pencil"></i>
 								Configure
 							</a>
 							<form action="/workspaces/{{ workspace.handle }}/collections/{{ entity.id }}" method="post" class="delete">
 								<input type="hidden" name="_method" value="delete">
-								<button class="btn">
+								<button class="btn permission-administrator">
 									<i class="icon-remove"></i>
 									Delete
 								</button>

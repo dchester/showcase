@@ -1,0 +1,37 @@
+{% extends 'layout.html' %}
+
+{% set title = 'Users' %}
+
+{% block page_header %}
+	<h1 class="pagetitle">
+		Users
+		<a class="btn btn-darker btn-large" href="/admin/users/new">
+			<i class="icon-plus icon-white"></i>
+			New User
+		</a>
+	</h1>
+{% endblock %}
+
+{% block content %}
+
+	<div class="content">
+		{% if users.length %}
+			<table class="table">
+				{% for user in users %}
+					<tr>
+						<td>
+							<a href="/admin/users/{{ user.id }}/edit">{{ user.username }}</a>
+						</td>
+						<td>
+							<a class="btn" href="/admin/users/{{ user.id }}/edit">
+								<i class="icon-pencil"></i>
+								Edit
+							</a>
+						</td>
+					</tr>
+				{% endfor %}
+			</table>
+		{% endif %}
+	</div>
+
+{% endblock %}

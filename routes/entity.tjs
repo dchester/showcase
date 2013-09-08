@@ -11,8 +11,9 @@ exports.initialize = function(app) {
 
 	var models = app.dreamer.models;
 	var workspaceLoader = app.flight.workspaceLoader;
+	var workspaceAdmin = app.flight.workspacePermission('administrator');
 
-	app.get("/workspaces/:workspace_handle/collections", workspaceLoader, function(req, res) {
+	app.get("/workspaces/:workspace_handle/collections", workspaceLoader, workspaceAdmin, function(req, res) {
 
 		var entities, entity_counts;
 		var workspace_handle = req.params.workspace_handle;
@@ -46,7 +47,7 @@ exports.initialize = function(app) {
 		});
 	});
 
-	app.get("/workspaces/:workspace_handle/collections/new", workspaceLoader, function(req, res) {
+	app.get("/workspaces/:workspace_handle/collections/new", workspaceLoader, workspaceAdmin, function(req, res) {
 
 		var workspace = req.flight.workspace;
 		var workspace_handle = req.params.workspace_handle;
@@ -58,7 +59,7 @@ exports.initialize = function(app) {
 		});
 	});
 
-	app.post("/workspaces/:workspace_handle/collections/new", workspaceLoader, function(req, res) {
+	app.post("/workspaces/:workspace_handle/collections/new", workspaceLoader, workspaceAdmin, function(req, res) {
 
 		var title = req.body.title;
 		var description = req.body.description;
@@ -99,7 +100,7 @@ exports.initialize = function(app) {
 		});
 	});
 
-	app.post("/workspaces/:workspace_handle/collections/:id/edit", workspaceLoader, function(req, res) {
+	app.post("/workspaces/:workspace_handle/collections/:id/edit", workspaceLoader, workspaceAdmin, function(req, res) {
 
 		var entity_id = req.params.id;
 
@@ -142,7 +143,7 @@ exports.initialize = function(app) {
 		});
 	});
 
-	app.get("/workspaces/:workspace_handle/collections/:id/edit", function(req, res) {
+	app.get("/workspaces/:workspace_handle/collections/:id/edit", workspaceLoader, workspaceAdmin, function(req, res) {
 
 		var entity_id = req.params.id;
 
@@ -160,7 +161,7 @@ exports.initialize = function(app) {
 		});
 	});
 
-	app.del("/workspaces/:workspace_handle/collections/:id", function(req, res) {
+	app.del("/workspaces/:workspace_handle/collections/:id", workspaceLoader, workspaceAdmin, function(req, res) {
 
 		var entity_id = req.params.id;
 

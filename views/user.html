@@ -1,0 +1,102 @@
+{% extends 'layout.html' %}
+
+{% set title = 'User' %}
+
+{% block css %}
+	<link rel="stylesheet" href="/css/user.css">
+{% endblock %}
+
+{% block page_header %}
+
+	<h1 class="pagetitle">
+		<a href="/admin/users">Users</a>
+		<span class="transparent">{{ subtitle }}</span>
+	</h1>
+
+{% endblock %}
+
+{% block content %}
+
+	<div class="content">
+
+		<form method="post">
+			<table class="table">
+				<tr>
+					<th>
+						Username
+					</th>
+					<td>
+						<input type="text" name="username" value="{{ user.username }}">
+						<div class="description">
+							Username for the end user
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<th>
+						Flight Superuser
+					</th>
+					<td>
+						<select name="is_superuser">
+							<option value="0" {% if !user.is_superuser %}selected="selected"{% endif %}>User</option>
+							<option value="1" {% if user.is_superuser %}selected="selected"{% endif %}>Superuser</option>
+						</select>
+						<div class="description">
+							Is this user all-powerful?
+						</div>
+					</td>
+				</tr>
+				{% if workspaces %}
+					<tr class="workspaces-row {% if user.is_superuser %}superuser{% endif %}">
+						<th>
+							Workspace<br>Permissions
+						</th>
+						<td>
+							<table class="table-secondary">
+								{% for workspace in workspaces %}
+									<tr>
+										<td>{{ workspace.title }}</td>
+										<td>
+											<input type="hidden" name="workspace_handle" value="{{ workspace.handle }}">
+											<select name="permission">
+												<option value="viewer" {% if workspace.permission == 'viewer' %}selected="selected"{% endif %}>Viewer</option>
+												<option value="editor" {% if workspace.permission == 'editor' %}selected="selected"{% endif %}>Editor</option>
+												<option value="administrator" {% if workspace.permission == 'administrator' %}selected="selected"{% endif %}>Administrator</option>
+											</select>
+										</td>
+									</tr>
+								{% endfor %}
+							</table>
+						</td>
+					</tr>
+				{% endif %}
+			</table>
+
+			<button class="btn btn-primary btn-large">
+				<i class="icon-ok icon-white"></i>
+				Save
+			</button>
+		</form>
+	</div>
+
+{% endblock %}
+
+{% block footer_js %}
+	<script>
+
+		var workspaces = document.querySelector(".workspaces-row");
+		var superuser_select = document.querySelector("select[name=is_superuser]");
+
+		if (workspaces) {
+			superuser_select.addEventListener("change", function(e) {
+				if (e.target.value == 1) {
+					workspaces.classList.add('superuser');
+				} else {
+					workspaces.classList.remove('superuser');
+				}
+			});
+		}
+
+	</script>
+{% endblock %}
+

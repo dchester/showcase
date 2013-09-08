@@ -1,0 +1,188 @@
+var Deferrals = require('../lib/deferrals');
+var async = require('async');
+
+exports.initialize = function(app) {
+
+	var models = app.dreamer.models;
+
+	app.get("/admin/users", function(req, res) {
+
+		var users;
+
+		await {
+
+			var deferrals = new Deferrals(defer());
+
+			models.users.findAll({})
+				.error(req.error)
+				.success(function(_users) {
+					users = _users;
+					deferrals.run();
+				});
+		}
+
+		res.render("users.html", { users: users });
+	});
+
+	app.get("/admin/users/new", function(req, res) {
+
+		var subtitle = ' › New';
+		res.render("user.html", { subtitle: subtitle });
+	});
+
+	app.get("/admin/users/:user_id/edit", function(req, res) {
+
+		var user_id = req.params.user_id;
+		var user, workspaces, permissions;
+
+		await {
+			var deferrals = new Deferrals(defer(), defer(), defer());
+
+			models.users.find({ where: { id: user_id } })
+				.error(req.error)
+				.success(function(_user) {
+					user = _user;
+					deferrals.run();
+				});
+
+			models.workspaces.findAll({})
+				.error(req.error)
+				.success(function(_workspaces) {
+					workspaces = _workspaces;
+					deferrals.run();
+				});
+
+			models.workspace_user_permissions
+				.findAll({ where: { user_id: user_id } })
+				.error(req.error)
+				.success(function(_permissions) {
+					permissions = _permissions;
+					deferrals.run();
+				});
+		}
+
+		workspaces = JSON.parse(JSON.stringify(workspaces));
+
+		workspaces.forEach(function(workspace) {
+
+			var workspace_permission = permissions
+				.filter(function(p) { return p.workspace_handle == workspace.handle; })
+				.shift();
+
+			if (workspace_permission) {
+				workspace.permission = workspace_permission.permission;
+			}
+		});
+
+		console.log(workspaces);
+
+		var subtitle = ' › Edit';
+		res.render("user.html", { 
+			subtitle: subtitle,
+			user: user,
+			workspaces: workspaces
+		});
+
+	});
+
+	app.post("/admin/users/:user_id/edit", function(req, res) {
+
+		var user;
+		var user_id = req.params.user_id;
+
+		await {
+			var deferrals = new Deferrals(defer());
+
+			models.users.find({ where: { id: user_id } })
+				.error(req.error)
+				.success(function(_user) {
+					user = _user;
+					deferrals.run();
+				});
+
+		}
+
+		var fields = ['username', 'is_superuser'];
+
+		fields.forEach(function(field) {
+			user[field] = req.body[field];
+		});
+
+		var errors = user.validate();
+
+		if (errors) {
+			req.flash('danger', 'There was an error: ' + JSON.stringify(errors));
+			return res.redirect("/admin/users");
+		}
+
+		var workspace_permissions = [];
+
+		var workspace_handles = Array.isArray(req.body.workspace_handle) ? 
+			req.body.workspace_handle : [ req.body.workspace_handle ];
+
+		var permissions = Array.isArray(req.body.permission) ? 
+			req.body.permission : [ req.body.permission ];
+
+		workspace_handles.forEach(function(handle, index) {
+			permission = {
+				user_id: user.id,
+				permission: permissions[index],
+				workspace_handle: handle
+			};
+			workspace_permissions.push(permission);
+		});
+
+		console.log(workspace_permissions);
+
+		await {
+			var deferrals = new Deferrals(defer(), defer());
+
+			user.save()
+				.error(req.error)
+				.success(function(_user) {
+					user = _user;
+					req.flash('success', 'Saved user');
+					deferrals.run();
+				});
+
+			var query = 'delete from workspace_user_permissions where user_id = ?';
+
+			app.dreamer.db.query(query, null, {raw: true}, [user_id])
+				.error(req.error)
+				.success(function() {
+			
+					async.forEach(workspace_permissions, function(permission, callback) {
+						models.workspace_user_permissions
+							.create(permission)
+							.error(req.error)
+							.success(callback);
+
+					}, function() { 
+						deferrals.run(); 
+					});
+				});
+		}
+
+		res.redirect("/admin/users");
+	});
+
+	app.post("/admin/users/new", function(req, res) {
+
+		var user = models.users.build({
+			username: req.body.username
+		});
+
+		var errors = user.validate();
+
+		if (!errors) {
+			user.save();
+			req.flash('info', 'Created new user');
+			res.redirect("/admin/users");
+		} else {
+			req.flash('error', 'There was an error');
+			res.redirect("/admin/users/new");
+		}
+	});
+};
+	
+

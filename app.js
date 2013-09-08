@@ -55,6 +55,11 @@ var flashLoader = function(req, res, next) {
 	next();
 };
 
+var sessionLocalizer = function(req, res, next) {
+	res.locals.session = req.session;
+	next();
+};
+
 var storagePath;
 if (!config.files.storage_path.match(/^\//)) {
 	storagePath = path.join(__dirname, config.files.storage_path); 
@@ -63,6 +68,8 @@ if (!config.files.storage_path.match(/^\//)) {
 }
 
 mkdirp.sync(config.files.storage_path + "/files");
+
+var secret = 'arthur is fond of jimz';
 
 app.configure(function(){
 	app.engine('.html', consolidate.swig);
@@ -75,9 +82,11 @@ app.configure(function(){
 	app.use(express.bodyParser());
 	app.use(express.methodOverride());
 	app.use(express.cookieParser('__SECRET__'));
-	app.use('/workspaces', express.session());
+	app.use('/workspaces', express.cookieSession({ secret: secret }));
+	app.use('/admin', express.cookieSession({ secret: secret }));
 	app.use(flash());
 	app.use(flashLoader);
+	app.use(sessionLocalizer);
 	app.use(app.router);
 	app.use(express.static(path.join(__dirname, 'public')), { maxAge: 600 });
 	app.use(express.static(storagePath));
@@ -94,15 +103,18 @@ app.get('/', function(req, res) {
 	res.redirect("/workspaces");
 });
 
-app.get ('/admin/fields', function(req, res) {
-	var fields = require('./lib/fields');
-	res.render("fields.html", { fields: fields.controls });
+/*
+app.get('/admin/session', function(req, res) {
+	res.json(req.session);
 });
+*/
 
 require('./routes/workspaces.tjs').initialize(app);
 require('./routes/entity.tjs').initialize(app);
 require('./routes/item.tjs').initialize(app);
 require('./routes/api.tjs').initialize(app);
+require('./routes/users.tjs').initialize(app);
+require('./routes/login.tjs').initialize(app);
 
 dreamer.dream();
 

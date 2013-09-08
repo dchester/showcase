@@ -230,9 +230,12 @@ exports.initialize = function(app) {
 								route: route,
 								preview: route,
 								description: 'Get a listing of ' + entity.title.toLowerCase(),
-								example_response: example_response,
 								example_uri: route
 							};
+
+							if (response.body !== '[]') {
+								resource.example_response = example_response;
+							}
 
 							resources.push(resource);
 
@@ -246,7 +249,6 @@ exports.initialize = function(app) {
 							resources.push(write_resource);
 
 							entity_resources.push(resources);
-
 							cb();
 						}
 					});
