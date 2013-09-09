@@ -1,10 +1,5 @@
 <style>
 	{% if session.is_superuser %}
-		.permission-superuser {
-			visibility: visible;
-		}
-	{% endif %}
-	{% if workspace_user_permission == 'superuser' %}
 		.permission-superuser, .permission-editor, .permission-administrator {
 			visibility: visible;
 		}

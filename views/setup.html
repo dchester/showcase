@@ -1,0 +1,25 @@
+{% extends 'layout.html' %}
+
+{% set title = 'Setup' %}
+
+{% block css %}
+	<link rel="stylesheet" href="/css/setup.css">
+{% endblock %}
+
+{% block page_header %}
+	<h1 class="pagetitle">Setup</h1>
+{% endblock %}
+
+{% block content %}
+	<div class="content">
+		<div class="center-box">
+			<h3 class="muted">Create an administrator account</h3>
+			<form method="post" class="setup-form">
+				<input type="text" name="username" placeholder="Username"><br>
+				<button class="btn btn-primary">
+					Create User
+				</button>
+			</form>
+		</div>
+	</div>
+{% endblock %}

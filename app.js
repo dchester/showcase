@@ -14,51 +14,10 @@ var armrest = require('armrest');
 tame.register({ catchExceptions : true });
 
 var app = express();
+app.flight = {};
 
 var views = __dirname + '/views';
 swig.init({ root: views, allowErrors: true });
-
-var errorHandler = function(req, res, next) {
-
-	req.error = function(error) {
-
-		if (arguments.length == 2) {
-			var status = arguments[0];
-			var error = arguments[1];
-		} else {
-			var status = 500;
-			var error = arguments[0];
-		}
-
-		try {
-			var response = JSON.parse(JSON.stringify(error));
-			response.message = error.toString();
-		} catch(e) {
-			var response = { error: error };
-		}
-
-		res.json(status, response);
-	};
-
-	next();
-};
-
-var flashLoader = function(req, res, next) {
-
-	var _render = res.render;
-
-	res.render = function() {
-		res.locals.messages = req.flash();
-		_render.apply(res, arguments);
-	};
-
-	next();
-};
-
-var sessionLocalizer = function(req, res, next) {
-	res.locals.session = req.session;
-	next();
-};
 
 var storagePath;
 if (!config.files.storage_path.match(/^\//)) {
@@ -71,12 +30,24 @@ mkdirp.sync(config.files.storage_path + "/files");
 
 var secret = 'arthur is fond of jimz';
 
+var dreamer = Dreamer.initialize({
+	app: app,
+	schema: "spec/schema.md"
+});
+
+app.dreamer = dreamer;
+
+var middleware = require('./lib/middleware').initialize(app);
+app.flight.middleware = middleware;
+
 app.configure(function(){
 	app.engine('.html', consolidate.swig);
 	app.set('view engine', 'html');
 	app.set('views', views);
 	app.set('port', process.env.PORT || config.port || 3000);
-	app.use(errorHandler);
+	app.use(middleware.errorHandler);
+	app.use(express.static(path.join(__dirname, 'public')), { maxAge: 600 });
+	app.use(express.static(storagePath));
 	app.use(express.favicon());
 	app.use(express.logger('dev'));
 	app.use(express.bodyParser());
@@ -85,22 +56,28 @@ app.configure(function(){
 	app.use('/workspaces', express.cookieSession({ secret: secret }));
 	app.use('/admin', express.cookieSession({ secret: secret }));
 	app.use(flash());
-	app.use(flashLoader);
-	app.use(sessionLocalizer);
+	app.use(middleware.flashLoader);
+	app.use(middleware.sessionLocalizer);
+	app.use(middleware.setupChecker);
 	app.use(app.router);
-	app.use(express.static(path.join(__dirname, 'public')), { maxAge: 600 });
-	app.use(express.static(storagePath));
 });
 
-var dreamer = Dreamer.initialize({
-	app: app,
-	schema: "spec/schema.md"
+/*
+app.use(function(err, req, res, next) {
+	console.log("!ERROR!");
+	res.render("error.html", { error: err });
 });
+*/
 
-app.dreamer = dreamer;
 
 app.get('/', function(req, res) {
 	res.redirect("/workspaces");
+});
+
+app.get('/admin/error', function(req, res) {
+	setTimeout(function() {
+		throw "hi";
+	}, 500);
 });
 
 /*
@@ -109,11 +86,7 @@ app.get('/admin/session', function(req, res) {
 });
 */
 
-var middleware = require('./lib/middleware').initialize(app);
-
-app.flight = app.flight || {};
-app.flight.middleware = middleware;
-
+require('./routes/setup.tjs').initialize(app);
 require('./routes/workspaces.tjs').initialize(app);
 require('./routes/entity.tjs').initialize(app);
 require('./routes/item.tjs').initialize(app);

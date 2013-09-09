@@ -171,9 +171,12 @@ exports.initialize = function(app) {
 		var errors = user.validate();
 
 		if (!errors) {
-			user.save();
-			req.flash('info', 'Created new user');
-			res.redirect("/admin/users");
+			user.save()
+				.error(req.error)
+				.success(function() {
+					req.flash('info', 'Created new user');
+					res.redirect("/admin/users");
+				});
 		} else {
 			req.flash('error', 'There was an error');
 			res.redirect("/admin/users/new");

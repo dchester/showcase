@@ -24,6 +24,7 @@
     "mv": "*",
     "mkdirp": "*",
     "armrest": "*",
-    "mysql": "*"
+    "mysql": "*",
+    "connect-domain": "*"
   }
 }

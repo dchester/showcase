@@ -1,0 +1,38 @@
+exports.initialize = function(app) {
+
+	var models = app.dreamer.models;
+
+	app.get('/admin/setup', function(req, res) {
+		res.render("setup.html");
+	});
+
+	app.post('/admin/setup', function(req, res) {
+
+		// check there's no users at all
+
+		await {
+			var deferral = defer();
+
+			models.users.count()
+				.error(req.error)
+				.success(function(count) {
+					if (count) {
+						req.flash('danger', 'Already set up');
+						res.redirect('/admin/users');
+					} else {
+						deferral();
+					}
+				});
+		}
+
+		// insert the one user
+
+		models.users.create({ username: req.body.username, is_superuser: 1 })
+			.error(req.error)
+			.success(function() {
+				req.flash('info', 'Created superuser.  Time to log in now...');
+				res.redirect('/admin/login');
+			});
+	});
+};
+

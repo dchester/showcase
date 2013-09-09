@@ -17,20 +17,24 @@
 {% block content %}
 
 	<div class="content">
-		<table class="table">
-			{% for workspace in workspaces %}
-				<tr>
-					<td><a href="/workspaces/{{ workspace.handle }}/collections">{{ workspace.title }}</a></td>
-					<td>{{ workspace.description }}</td>
-					<td>
-						<a class="btn" href="/workspaces/{{ workspace.handle }}/edit">
-							<i class="icon-pencil"></i>
-							Configure
-						</a>
-					</td>
-				</tr>
-			{% endfor %}
-		</table>
+		{% if workspaces.length %}
+			<table class="table">
+				{% for workspace in workspaces %}
+					<tr>
+						<td><a href="/workspaces/{{ workspace.handle }}/collections">{{ workspace.title }}</a></td>
+						<td>{{ workspace.description }}</td>
+						<td>
+							<a class="btn" href="/workspaces/{{ workspace.handle }}/edit">
+								<i class="icon-pencil"></i>
+								Configure
+							</a>
+						</td>
+					</tr>
+				{% endfor %}
+			</table>
+		{% else %}
+			<h3 class="muted">No workspaces yet.</h3>
+		{% endif %}
 	</div>
 
 {% endblock %}

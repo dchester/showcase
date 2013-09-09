@@ -61,8 +61,8 @@ Uploaded files associated with items
 ### Users
 
 ```
-- username
-- is_superuser  boolean
+- username          unique
+- is_superuser      boolean
 - external_user_id  nullable
 ```
 
