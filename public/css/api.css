@@ -29,10 +29,14 @@ h5 {
 }
 .resources-listing-nav {
 	margin-right: 30px;
+	width: 270px;
 }
 .resources-listing-nav.affix {
 	top: 32px;
 }
 .resources-listing {
 	padding-top: 20px;
+}
+.sidebar {
+	margin: 0;
 }

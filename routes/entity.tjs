@@ -10,8 +10,8 @@ var coalesceArray = function(data) {
 exports.initialize = function(app) {
 
 	var models = app.dreamer.models;
-	var workspaceLoader = app.flight.workspaceLoader;
-	var workspaceAdmin = app.flight.workspacePermission('administrator');
+	var workspaceLoader = app.flight.middleware.workspaceLoader;
+	var workspaceAdmin = app.flight.middleware.workspacePermission('administrator');
 
 	app.get("/workspaces/:workspace_handle/collections", workspaceLoader, workspaceAdmin, function(req, res) {
 

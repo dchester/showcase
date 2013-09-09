@@ -12,8 +12,8 @@ var Item = require('../lib/item');
 exports.initialize = function(app) {
 
 	var models = app.dreamer.models;
-	var workspaceLoader = app.flight.workspaceLoader;
-	var workspaceEditor = app.flight.workspacePermission('editor');
+	var workspaceLoader = app.flight.middleware.workspaceLoader;
+	var workspaceEditor = app.flight.middleware.workspacePermission('editor');
 
 	var saveFiles = function(req, res, next) {
 

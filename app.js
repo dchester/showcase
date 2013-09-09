@@ -109,6 +109,11 @@ app.get('/admin/session', function(req, res) {
 });
 */
 
+var middleware = require('./lib/middleware').initialize(app);
+
+app.flight = app.flight || {};
+app.flight.middleware = middleware;
+
 require('./routes/workspaces.tjs').initialize(app);
 require('./routes/entity.tjs').initialize(app);
 require('./routes/item.tjs').initialize(app);

@@ -61,8 +61,6 @@ exports.initialize = function(app) {
 				});
 		}
 
-		workspaces = JSON.parse(JSON.stringify(workspaces));
-
 		workspaces.forEach(function(workspace) {
 
 			var workspace_permission = permissions
@@ -73,8 +71,6 @@ exports.initialize = function(app) {
 				workspace.permission = workspace_permission.permission;
 			}
 		});
-
-		console.log(workspaces);
 
 		var subtitle = ' › Edit';
 		res.render("user.html", { 

@@ -9,7 +9,7 @@ var EXAMPLE_LENGTH = 1500;
 exports.initialize = function(app) {
 
 	var models = app.dreamer.models;
-	var workspaceLoader = app.flight.workspaceLoader;
+	var workspaceLoader = app.flight.middleware.workspaceLoader;
 
 	app.get('/api/:workspace_handle/:entity_handle', workspaceLoader, function(req, res) {
 
