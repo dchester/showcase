@@ -1,0 +1,25 @@
+{% extends 'layout.html' %}
+
+{% set title = 'Sign In' %}
+
+{% block css %}
+	<link rel="stylesheet" href="/css/login.css">
+{% endblock %}
+
+{% block page_header %}
+	<h1 class="pagetitle">
+		Sign In
+	</h1>
+{% endblock %}
+
+{% block content %}
+	<div class="content">
+		<div class="center-box">
+			<h3 class="muted">Sign in to your account</h3>
+			<form method="post" class="login-form">
+				<input name="username" type="text" placeholder="username"><br>
+				<button class="btn btn-primary">Sign In</button>
+			</form>
+		</div>
+	</div>
+{% endblock %}

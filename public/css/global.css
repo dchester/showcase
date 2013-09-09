@@ -6,6 +6,9 @@
 h1, h2, h3, h4, h5, h6 {
 	text-rendering: optimizespeed;
 }
+body {
+	background: #eee;
+}
 a:hover {
 	text-decoration: none;
 }
@@ -78,8 +81,30 @@ select, textarea, input[type="text"], input[type="password"], input[type="dateti
 .navbar .nav i.icon-plane {
 	margin-right: 0.3em;
 }
+.navbar .workspace-title {
+	color: white;
+	padding: 14px 20px;
+	float: left;
+	font-size: 22px;
+	background: rgba(255, 255, 255, 0.1);
+	margin-right: 12px;
+	display: block;
+}
+.navbar .user {
+	color: rgba(255, 255, 255, 0.95);
+	font-size: 15px;
+	padding: 14px 10px;
+}
+.navbar .user i {
+	opacity: 0.5;
+	font-size: 1.2em;
+	margin-bottom: -2px;
+}
+.navbar .user a {
+	color: rgba(255, 255, 255, 0.95);
+}
 .pagetitle {
-	margin: 0 0 20px;
+	margin: 0;
 	background: #4a98b9;
 	color: #d0e5ed;
 	font-weight: normal;
@@ -108,6 +133,13 @@ code {
 	border-radius: 3px;
 	box-shadow: none;
 	margin-right: 5px;
+}
+.btn-link {
+	color: #08c;
+}
+.btn-link:hover {
+	background: #f6f6f6;
+	text-decoration: none;
 }
 .btn-secondary {
 	background: #a4c7d6;
@@ -151,16 +183,15 @@ h3.muted {
 	font-weight: normal;
 }
 .content {
-	margin: 0 20px;
+	margin: 0;
+	padding: 20px 20px 100px 20px;
+	background: white;
 }
 .nowrap {
 	white-space: nowrap;
 }
 td.actions {
 	width: 1px;
-}
-hr.footer {
-	margin-top: 100px;
 }
 form .table td,
 form .table th {
@@ -206,12 +237,12 @@ form .table.table-condensed select {
 	margin-bottom: 0.5em;
 }
 .pagetitle + .alert.alert-block {
-	margin-top: -20px;
 	border-radius: 0;
 }
 .alert.alert-block {
 	padding-left: 20px;
-	font-size: 16px
+	font-size: 16px;
+	margin: 0;
 }
 textarea:focus, input[type="text"]:focus, input[type="password"]:focus, input[type="datetime"]:focus, input[type="datetime-local"]:focus, input[type="date"]:focus, input[type="month"]:focus, input[type="time"]:focus, input[type="week"]:focus, input[type="number"]:focus, input[type="email"]:focus, input[type="url"]:focus, input[type="search"]:focus, input[type="tel"]:focus, input[type="color"]:focus, .uneditable-input:focus {
 	-webkit-box-shadow: none;
@@ -273,6 +304,12 @@ textarea:focus, input[type="text"]:focus, input[type="password"]:focus, input[ty
 .content-condensed {
 	width: 990px;
 }
+.center-box {
+	margin: 50px auto;
+	width: 700px;
+	border: 1px solid #ccc;
+	padding: 50px;
+}
 pre {
 	border-radius: 2px;
 	background: #f8f8f8;
@@ -294,3 +331,21 @@ p + pre {
 	width: 90%;
 	border: 1px solid #ccc;
 }
+img {
+	height: inherit;
+}
+.separator {
+	padding: 0 6px;
+	opacity: 0.3;
+	font-size: 1.4em;
+}
+footer {
+	border-top: 1px solid #ccc;
+	height: 100px;
+}
+.permission-superuser,
+.permission-administrator,
+.permission-editor {
+	visibility: hidden;
+}
+

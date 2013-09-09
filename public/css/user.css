@@ -1,0 +1,22 @@
+.table-secondary {
+	width: 100%;
+	margin-bottom: 20px;
+}
+.table-secondary tr td {
+	border-bottom: 1px solid #dde7ec; 
+}
+.table-secondary tr td {
+	padding-left: 0;
+}
+.table-secondary tr td select {
+	font-size: 14px;
+	color: rgba(0, 0, 0, 0.4);
+	margin: 5px 0; 
+}
+select option {
+	display: block;
+	padding: 20px;
+}
+.workspaces-row.superuser {
+	display: none;
+}

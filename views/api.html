@@ -10,20 +10,24 @@
 
 	<h1 class="pagetitle">REST API</h1>
 
-	<div class="row">
+	<div class="content row">
 
-		<div class="span4">
-			<div class="resources-listing-nav" data-spy="affix" data-offset-top="100">
-				<h4>Resources</h4>
-				<ul class="nav nav-tabs nav-stacked">
-					{% for resources in entity_resources %}
-						<li><a href="#{{ resources.entity.name }}">{{ resources.entity.title }}</a></li>
-					{% endfor %}
-				</ul>
-			</div>
+		<div class="span4 sidebar">
+			{% if entity_resources.length %}
+				<div class="resources-listing-nav" data-spy="affix" data-offset-top="100">
+					<h4>Resources</h4>
+					<ul class="nav nav-tabs nav-stacked">
+						{% for resources in entity_resources %}
+							<li><a href="#{{ resources.entity.name }}">{{ resources.entity.title }}</a></li>
+						{% endfor %}
+					</ul>
+				</div>
+			{% else %}
+				<h3 class="muted">No resources yet</h3>
+			{% endif %}
 		</div>
 
-		<div class="content content-condensed span8 resources-listing">
+		<div class="content-condensed span8 resources-listing">
 
 			{% for resources in entity_resources %}
 
@@ -36,6 +40,9 @@
 					<h4>
 						<p target="_blank" href="{{ resource.example_uri }}">
 							{{ resource.method }} {{ resource.route }}
+							{% if resource.preview %}
+								&nbsp;<small><a class="btn btn-link" href="{{ resource.preview }}" target="_blank">preview</a></small>
+							{% endif %}
 						</p>
 					</h4>
 

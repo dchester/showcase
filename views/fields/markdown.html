@@ -7,12 +7,15 @@
 		textarea: document.querySelector("textarea[name={{ field.name }}]"),
 		basePath: '/dist/epic',
 		theme: {
-			editor: '/../../css/epic-editor-light.css'
+			editor: '/../../css/editor/editor.css',
+			preview: '/../../css/editor/preview.css'
 		},
 		file: {
 			name: Math.random()
 		},
-		autogrow: true
+		autogrow: {
+			maxHeight: function() { return $(window).height() * 0.8 }
+		}
 	});
 	editor.load();
 }());

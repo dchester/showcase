@@ -8,7 +8,7 @@
 
 {% block page_header %}
 	<h1 class="pagetitle">
-		<a href="/admin/entities">Collections</a>
+		<a href="/workspaces/{{ workspace.handle }}/collections">Collections</a>
 		<span class="transparent">{{ subtitle }}</span>
 	</h1>
 {% endblock %}
@@ -18,6 +18,7 @@
 	<div class="content"> 
 
 		<form id="collection" method="post">
+			<input type="hidden" name="workspace_handle" value="{{ workspace.handle }}">
 			<table class="table" id="entity_form">
 				<tr>
 					<th>Collection Title</th>
@@ -45,7 +46,7 @@
 					<td>
 						<ul class="clean" id="fields"></ul>
 						<div class="error no-fields">Please add some fields.</div>
-						<button class="btn btn-darker" type="button" id="new_field">
+						<button class="btn btn-darker permission-administrator" type="button" id="new_field">
 							<i class="icon-plus icon-white"></i>
 							Add New Field
 						</button>
@@ -53,7 +54,7 @@
 				</tr>
 			</table>
 
-			<button class="btn btn-primary btn-large" id="save_collection">
+			<button class="btn btn-primary btn-large permission-administrator" id="save_collection">
 				<i class="icon-ok icon-white"></i>
 				Save
 			</button>
@@ -124,11 +125,11 @@
 							</table>
 
 							<input type="hidden" class="order" name="field_index" placeholder="Index..." value="{{ field.index }}">
-							<button type="button" class="btn btn-primary save_fields">
+							<button type="button" class="btn btn-primary save_fields permission-administrator">
 								<i class="icon-ok icon-white"></i>
 								Save
 							</button>
-							<button type="button" class="btn cancel_fields">
+							<button type="button" class="btn cancel_fields permission-administrator">
 								<i class="icon-remove icon-white"></i>
 								Cancel
 							</button>

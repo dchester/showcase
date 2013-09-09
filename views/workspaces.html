@@ -1,0 +1,36 @@
+{% extends 'layout.html' %}
+
+{% set title = 'Workspace' %}
+
+{% block page_header %}
+
+	<h1 class="pagetitle">
+		Workspaces
+		<a class="btn btn-darker btn-large permission-superuser" href="/workspaces/new">
+			<i class="icon-plus icon-white"></i>
+			New Workspace
+		</a>
+	</h1>
+
+{% endblock %}
+
+{% block content %}
+
+	<div class="content">
+		<table class="table">
+			{% for workspace in workspaces %}
+				<tr>
+					<td><a href="/workspaces/{{ workspace.handle }}/collections">{{ workspace.title }}</a></td>
+					<td>{{ workspace.description }}</td>
+					<td>
+						<a class="btn" href="/workspaces/{{ workspace.handle }}/edit">
+							<i class="icon-pencil"></i>
+							Configure
+						</a>
+					</td>
+				</tr>
+			{% endfor %}
+		</table>
+	</div>
+
+{% endblock %}

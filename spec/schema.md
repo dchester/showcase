@@ -6,6 +6,7 @@ Different types of entities or models
 - title
 - description
 - name
+- workspace_handle  fk=workspaces.handle
 ```
 
 ### Entity Fields
@@ -20,25 +21,6 @@ Possible fields or attributes an entity might have
 - description
 - is_required   boolean
 - index         integer
-```
-
-### Field Constraints
-
-Constraints on fields, such as being required
-
-```
-- entity_field_id
-- constraint_id
-```
-
-### Constraints
-
-Possible constraints on fields
-
-```
-- name
-- description
-- error_text
 ```
 
 ### Entity Items
@@ -75,4 +57,29 @@ Uploaded files associated with items
 - meta_json          text,nullable
 - size               integer
 ```
+
+### Users
+
+```
+- username
+- is_superuser  boolean
+- external_user_id  nullable
+```
+
+### Workspace User Permissions
+
+```
+- user_id
+- workspace_handle
+- permission  enum=(administrator|editor|viewer)
+```
+
+### Workspaces
+
+```
+- title
+- handle
+- description
+```
+
 

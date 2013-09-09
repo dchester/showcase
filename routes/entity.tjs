@@ -10,10 +10,13 @@ var coalesceArray = function(data) {
 exports.initialize = function(app) {
 
 	var models = app.dreamer.models;
+	var workspaceLoader = app.flight.middleware.workspaceLoader;
+	var workspaceAdmin = app.flight.middleware.workspacePermission('administrator');
 
-	app.get("/admin/entities", function(req, res) {
+	app.get("/workspaces/:workspace_handle/collections", workspaceLoader, workspaceAdmin, function(req, res) {
 
 		var entities, entity_counts;
+		var workspace_handle = req.params.workspace_handle;
 
 		await {
 
@@ -21,6 +24,7 @@ exports.initialize = function(app) {
 
 			Entity.findAll({
 				error: req.error,
+				workspace_handle: workspace_handle,
 				success: function(_entities) {
 					entities = _entities;
 					deferrals.run();
@@ -29,6 +33,7 @@ exports.initialize = function(app) {
 
 			Entity.itemCounts({
 				error: req.error,
+				workspace_handle: workspace_handle,
 				success: function(_entity_counts) {
 					entity_counts = _entity_counts;
 					deferrals.run();
@@ -42,21 +47,24 @@ exports.initialize = function(app) {
 		});
 	});
 
-	app.get("/admin/entities/new", function(req, res) {
+	app.get("/workspaces/:workspace_handle/collections/new", workspaceLoader, workspaceAdmin, function(req, res) {
+
+		var workspace = req.flight.workspace;
+		var workspace_handle = req.params.workspace_handle;
 
 		var subtitle = ' › New';
 		res.render("collection.html", {
 			subtitle: subtitle,
 			controls: controls
 		});
-
 	});
 
-	app.post("/admin/entities/new", function(req, res) {
+	app.post("/workspaces/:workspace_handle/collections/new", workspaceLoader, workspaceAdmin, function(req, res) {
 
 		var title = req.body.title;
 		var description = req.body.description;
 		var name = req.body.name;
+		var workspace = req.flight.workspace;
 
 		var fields = [];
 		var field_attributes = {};
@@ -82,22 +90,24 @@ exports.initialize = function(app) {
 			title: title,
 			description: description,
 			name: name,
+			workspace_handle: workspace.handle,
 			fields: fields,
 			error: req.error,
 			success: function() {
 				req.flash('success', 'Created new collection');
-				res.redirect('/admin/entities');
+				res.redirect('/workspaces/' + workspace.handle + '/collections');
 			}
 		});
 	});
 
-	app.post("/admin/entities/:id/edit", function(req, res) {
+	app.post("/workspaces/:workspace_handle/collections/:id/edit", workspaceLoader, workspaceAdmin, function(req, res) {
 
 		var entity_id = req.params.id;
 
 		var title = req.body.title;
 		var description = req.body.description;
 		var name = req.body.name;
+		var workspace = req.flight.workspace;
 
 		var fields = [];
 		var field_attributes = {};
@@ -128,12 +138,12 @@ exports.initialize = function(app) {
 			error: req.error,
 			success: function(entity) {
 				req.flash('info', 'Saved ' +  entity.title + ' Collection');
-				res.redirect('/admin/entities');
+				res.redirect('/workspaces/' + workspace.handle + '/collections');
 			}
 		});
 	});
 
-	app.get("/admin/entities/:id/edit", function(req, res) {
+	app.get("/workspaces/:workspace_handle/collections/:id/edit", workspaceLoader, workspaceAdmin, function(req, res) {
 
 		var entity_id = req.params.id;
 
@@ -151,7 +161,7 @@ exports.initialize = function(app) {
 		});
 	});
 
-	app.del("/admin/entities/:id", function(req, res) {
+	app.del("/workspaces/:workspace_handle/collections/:id", workspaceLoader, workspaceAdmin, function(req, res) {
 
 		var entity_id = req.params.id;
 
@@ -159,7 +169,7 @@ exports.initialize = function(app) {
 			id: entity_id,
 			error: req.error,
 			success: function() { 
-				res.redirect("/admin/entities");
+				res.redirect("/workspaces/" + workspace.handle + "/collections");
 			}
 		});
 	});

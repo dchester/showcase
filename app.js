@@ -5,11 +5,13 @@ var swig = require('swig');
 var consolidate = require('consolidate');
 var Dreamer = require('dreamer');
 var async = require('async');
-var tamejs = require('tamejs').register();
+var tame = require('tamejs')
 var flash = require('connect-flash');
 var config = require('config');
 var mkdirp = require('mkdirp');
 var armrest = require('armrest');
+
+tame.register({ catchExceptions : true });
 
 var app = express();
 
@@ -32,7 +34,7 @@ var errorHandler = function(req, res, next) {
 			var response = JSON.parse(JSON.stringify(error));
 			response.message = error.toString();
 		} catch(e) {
-			var response = {};
+			var response = { error: error };
 		}
 
 		res.json(status, response);
@@ -43,14 +45,19 @@ var errorHandler = function(req, res, next) {
 
 var flashLoader = function(req, res, next) {
 
-		var _render = res.render;
+	var _render = res.render;
 
-		res.render = function() {
-			res.locals.messages = req.flash();
-			_render.apply(res, arguments);
-		};
+	res.render = function() {
+		res.locals.messages = req.flash();
+		_render.apply(res, arguments);
+	};
 
-		next();
+	next();
+};
+
+var sessionLocalizer = function(req, res, next) {
+	res.locals.session = req.session;
+	next();
 };
 
 var storagePath;
@@ -61,6 +68,8 @@ if (!config.files.storage_path.match(/^\//)) {
 }
 
 mkdirp.sync(config.files.storage_path + "/files");
+
+var secret = 'arthur is fond of jimz';
 
 app.configure(function(){
 	app.engine('.html', consolidate.swig);
@@ -73,11 +82,13 @@ app.configure(function(){
 	app.use(express.bodyParser());
 	app.use(express.methodOverride());
 	app.use(express.cookieParser('__SECRET__'));
-	app.use('/admin', express.session());
+	app.use('/workspaces', express.cookieSession({ secret: secret }));
+	app.use('/admin', express.cookieSession({ secret: secret }));
 	app.use(flash());
 	app.use(flashLoader);
+	app.use(sessionLocalizer);
 	app.use(app.router);
-	app.use(express.static(path.join(__dirname, 'public')));
+	app.use(express.static(path.join(__dirname, 'public')), { maxAge: 600 });
 	app.use(express.static(storagePath));
 });
 
@@ -89,17 +100,26 @@ var dreamer = Dreamer.initialize({
 app.dreamer = dreamer;
 
 app.get('/', function(req, res) {
-	res.redirect("/admin/entities");
+	res.redirect("/workspaces");
 });
 
-app.get ('/admin/fields', function(req, res) {
-	var fields = require('./lib/fields');
-	res.render("fields.html", { fields: fields.controls });
+/*
+app.get('/admin/session', function(req, res) {
+	res.json(req.session);
 });
+*/
 
+var middleware = require('./lib/middleware').initialize(app);
+
+app.flight = app.flight || {};
+app.flight.middleware = middleware;
+
+require('./routes/workspaces.tjs').initialize(app);
 require('./routes/entity.tjs').initialize(app);
 require('./routes/item.tjs').initialize(app);
 require('./routes/api.tjs').initialize(app);
+require('./routes/users.tjs').initialize(app);
+require('./routes/login.tjs').initialize(app);
 
 dreamer.dream();
 
