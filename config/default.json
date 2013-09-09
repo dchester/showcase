@@ -1,7 +1,6 @@
 {
   "database": {
-    "dialect": "sqlite",
-    "storage": "/var/tmp/cms2.sqlite",
+    "dialect": "mysql",
     "database": "cms",
     "username": "cms",
     "password": "cms"
