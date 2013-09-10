@@ -20,6 +20,7 @@ Edit your database configuration in `config/default.json`:
 {
   "database": {
     "dialect": "mysql",
+    "host": "localhost",
     "database": "cms",
     "username": "cms",
     "password": "cms"
@@ -50,6 +51,25 @@ Once the server is up and running, start by creating a new collection.  A collec
 ## REST API
 
 Access and modify data in collections through the built-in RESTful API.  Visit `/admin/api` in a running instance to see details for each collection.
+
+## Configuration
+
+This project uses [config](https://github.com/lorenwest/node-config).  Find configuration files under `config/`.
+
+##### Database
+
+Specify database connection details under the `database` key:
+
+- `dialect` can be `mysql`, `postgres`, or `sqlite`
+- `storage` specifies the file on disk for the `sqlite` dialect
+- `host`, `database`, `username`, and `password` are relevant connection parameters
+
+Under the hood these are sent through to the [Sequelize constructor](http://sequelizejs.com/documentation#usage-options).
+
+##### Files
+
+- `tmp_path` specifies where incoming uploaded files should be stored during transfer
+- `storage_path` specifies long term storage where uploaded files should reside
 
 ## License
 

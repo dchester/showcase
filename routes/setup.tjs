@@ -34,5 +34,13 @@ exports.initialize = function(app) {
 				res.redirect('/admin/login');
 			});
 	});
+
+	app.get('/admin/error/schema', function(req, res) {
+		res.render("error_schema.html");
+	});
+
+	app.get('/admin/error/db', function(req, res) {
+		res.render("error_db.html");
+	});
 };
 

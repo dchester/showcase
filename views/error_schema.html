@@ -1,0 +1,17 @@
+{% extends 'layout.html' %}
+
+{% set title = 'Schema Error' %}
+
+{% block page_header %}
+	<h1 class="pagetitle">Schema Error</h1>
+{% endblock %}
+
+{% block content %}
+	<div class="content">
+		<div class="center-box">
+			<h3 class="muted">Couldn't find valid database schema!</h3>
+			Try <code>node app schema-sync</code> to initialize the database.
+		</div>
+	</div>
+{% endblock %}
+
