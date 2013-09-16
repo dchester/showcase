@@ -24,6 +24,8 @@ exports.initialize = function(app) {
 
 			var upload = req.files[key];
 
+			if (upload.size == 0) return callback();
+
 			var filename = sha1(upload.path + Math.random()) + '-' + upload.name;
 			var target_path = path.join(config.files.storage_path, 'files', filename); 
 
@@ -36,7 +38,7 @@ exports.initialize = function(app) {
 					path: filename,
 					original_filename: upload.name,
 					size: upload.size,
-					content_type: upload.type,
+					content_type: upload.type || 'application/octet-stream',
 					meta_json: '{}',
 					description: ''
 				});
