@@ -164,6 +164,7 @@ exports.initialize = function(app) {
 	app.del("/workspaces/:workspace_handle/collections/:id", workspaceLoader, workspaceAdmin, function(req, res) {
 
 		var entity_id = req.params.id;
+		var workspace = req.flight.workspace;
 
 		Entity.destroy({
 			id: entity_id,
