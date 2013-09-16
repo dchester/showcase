@@ -83,6 +83,7 @@ exports.initialize = function(app) {
 				field_data[name] = field_attributes[name][index];
 			});
 
+			field_data.is_required = Number(field_data.is_required) ? true : false;
 			fields.push(field_data);
 		});
 
@@ -126,6 +127,7 @@ exports.initialize = function(app) {
 				field_data[name] = field_attributes[name][index];
 			});
 
+			field_data.is_required = Number(field_data.is_required) ? true : false;
 			fields.push(field_data);
 		});
 
