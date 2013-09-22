@@ -92,6 +92,7 @@ exports.initialize = function(app) {
 				pagination.data.prelink = pagination.preparePreLink(pagination.data.prelink);
 
 				items.forEach(function(item) {
+					item = Item._preview(item, items.entity);
 					Object.keys(item).forEach(function(key) {
 						if (typeof item[key] == 'string') {
 							if (item[key].length > 255) {

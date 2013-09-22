@@ -1,0 +1,8 @@
+<select name="{{ field.name }}">
+
+	{% for option in field.options %}
+		<option value="{{ option.handle }}" {% if item[field.name] == option.handle %}selected="selected"{% endif %}>{{ option.title }}</option>
+	{% endfor %}
+
+</select>
+
