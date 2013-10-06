@@ -6,11 +6,28 @@
 	<link rel="stylesheet" type="text/css" href="/css/entities.css">
 {% endblock %}
 
-{% block page_header %}
-	<h1 class="pagetitle">
-		<a href="/workspaces/{{ workspace.handle }}/collections">Collections</a>
-		<span class="transparent">{{ subtitle }}</span>
-	</h1>
+{% block nav %}
+	<ul class="nav">
+		<li><a href="/workspaces">Workspaces</a></li>
+		<li><a href="/workspaces/{{ workspace.handle }}/collections">{{ workspace.title }}</a></li>
+		{% if entity %}
+			<li><a href="/workspaces/{{ workspace.handle }}/collections/{{ entity.id }}/items">{{ entity.title }}</a></li>
+			<li><a href="">Configure</a></li>
+		{% else %}
+			<li><a href="">New Collection</a></li>
+		{% endif %}
+	</ul>
+{% endblock %}
+
+{% block pagetitle %}
+	<div class="pagetitle">
+		{% if entity %}
+			<h1>{{ entity.title }}</h1>
+		{% else %}
+			<h1>New Collection</h1>
+		{% endif %}
+		<br>
+	</div>
 {% endblock %}
 
 {% block content %}

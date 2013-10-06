@@ -10,10 +10,31 @@
 		{% include 'permissions.html' %}
 	</head>
 	<body>
-		{% include 'header.html' %}
-		{% block page_header %}{% endblock %}
-		{% include 'flash.html' %}
-		{% block content %}{% endblock %}
+		<div class="navbar navbar-inverse navbar-static-top">
+			<div class="navbar-inner">
+				<a class="brand" href="/"><img width="106" height="26" src="/images/dataflight.png"></a>
+				<div class="user pull-right">
+					{% if {{ session.username }} %}
+						<i class="icon-user"></i>&nbsp;
+						{{ session.username }}
+						<span class="separator">|</span>
+						<i class="icon-signout"></i>&nbsp;
+						<a href="/admin/logout">Sign Out</a>
+					{% else %}
+						<i class="icon-signin"></i>&nbsp;
+						<a href="/admin/login">Sign In</a>
+					{% endif %}
+				</div>
+			</div>
+		</div>
+		<div class="background">
+			{% include 'flash.html' %}
+			<div class="breadcrumbs navbar clearfix">
+				{% block nav %}{% endblock %}
+			</div>
+			{% block pagetitle %}{% endblock %}
+			{% block content %}{% endblock %}
+		</div>
 		{% include 'footer.html' %}
 		{% block footer_js %}{% endblock %}
 	</body>

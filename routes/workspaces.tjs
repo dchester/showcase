@@ -28,10 +28,10 @@ exports.initialize = function(app) {
 
 	app.get("/workspaces/new", requireSuperuser, function(req, res) {
 
-		var subtitle = ' › New';
+		var breadcrumbs = [ { text: 'New' } ];
 
 		res.render("workspace.html", {
-			subtitle: subtitle
+			breadcrumbs: breadcrumbs
 		});
 	});
 
@@ -39,9 +39,12 @@ exports.initialize = function(app) {
 
 		var workspace = req.flight.workspace;
 
-		var subtitle = '› ' + workspace.title + ' › Edit';
+		var breadcrumbs = [
+			{ href: '/workspaces/' + workspace.handle + '/collections', text: workspace.title }
+		];
+
 		res.render("workspace.html", {
-			subtitle: subtitle,
+			breadcrumbs: breadcrumbs,
 			workspace: workspace
 		});
 	});
@@ -69,6 +72,17 @@ exports.initialize = function(app) {
 			res.redirect("/workspaces/new");
 		}
 
+	});
+
+	app.delete("/workspaces/:workspace_handle", workspaceLoader, workspaceAdmin, function(req, res) {
+
+		var workspace = req.flight.workspace;
+		workspace.destroy()
+			.error(req.error)
+			.success(function() {
+				req.flash('info', 'Deleted workspace');
+				res.redirect('/workspaces');
+			});
 	});
 
 	app.post("/workspaces/:workspace_handle/edit", workspaceLoader, workspaceAdmin, function(req, res) {

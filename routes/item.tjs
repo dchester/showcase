@@ -124,7 +124,7 @@ exports.initialize = function(app) {
 			error: req.error,
 			success: function(item) {
 
-				var subtitle = ["", "#" + item.id, "Edit"].join(' › ');
+				var action = 'Edit';
 
 				var fields = item._entity.fields;
 				fields.forEach(function(field) {
@@ -135,7 +135,7 @@ exports.initialize = function(app) {
 					item: item,
 					entity: item._entity,
 					fields: item._entity.fields,
-					subtitle: subtitle
+					action: action
 				});
 			}
 		});
@@ -155,7 +155,7 @@ exports.initialize = function(app) {
 			error: req.error,
 			invalid: function(item) {
 
-				var subtitle = ["", "#" + item.id, "Edit"].join(' › ');
+				var action = "Edit";
 
 				var fields = item._entity.fields;
 
@@ -168,7 +168,7 @@ exports.initialize = function(app) {
 					errors: item._errors,
 					entity: item._entity,
 					fields: fields,
-					subtitle: subtitle
+					action: action
 				});
 			},
 			success: function() {
@@ -181,7 +181,6 @@ exports.initialize = function(app) {
 	app.get("/workspaces/:workspace_handle/collections/:entity_id/items/new", workspaceLoader, workspaceEditor, function(req, res) {
 
 		var entity_id = req.params.entity_id;
-		var subtitle = ' › New';
 
 		Entity.find({
 			id: entity_id,		
@@ -193,9 +192,9 @@ exports.initialize = function(app) {
 				});
 
 				res.render("item.html", {
-					subtitle: subtitle,
 					entity: entity,
-					fields: entity.fields
+					fields: entity.fields,
+					action: 'New'
 				});
 			}
 		});
@@ -214,7 +213,7 @@ exports.initialize = function(app) {
 			error: req.error,
 			invalid: function(item) {
 
-				var subtitle = " › New";
+				var action = "New";
 
 				var fields = item._entity.fields;
 
@@ -227,7 +226,7 @@ exports.initialize = function(app) {
 					errors: item._errors,
 					entity: item._entity,
 					fields: fields,
-					subtitle: subtitle
+					actions: actions
 				});
 			},
 			success: function(item) {

@@ -2,13 +2,27 @@
 
 {% set title = 'Item' %}
 
-{% block page_header %}
+{% block nav %}
+	<ul class="nav">
+		<li><a href="/workspaces">Workspaces</a></li>
+		<li><a href="/workspaces/{{ workspace.handle }}/collections">{{ workspace.title }}</a></li>
+		<li><a href="/workspaces/{{ workspace.handle }}/collections/{{ entity.id }}/items">{{ entity.title }}</a></li>
+		<li><a href="/workspaces/{{ workspace.handle }}/collections/{{ entity.id }}/items">#{{ item.id }}</a></li>
+	</ul>
+{% endblock %}
 
-	<h1 class="pagetitle">
-		<a href="/workspaces/{{ workspace.handle }}/collections/{{ entity.id }}/items">{{ entity.title }}</a>
-		<span class="transparent">{{ subtitle }}</span>
-	</h1>
-
+{% block pagetitle %}
+	<div class="pagetitle">
+		<ul class="nav">
+			<li><a href="/workspaces/{{ workspace.handle }}/collections/{{ entity.id }}/items">{{ entity.title }}</a></li>
+			{% if item.id %}
+				<li>#{{ item.id }}</li>
+			{% else %}
+				<li href="">{{ action }}</li>
+			{% endif %}
+		</ul>
+		<br>
+	</div>
 {% endblock %}
 
 {% block css %}
@@ -16,10 +30,7 @@
 {% endblock %}
 
 {% block content %}
-
 	<div class="content">
-
-		<h3 class="muted">{{ entity.description }}</h3>
 
 		<form id="item_form" method="post" enctype="multipart/form-data">
 			<table class="table">

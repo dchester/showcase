@@ -5,17 +5,30 @@
 	<link rel="stylesheet" href="/vendor/hljs/hljs.css">
 {% endblock %}
 
+{% block nav %}
+	<ul class="nav">
+		<li><a href="/workspaces">Workspaces</a></li>
+		<li><a href="/workspaces/{{ workspace.handle }}/collections">{{ workspace.title }}</a></li>
+		<li><a href="/workspaces/{{ workspace.handle }}/api">REST API</a></li>
+	</ul>
+{% endblock %}
+
+{% block pagetitle %}
+	<div class="pagetitle">
+		<h1>{{ workspace.title }} REST API</h1>
+		<hr>
+	</div>
+{% endblock %}
 
 {% block content %}
 
-	<h1 class="pagetitle">REST API</h1>
 
 	<div class="content row">
 
 		<div class="span4 sidebar">
 			{% if entity_resources.length %}
-				<div class="resources-listing-nav" data-spy="affix" data-offset-top="100">
-					<h4>Resources</h4>
+				<div class="resources-listing-nav" data-spy="affix" data-offset-top="170">
+					<h4>API Resources</h4>
 					<ul class="nav nav-tabs nav-stacked">
 						{% for resources in entity_resources %}
 							<li><a href="#{{ resources.entity.name }}">{{ resources.entity.title }}</a></li>
@@ -27,7 +40,7 @@
 			{% endif %}
 		</div>
 
-		<div class="content-condensed span8 resources-listing">
+		<div class="span8 resources-listing">
 
 			{% for resources in entity_resources %}
 

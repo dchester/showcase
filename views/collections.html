@@ -2,18 +2,31 @@
 
 {% set title = 'Collections' %}
 
-{% block page_header %}
-	<h1 class="pagetitle">
-		Collections
-		<a class="btn btn-darker btn-large permission-administrator" href="/workspaces/{{ workspace.handle }}/collections/new">
-			<i class="icon-plus icon-white"></i>
-			New Collection
-		</a>
-	</h1>
+{% block nav %}
+	<ul class="nav">
+		<li><a href="/workspaces">Workspaces</a></li>
+		<li><a href="/workspaces/{{ workspace.handle }}/collections">{{ workspace.title }}</a></li>
+	</ul>
+{% endblock %}
+
+{% block pagetitle %}
+	<div class="pagetitle">
+		<h1>{{ workspace.title }}</h1>
+
+		<div class="btn-group">
+			<a class="btn dropdown-toggle" data-toggle="dropdown" href="#"><i class="icon-gear"></i><span class="caret"></span></a>
+			<ul class="dropdown-menu">
+				<li><a class="permission-administrator" href="/workspaces/{{ workspace.handle }}/collections/new">New Collection</a></li>
+				<li><a href="/workspaces/{{ workspace.handle }}/api">REST API</a></li>
+			</ul>
+		</div>
+
+		<hr>
+		<h3 class="muted">{{ workspace.description }}</h3>
+	</div>
 {% endblock %}
 
 {% block content %}
-
 	<div class="content">
 		{% if entities.length %}
 			<table class="table">
@@ -42,7 +55,8 @@
 				{% endfor %}
 			</table>
 		{% else %}
-			<h3 class="muted">No collections yet.  <a href="/workspaces/{{ workspace.handle }}/collections/new">Create a new collection.</a></h3>
+			<h3 class="muted">No collections yet.</h3>
+			<p class="muted">A collection contains many like items, analagous to a table in a relational database.  For example, you may have a collection of books, or a collection of users.</p>
 		{% endif %}
 	</div>
 

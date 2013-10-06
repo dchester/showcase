@@ -2,13 +2,23 @@
 
 {% set title = 'Workspace' %}
 
-{% block page_header %}
+{% block nav %}
+	<ul class="nav">
+		<li><a href="/workspaces">Workspaces</a>
+		{% for crumb in breadcrumbs %}
+			<li><a href="{{ crumb.href }}">{{ crumb.text }}</a></li>
+		{% endfor %}
+	</ul>
+{% endblock %}
 
-	<h1 class="pagetitle">
-		<a href="/workspaces">Workspaces</a>
-		<span class="transparent">{{ subtitle }}</span>
-	</h1>
-
+{% block pagetitle %}
+	<div class="pagetitle">
+		{% if workspace.handle %}
+			<h1>{{ workspace.title }}</h1>
+		{% else %}
+			<h1>New Workspace</h1>
+		{% endif %}
+	</div>
 {% endblock %}
 
 {% block content %}

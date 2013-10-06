@@ -6,8 +6,8 @@
 h1, h2, h3, h4, h5, h6 {
 	text-rendering: optimizespeed;
 }
-body {
-	background: #eee;
+a {
+	color: #368cb1;
 }
 a:hover {
 	text-decoration: none;
@@ -42,17 +42,24 @@ select, textarea, input[type="text"], input[type="password"], input[type="dateti
 .table td:last-child {
 	padding-right: 8px;
 }
+.background {
+	background: white;
+}
 .navbar-inverse .navbar-inner {
-	background: #2B687E;
-	border-color: #225a72;
-	border-width: 0 0 2px 0;
-	padding: 17px 20px 14px;
+	background: #225a72;
+	border-color: #368db1;
+	border-width: 0 0 6px 0;
+	padding: 12px 22px 8px 20px;
 	vertical-align: middle;
 }
 .navbar-inverse .brand,
 .navbar-inverse .nav > li > a {
 	color: white;
 	text-shadow: none;
+}
+.nav > li > a:hover,
+.nav > li > a:focus {
+	background: inherit;
 }
 .navbar-inverse .nav .active > a,
 .navbar-inverse .nav .active > a:hover,
@@ -67,33 +74,67 @@ select, textarea, input[type="text"], input[type="password"], input[type="dateti
 	-moz-box-shadow: none;
 	box-shadow: none;
 }
+.navbar {
+	margin-bottom: 0;
+	background: #f2f2f2;
+}
+.navbar:empty {
+	display: none;
+}
 .navbar .nav {
-	margin: 0 10px 0 0;
-	font-size: 18px;
+	margin: 3px 0 3px 16px;
+	font-size: 14px;
+}
+.navbar.breadcrumbs {
+	border-radius: 4px;
+	margin: 20px 20px 0 16px;
+}
+.navbar .nav li:first-child a {
+	padding-left: 0;
+}
+.navbar .nav li:before {
+	content: "\203a";
+	color: #bbb;
+	font-size: 20px;
+	position: relative;
+	top: 2px;
+}
+.navbar .nav li.action {
+	margin-left: 15px;
+}
+.navbar .nav li.action:before,
+.navbar .nav li:first-child:before {
+	display: none;
+}
+.navbar .nav > li > a {
+	padding-left: 7px;
+	padding-right: 7px;
+	color: #368cb1;
+	text-shadow: none;
+	font-size: 13px;
+}
+.navbar .nav > li:last-child a {
+	color: #aaa;
+}
+.navbar-inner .nav li .btn-large {
+	padding-right: 22px;
+	padding-left: 22px;
+	margin-top: 0;
 }
 .navbar .nav i {
 	opacity: 0.5;
 	position: relative;
-	top: 3px;
+	top: 1px;
 	margin: 0 0.3em 0 0;
-	font-size: 24px;
+	font-size: 18px;
 }
 .navbar .nav i.icon-plane {
 	margin-right: 0.3em;
 }
-.navbar .workspace-title {
-	color: white;
-	padding: 14px 20px;
-	float: left;
-	font-size: 22px;
-	background: rgba(255, 255, 255, 0.1);
-	margin-right: 12px;
-	display: block;
-}
 .navbar .user {
 	color: rgba(255, 255, 255, 0.95);
 	font-size: 15px;
-	padding: 14px 10px;
+	padding: 8px 10px;
 }
 .navbar .user i {
 	opacity: 0.5;
@@ -103,23 +144,61 @@ select, textarea, input[type="text"], input[type="password"], input[type="dateti
 .navbar .user a {
 	color: rgba(255, 255, 255, 0.95);
 }
+.navbar .brand {
+	float: none;
+	display: inline-block;
+}
+.breadcrumbs .nav > li > a {
+	display: inline-block;
+}
 .pagetitle {
 	margin: 0;
-	background: #4a98b9;
-	color: #d0e5ed;
+	background: white;
+	color: #333;
 	font-weight: normal;
-	padding: 13px 0 12px 20px;
-	border-bottom: 2px solid #307c9c;
+	padding: 13px 25px 5px 20px;
 }
-h1.pagetitle {
-	font-size: 21px;
+.pagetitle hr {
+	margin-top: 10px;
+}
+.pagetitle h1 {
+	font-weight: normal;
+	font-size: 28px;
+	display: inline-block;
+	vertical-align: middle;
+	margin-bottom: 10px;
+	margin-right: 10px;
 }
 .pagetitle a {
 	text-decoration: none;
-	color: inherit;
 }
-.pagetitle > a.btn:last-child {
+.pagetitle > a.btn {
 	margin-left: 20px;
+	color: white;
+	vertical-align: middle;
+	background: #a7aeb2;
+}
+.pagetitle > a.btn:hover {
+	opacity: 0.8;
+}
+.pagetitle .nav {
+	margin: 16px 0 6px 0;
+}
+.pagetitle .nav li {
+	font-size: 28px;
+	display: inline-block;
+	padding: 5px 7px 5px 0;
+}
+.pagetitle .nav li:first-child:before {
+	display: none;
+}
+.pagetitle .nav li:before {
+	margin-right: 12px;
+	content: "\203a";
+	color: #bbb;
+}
+.dropdown-toggle .caret {
+	opacity: 0.5;
 }
 code {
 	font-family: Consolas, "Liberation Mono", Courier, monospace;
@@ -135,7 +214,7 @@ code {
 	margin-right: 5px;
 }
 .btn-link {
-	color: #08c;
+	color: #368cb1;
 }
 .btn-link:hover {
 	background: #f6f6f6;
@@ -166,7 +245,7 @@ code {
 }
 .btn-darker {
 	background: rgba(0, 0, 0, 0.2);
-	color: white;
+	color: rgba(255, 255, 255, 0.9);
 }
 .btn-darker:hover {
 	background: rgba(0, 0, 0, 0.3);
@@ -178,13 +257,20 @@ code {
 }
 h3.muted {
 	font-size: 20px;
+	margin-top: -10px;
+	color: #ccc;
 }
 .muted {
 	font-weight: normal;
 }
+.content > h3 {
+	margin-top: 0;
+	position: relative;
+	top: -7px;
+}
 .content {
 	margin: 0;
-	padding: 20px 20px 100px 20px;
+	padding: 0 20px 100px 20px;
 	background: white;
 }
 .nowrap {
@@ -296,10 +382,6 @@ textarea:focus, input[type="text"]:focus, input[type="password"]:focus, input[ty
 	box-orient: horizontal;
 	box-pack: center;
 	box-align: center;
-}
-.pagetitle .pagination,
-.pagetitle .pagination-summary {
-	display: none;
 }
 .content-condensed {
 	width: 990px;
