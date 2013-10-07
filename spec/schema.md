@@ -9,6 +9,15 @@ Different types of entities or models
 - workspace_handle  fk=workspaces.handle
 ```
 
+### Entity Versions
+
+Incrementing entity version counters
+
+```
+- entity_id        unique
+- version_counter  integer,default=0
+```
+
 ### Entity Fields
 
 Possible fields or attributes an entity might have

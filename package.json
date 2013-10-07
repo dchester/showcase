@@ -25,6 +25,7 @@
     "mkdirp": "*",
     "armrest": "*",
     "mysql": "*",
-    "connect-domain": "*"
+    "connect-domain": "*",
+    "lru-cache": "*"
   }
 }
