@@ -76,6 +76,9 @@
 	background: white;
 	margin: auto;
 	border-radius: 4px;
+	max-height: 90%;
+	overflow-y: auto;
+	width: 750px;
 }
 .inputs h2 {
 	margin: 0 0 10px;
@@ -97,5 +100,11 @@
 	display: none;
 }
 .error-no-fields .no-fields {
+	display: block;
+}
+.data_type_meta {
+	display: none;
+}
+.data_type_meta.active {
 	display: block;
 }

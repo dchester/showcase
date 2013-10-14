@@ -2,16 +2,18 @@
 
 {% set title = 'Workspace' %}
 
-{% block page_header %}
-
-	<h1 class="pagetitle">
-		Workspaces
-		<a class="btn btn-darker btn-large permission-superuser" href="/workspaces/new">
-			<i class="icon-plus icon-white"></i>
-			New Workspace
-		</a>
-	</h1>
-
+{% block pagetitle %}
+	<div class="pagetitle">
+		<h1>Workspaces</h1>
+		<div class="btn-group">
+			<a class="btn dropdown-toggle" data-toggle="dropdown" href="#"><i class="icon-gear"></i><span class="caret"></span></a>
+			<ul class="dropdown-menu">
+				<li><a class="permission-superuser" href="/workspaces/new">New Workspace</a></li>
+			</ul>
+		</div>
+		<hr>
+		<h3 class="muted">Workspaces are groups of collections, often one per web site</h3>
+	</div>
 {% endblock %}
 
 {% block content %}
@@ -28,12 +30,20 @@
 								<i class="icon-pencil"></i>
 								Configure
 							</a>
+							<form action="/workspaces/{{ workspace.handle }}" method="post">
+								<input type="hidden" name="_method" value="delete">
+								<button type="submit" class="btn permission-administrator" href="/workspaces/{{ workspace.handle }}/edit">
+									<i class="icon-remove"></i>
+									Delete
+								</button>
+							</form>
 						</td>
 					</tr>
 				{% endfor %}
 			</table>
 		{% else %}
 			<h3 class="muted">No workspaces yet.</h3>
+			<p class="muted">A workspace holds many related collections.  You may often have a workspace per website.</p>
 		{% endif %}
 	</div>
 

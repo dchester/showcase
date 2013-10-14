@@ -6,11 +6,28 @@
 	<link rel="stylesheet" type="text/css" href="/css/entities.css">
 {% endblock %}
 
-{% block page_header %}
-	<h1 class="pagetitle">
-		<a href="/workspaces/{{ workspace.handle }}/collections">Collections</a>
-		<span class="transparent">{{ subtitle }}</span>
-	</h1>
+{% block nav %}
+	<ul class="nav">
+		<li><a href="/workspaces">Workspaces</a></li>
+		<li><a href="/workspaces/{{ workspace.handle }}/collections">{{ workspace.title }}</a></li>
+		{% if entity %}
+			<li><a href="/workspaces/{{ workspace.handle }}/collections/{{ entity.id }}/items">{{ entity.title }}</a></li>
+			<li><a href="">Configure</a></li>
+		{% else %}
+			<li><a href="">New Collection</a></li>
+		{% endif %}
+	</ul>
+{% endblock %}
+
+{% block pagetitle %}
+	<div class="pagetitle">
+		{% if entity %}
+			<h1>{{ entity.title }}</h1>
+		{% else %}
+			<h1>New Collection</h1>
+		{% endif %}
+		<br>
+	</div>
 {% endblock %}
 
 {% block content %}
@@ -110,6 +127,10 @@
 											{% endfor %}
 										</select>
 										<div class="description">Data type to determine input and validation rules</div>
+										<div class="data_type_meta">
+											<textarea name="field_meta">{{ field.meta }}</textarea>
+											<div class="description meta_description"></div>
+										</div>
 									</td>
 								</tr>
 								<tr>
@@ -170,6 +191,31 @@
 		new InputPair({
 			source: document.querySelector("input[name=title]"),
 			target: document.querySelector("input[name=name]")
+		});
+
+		var selects = document.querySelectorAll('select.data_type');
+
+		[].forEach.call(selects, function(select) {
+
+			var meta_input = select.parentNode.querySelector('.data_type_meta');
+			var meta_description = select.parentNode.querySelector('.meta_description');
+
+			var sync = function(type) {
+				var control = data_types.filter(function(c) { return c.name == type }).shift();
+				if (control.meta_description) {
+					meta_input.classList.add('active');
+					meta_description.innerText = control.meta_description;
+				} else {
+					meta_input.classList.remove('active');	
+					meta_description.innerText = '';
+				}
+			};
+
+			select.addEventListener('change', function(e) {
+				sync(e.target.value);
+			});
+
+			sync(select.value);
 		});
 
 	</script>

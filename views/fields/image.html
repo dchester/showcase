@@ -1,25 +1,28 @@
 <fieldset id="field_{{ field.name }}">
-	{% if item[field.name].url %}
+	{% if item[field.name] == null || item[field.name] == undefined %}
+		<input type="file" name="{{ field.name }}" value="{{ item[field.name] }}">
+	{% else %}
 			<img class="preview" src="{{ item[field.name].url }}" width="100" height="100">
-			<button class="replace" type="button">replace</button>
+			<span class="divider">&nbsp;</span>
+			<button class="replace permission-editor btn btn-darker" type="button">Replace</button>
 			<script class="template" type="text/html">
 				<input type="file" name="{{ field.name }}" value="{{ item[field.name] }}">
 			</script>
 			<script>
-				var fieldset = document.querySelector('fieldset#field_{{ field.name }}');
-				var button = fieldset.querySelector('button');
-				var template = fieldset.querySelector('script.template');
+				(function() {
+					var fieldset = document.querySelector('fieldset#field_{{ field.name }}');
+					var button = fieldset.querySelector('button');
+					var template = fieldset.querySelector('script.template');
 
-				button.addEventListener('click', function(e) {
-					var container = document.createElement('div');
-					container.innerHTML = template.innerHTML;
-					fieldset.appendChild(container);
-					fieldset.removeChild(fieldset.querySelector('img.preview'));
-					fieldset.removeChild(fieldset.querySelector('button.replace'));
-				});
+					button.addEventListener('click', function(e) {
+						var container = document.createElement('div');
+						container.innerHTML = template.innerHTML;
+						fieldset.appendChild(container);
+						fieldset.removeChild(fieldset.querySelector('img.preview'));
+						fieldset.removeChild(fieldset.querySelector('button.replace'));
+					});
+				})();
 			</script>
-	{% else %}
-		<input type="file" name="{{ field.name }}" value="{{ item[field.name] }}">
 	{% endif %}
 </fieldset>
 

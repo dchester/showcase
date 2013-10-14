@@ -2,29 +2,34 @@
 
 {% set title = 'Items' %}
 
-{% block page_header %}
-	<h1 class="pagetitle">
-		{{ entity.title }}
+{% block nav %}
+	<ul class="nav">
+		<li><a href="/workspaces">Workspaces</a></li>
+		<li><a href="/workspaces/{{ workspace.handle }}/collections">{{ workspace.title }}</a></li>
+		<li><a href="/workspaces/{{ workspace.handle }}/collections/{{ entity.id }}/items">{{ entity.title }}</a></li>
+	</ul>
+{% endblock %}
 
-		{% set icon_color = "icon-white" %}
-		{% include "pagination.html" %}
-
-		<div class="pagination-summary">
-			{{ pagination.fromResult }}-{{ pagination.toResult }} of {{ pagination.totalResult }}
-		</div>
-
-		<a class="btn btn-darker btn-large permission-editor" href="/workspaces/{{ workspace.handle }}/collections/{{ entity.id }}/items/new">
+{% block pagetitle %}
+	<div class="pagetitle">
+		<h1>{{ entity.title }}</h1>
+		<a class="btn btn-darker permission-editor" href="/workspaces/{{ workspace.handle }}/collections/{{ entity.id }}/items/new">
 			<i class="icon-plus icon-white"></i>
 			Create New
 		</a>
-	</h1>
+		<div class="pagination-summary pull-right">
+			{{ pagination.fromResult }}-{{ pagination.toResult }} of {{ pagination.totalResult }}
+			{% set icon_color = "icon-black" %}
+			{% include "pagination.html" %}
+		</div>
+		<hr>
+		<h3 class="muted">{{ entity.description }}</h3>
+	</div>
 {% endblock %}
 
 {% block content %}
-
 	<div class="content">
 
-		<h3 class="muted">{{ entity.description }}</h3>
 
 		{% if items.length %}
 

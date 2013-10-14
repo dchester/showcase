@@ -1,18 +1,13 @@
 <div class="navbar navbar-inverse navbar-static-top">
 	<div class="navbar-inner">
-		<a class="brand" href="/">
-			<img width="125" height="30" src="/images/dataflight_125.png">
-		</a>
-
-		{% if workspace %}
-			<a class="workspace-title" href="/workspaces/{{ workspace.handle }}/collections">{{ workspace.title }}</a>
-			<ul class="nav">
-				<li><a href="/workspaces/{{ workspace.handle }}/collections"><i class="icon-plane icon-white"></i>Collections</a></li>
-				<li><a href="/workspaces/{{ workspace.handle }}/api"><i class="icon-cogs icon-white"></i>API</a></li>
-			</ul>
-		{% endif %}
+		<ul class="nav">
+			{% block breadcrumbs %}{% endblock %}
+		</ul>
 
 		<div class="user pull-right">
+			<a class="brand" href="/">
+				<img width="75" height="20" src="/images/dataflight_125.png">
+			</a>
 			{% if {{ session.username }} %}
 				<i class="icon-user"></i>&nbsp;
 				{{ session.username }}

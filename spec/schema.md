@@ -21,6 +21,7 @@ Possible fields or attributes an entity might have
 - description
 - is_required   boolean
 - index         integer
+- meta          text
 ```
 
 ### Entity Items
