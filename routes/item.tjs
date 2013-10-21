@@ -127,9 +127,6 @@ exports.initialize = function(app) {
 				var action = 'Edit';
 
 				var fields = item._entity.fields;
-				fields.forEach(function(field) {
-					field.template = 'fields/' + field.control.template + '.html';
-				});
 
 				res.render("item.html", {
 					item: item,
@@ -159,10 +156,6 @@ exports.initialize = function(app) {
 
 				var fields = item._entity.fields;
 
-				fields.forEach(function(field) {
-					field.template = 'fields/' + field.control.template + '.html';
-				});
-
 				res.render("item.html", {
 					item: item,
 					errors: item._errors,
@@ -186,10 +179,6 @@ exports.initialize = function(app) {
 			id: entity_id,		
 			error: req.error,
 			success: function(entity) {
-
-				entity.fields.forEach(function(field) {
-					field.template = 'fields/' + field.control.template + '.html';
-				});
 
 				res.render("item.html", {
 					entity: entity,
@@ -216,10 +205,6 @@ exports.initialize = function(app) {
 				var action = "New";
 
 				var fields = item._entity.fields;
-
-				fields.forEach(function(field) {
-					field.template = 'fields/' + field.control.template + '.html';
-				});
 
 				res.render("item.html", {
 					item: item,
