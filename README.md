@@ -9,8 +9,8 @@ Flight requires Node.js and a MySQL, Postgres, or SQLite database.
 Clone the repository and install dependencies:
 
 ```bash
-$ git clone https://github.com/dchester/flight-cms.git
-$ cd flight-cms
+$ git clone https://github.com/dchester/showcase.git
+$ cd showcase
 $ npm install
 ```
 

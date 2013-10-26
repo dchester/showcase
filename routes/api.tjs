@@ -9,7 +9,7 @@ var EXAMPLE_LENGTH = 1500;
 exports.initialize = function(app) {
 
 	var models = app.dreamer.models;
-	var workspaceLoader = app.flight.middleware.workspaceLoader;
+	var workspaceLoader = app.showcase.middleware.workspaceLoader;
 
 	app.get('/api/:workspace_handle/:entity_handle', workspaceLoader, function(req, res) {
 
@@ -17,7 +17,7 @@ exports.initialize = function(app) {
 		var per_page = req.query.per_page || 40;
 		var page = req.query.page || 0;
 		var entity, items;
-		var workspace = req.flight.workspace;
+		var workspace = req.showcase.workspace;
 
 		await {
 			var deferrals = new Deferrals(defer());
@@ -199,7 +199,7 @@ exports.initialize = function(app) {
 
 	app.get ('/workspaces/:workspace_handle/api', workspaceLoader, function(req, res) {
 
-		var workspace = req.flight.workspace;
+		var workspace = req.showcase.workspace;
 		var api = armrest.client("localhost:" + app.get('port'));
 
 		Entity.findAll({

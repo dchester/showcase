@@ -10,8 +10,8 @@ var coalesceArray = function(data) {
 exports.initialize = function(app) {
 
 	var models = app.dreamer.models;
-	var workspaceLoader = app.flight.middleware.workspaceLoader;
-	var workspaceAdmin = app.flight.middleware.workspacePermission('administrator');
+	var workspaceLoader = app.showcase.middleware.workspaceLoader;
+	var workspaceAdmin = app.showcase.middleware.workspacePermission('administrator');
 
 	app.get("/workspaces/:workspace_handle/collections", workspaceLoader, workspaceAdmin, function(req, res) {
 
@@ -49,7 +49,7 @@ exports.initialize = function(app) {
 
 	app.get("/workspaces/:workspace_handle/collections/new", workspaceLoader, workspaceAdmin, function(req, res) {
 
-		var workspace = req.flight.workspace;
+		var workspace = req.showcase.workspace;
 		var workspace_handle = req.params.workspace_handle;
 
 		var subtitle = ' › New';
@@ -64,7 +64,7 @@ exports.initialize = function(app) {
 		var title = req.body.title;
 		var description = req.body.description;
 		var name = req.body.name;
-		var workspace = req.flight.workspace;
+		var workspace = req.showcase.workspace;
 
 		var fields = [];
 		var field_attributes = {};
@@ -108,7 +108,7 @@ exports.initialize = function(app) {
 		var title = req.body.title;
 		var description = req.body.description;
 		var name = req.body.name;
-		var workspace = req.flight.workspace;
+		var workspace = req.showcase.workspace;
 
 		var fields = [];
 		var field_attributes = {};
@@ -166,7 +166,7 @@ exports.initialize = function(app) {
 	app.del("/workspaces/:workspace_handle/collections/:id", workspaceLoader, workspaceAdmin, function(req, res) {
 
 		var entity_id = req.params.id;
-		var workspace = req.flight.workspace;
+		var workspace = req.showcase.workspace;
 
 		Entity.destroy({
 			id: entity_id,

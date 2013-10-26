@@ -3,9 +3,9 @@ var Deferrals = require('../lib/deferrals');
 exports.initialize = function(app) {
 
 	var models = app.dreamer.models;
-	var workspaceAdmin = app.flight.middleware.workspacePermission('administrator');
-	var workspaceLoader = app.flight.middleware.workspaceLoader;
-	var requireSuperuser = app.flight.middleware.requireSuperuser;
+	var workspaceAdmin = app.showcase.middleware.workspacePermission('administrator');
+	var workspaceLoader = app.showcase.middleware.workspaceLoader;
+	var requireSuperuser = app.showcase.middleware.requireSuperuser;
 
 	app.get("/workspaces", function(req, res) {
 
@@ -37,7 +37,7 @@ exports.initialize = function(app) {
 
 	app.get("/workspaces/:workspace_handle/edit", workspaceLoader, workspaceAdmin, function(req, res) {
 
-		var workspace = req.flight.workspace;
+		var workspace = req.showcase.workspace;
 
 		var breadcrumbs = [
 			{ href: '/workspaces/' + workspace.handle + '/collections', text: workspace.title }
@@ -76,7 +76,7 @@ exports.initialize = function(app) {
 
 	app.delete("/workspaces/:workspace_handle", workspaceLoader, workspaceAdmin, function(req, res) {
 
-		var workspace = req.flight.workspace;
+		var workspace = req.showcase.workspace;
 		workspace.destroy()
 			.error(req.error)
 			.success(function() {
@@ -87,7 +87,7 @@ exports.initialize = function(app) {
 
 	app.post("/workspaces/:workspace_handle/edit", workspaceLoader, workspaceAdmin, function(req, res) {
 
-		var workspace = req.flight.workspace;
+		var workspace = req.showcase.workspace;
 
 		var fields = ['title', 'handle', 'description'];
 

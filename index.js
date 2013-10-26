@@ -14,7 +14,7 @@ var armrest = require('armrest');
 tame.register({ catchExceptions : true });
 
 var app = express();
-app.flight = {};
+app.showcase = {};
 
 var views = __dirname + '/views';
 swig.init({ root: views, allowErrors: true });
@@ -38,7 +38,7 @@ var dreamer = Dreamer.initialize({
 app.dreamer = dreamer;
 
 var middleware = require('./lib/middleware').initialize(app);
-app.flight.middleware = middleware;
+app.showcase.middleware = middleware;
 
 app.configure(function(){
 	app.engine('.html', consolidate.swig);

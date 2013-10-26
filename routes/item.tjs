@@ -12,8 +12,8 @@ var Item = require('../lib/item');
 exports.initialize = function(app) {
 
 	var models = app.dreamer.models;
-	var workspaceLoader = app.flight.middleware.workspaceLoader;
-	var workspaceEditor = app.flight.middleware.workspacePermission('editor');
+	var workspaceLoader = app.showcase.middleware.workspaceLoader;
+	var workspaceEditor = app.showcase.middleware.workspacePermission('editor');
 
 	var saveFiles = function(req, res, next) {
 
@@ -58,7 +58,7 @@ exports.initialize = function(app) {
 
 		var entity_id = req.params.entity_id;
 		var item_id = req.params.item_id;
-		var workspace = req.flight.workspace;
+		var workspace = req.showcase.workspace;
 
 		Item.destroy({
 			id: item_id,
@@ -143,7 +143,7 @@ exports.initialize = function(app) {
 		var entity_id = req.params.entity_id;
 		var entity_item_id = req.params.entity_item_id;
 		var status = req.body._status;
-		var workspace = req.flight.workspace;
+		var workspace = req.showcase.workspace;
 
 		Item.update({
 			id: entity_item_id,
@@ -193,7 +193,7 @@ exports.initialize = function(app) {
 
 		var entity_id = req.params.entity_id;
 		var status = req.body._status;
-		var workspace = req.flight.workspace;
+		var workspace = req.showcase.workspace;
 
 		Item.create({
 			entity_id: entity_id,

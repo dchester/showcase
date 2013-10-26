@@ -49,7 +49,7 @@ select, textarea, input[type="text"], input[type="password"], input[type="dateti
 	background: #225a72;
 	border-color: #368db1;
 	border-width: 0 0 6px 0;
-	padding: 12px 22px 8px 20px;
+	padding: 12px 15px 11px 18px;
 	vertical-align: middle;
 }
 .navbar-inverse .brand,
@@ -134,7 +134,8 @@ select, textarea, input[type="text"], input[type="password"], input[type="dateti
 .navbar .user {
 	color: rgba(255, 255, 255, 0.95);
 	font-size: 15px;
-	padding: 8px 10px;
+	line-height: 50px;
+	margin-right: 20px;
 }
 .navbar .user i {
 	opacity: 0.5;
@@ -171,6 +172,7 @@ select, textarea, input[type="text"], input[type="password"], input[type="dateti
 }
 .pagetitle a {
 	text-decoration: none;
+	color: #333;
 }
 .pagetitle > a.btn {
 	margin-left: 20px;
