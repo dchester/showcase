@@ -1,10 +1,10 @@
-# Flight CMS
+# Showcase
 
 Custom content types and fields with a JSON API
 
 ## Getting Started
 
-Flight requires Node.js and a MySQL, Postgres, or SQLite database.
+Showcase requires Node.js and a MySQL, Postgres, or SQLite database.
 
 Clone the repository and install dependencies:
 
