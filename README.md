@@ -1,6 +1,6 @@
 # Showcase
 
-Custom content types and fields with a JSON API
+Lightweight pluggable CMS in Node.js with a RESTful API
 
 ## Getting Started
 
