@@ -1,17 +1,20 @@
 <style>
 	{% if session.is_superuser %}
 		.permission-superuser, .permission-editor, .permission-administrator {
-			visibility: visible;
+			pointer-events: auto;
+			opacity: 1;
 		}
 	{% endif %}
 	{% if workspace_user_permission == 'administrator' %}
 		.permission-editor, .permission-administrator {
-			visibility: visible;
+			pointer-events: auto;
+			opacity: 1;
 		}
 	{% endif %}
 	{% if workspace_user_permission == 'editor' %}
 		.permission-editor {
-			visibility: visible;
+			pointer-events: auto;
+			opacity: 1;
 		}
 	{% endif %}
 </style>

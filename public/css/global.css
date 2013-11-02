@@ -430,6 +430,7 @@ footer {
 .permission-superuser,
 .permission-administrator,
 .permission-editor {
-	visibility: hidden;
+	pointer-events: none;
+	opacity: 0.5;
 }
 
