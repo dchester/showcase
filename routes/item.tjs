@@ -1,9 +1,5 @@
 var async = require('async');
 var Pagination = require('pagination').ItemPaginator;
-var sha1 = require('sha1');
-var mv = require('mv');
-var path = require('path');
-var config = require('config');
 
 var Deferrals = require('../lib/deferrals');
 var Entity = require('../lib/entity');
@@ -14,45 +10,6 @@ exports.initialize = function(app) {
 	var models = app.dreamer.models;
 	var workspaceLoader = app.showcase.middleware.workspaceLoader;
 	var workspaceEditor = app.showcase.middleware.workspacePermission('editor');
-
-	var saveFiles = function(req, res, next) {
-
-		var entity_item_id = req.params.entity_item_id;
-		var file_keys = Object.keys(req.files);
-
-		async.forEach(file_keys, function(key, callback) {
-
-			var upload = req.files[key];
-
-			if (upload.size == 0) return callback();
-
-			var filename = sha1(upload.path + Math.random()) + '-' + upload.name;
-			var target_path = path.join(config.files.storage_path, 'files', filename); 
-
-			mv(upload.path, target_path, function(err) {
-
-				if (err) return req.error(err);
-
-				var file = models.files.build({
-					entity_item_id: entity_item_id,
-					path: filename,
-					original_filename: upload.name,
-					size: upload.size,
-					content_type: upload.type || 'application/octet-stream',
-					meta_json: '{}',
-					description: ''
-				});
-
-				file.save()
-					.error(req.error)
-					.success(function(file) {
-						req.body[key] = { file_id: file.id };
-						callback();
-					});
-			});
-
-		}, next);
-	};
 
 	app.del("/workspaces/:workspace_handle/collections/:entity_id/items/:item_id", workspaceLoader, workspaceEditor, function(req, res) {
 
@@ -138,7 +95,7 @@ exports.initialize = function(app) {
 		});
 	});
 
-	app.post("/workspaces/:workspace_handle/collections/:entity_id/items/:entity_item_id/edit", workspaceLoader, workspaceEditor, saveFiles, function(req, res) {
+	app.post("/workspaces/:workspace_handle/collections/:entity_id/items/:entity_item_id/edit", workspaceLoader, workspaceEditor, function(req, res) {
 
 		var entity_id = req.params.entity_id;
 		var entity_item_id = req.params.entity_item_id;
@@ -189,7 +146,7 @@ exports.initialize = function(app) {
 		});
 	});
 
-	app.post("/workspaces/:workspace_handle/collections/:entity_id/items/new", workspaceLoader, workspaceEditor, saveFiles, function(req, res) {
+	app.post("/workspaces/:workspace_handle/collections/:entity_id/items/new", workspaceLoader, workspaceEditor, function(req, res) {
 
 		var entity_id = req.params.entity_id;
 		var status = req.body._status;

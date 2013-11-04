@@ -1,0 +1,26 @@
+<input type="hidden" name="{{ field.name }}" placeholder="{{ field.control.placeholder }}" value="{{ item.data[field.id] }}">
+
+<div class="dz" id="image-list-container_{{ field.name }}">
+	<div class="target">Drag files here or click to upload...</div>
+</div>
+
+<script>
+
+(function() {
+
+	try {
+		var files = {{ item[field.name]|json_encode|raw }};
+	} catch(e) {
+		console.log("couldn't parse files");
+		return;
+	}
+
+	var showcaseImageList = new ShowcaseImageList({
+		container: document.querySelector('#image-list-container_{{ field.name }}'),
+		input: document.querySelector('input[name={{ field.name }}]'),
+		files: files
+	});
+
+}());
+
+</script>

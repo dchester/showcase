@@ -53,6 +53,7 @@ app.configure(function(){
 	app.use(express.bodyParser());
 	app.use(express.methodOverride());
 	app.use(express.cookieParser('__SECRET__'));
+	app.use('/files', express.cookieSession({ secret: secret }));
 	app.use('/workspaces', express.cookieSession({ secret: secret }));
 	app.use('/admin', express.cookieSession({ secret: secret }));
 	app.use(flash());
@@ -73,13 +74,22 @@ require('./routes/item.tjs').initialize(app);
 require('./routes/api.tjs').initialize(app);
 require('./routes/users.tjs').initialize(app);
 require('./routes/login.tjs').initialize(app);
+require('./routes/files.tjs').initialize(app);
 
 var plugins = require('./lib/plugins');
 
-exports.run = function() {
-	plugins.route(app);
-	dreamer.dream();
-};
+var registerPlugins = function() {
+	var image_list = require('./plugins/image_list');
+	plugins.register('field', image_list);
+}
 
 exports.plugins = plugins;
+
+exports.run = function() {
+
+	registerPlugins();
+	plugins.route(app);
+
+	dreamer.dream();
+};
 

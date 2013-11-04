@@ -37,3 +37,6 @@ h5 {
 .sidebar {
 	margin: 0;
 }
+.table {
+	min-width: inherit;
+}

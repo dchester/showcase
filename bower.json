@@ -5,8 +5,9 @@
     "swig": "*",
     "bootstrap": "http://getbootstrap.com/2.3.2/assets/bootstrap.zip",
     "jquery": "*",
-    "jquery-sortable": "https://github.com/farhadi/html5sortable.git",
+    "jquery-ui": "~1.10.3",
     "font-awesome": "*",
-    "EpicEditor": "*"
+    "EpicEditor": "*",
+    "dropzone": "3.7.1"
   }
 }

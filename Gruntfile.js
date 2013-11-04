@@ -8,17 +8,23 @@ module.exports = function(grunt) {
         src: [
           'components/underscore/underscore.js',
           'components/jquery/jquery.js',
-          'components/jquery-sortable/jquery.sortable.js',
+          'components/jquery-ui/ui/jquery.ui.core.js',
+          'components/jquery-ui/ui/jquery.ui.widget.js',
+          'components/jquery-ui/ui/jquery.ui.mouse.js',
+          'components/jquery-ui/ui/jquery.ui.sortable.js',
           'components/bootstrap/js/bootstrap.js',
           'components/EpicEditor/epiceditor/js/epiceditor.js',
-          'components/swig/swig.js'
+          'components/swig/swig.js',
+          'components/dropzone/downloads/dropzone.js'
         ],
         dest: 'public/dist/js/global.js'
       },
       css: {
         src: [
           'components/bootstrap/css/bootstrap.min.css',
-          'components/font-awesome/css/font-awesome.min.css'
+          'components/font-awesome/css/font-awesome.min.css',
+          'components/dropzone/downloads/css/basic.css',
+          'components/jquery-ui/themes/base/jquery-ui.css'
         ],
         dest: 'public/dist/css/dist.css'
       }

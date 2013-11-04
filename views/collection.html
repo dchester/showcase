@@ -179,14 +179,16 @@
 			collection.addFieldInputs({ field: field });
 		});
 
-		$('#fields').sortable({ forcePlaceholderSize: true, handle: '.handle' })
-			.bind('sortupdate', function() {
+		$('#fields').sortable({
+			handle: '.handle',
+			update: function() {
 				var inputs = document.querySelectorAll('#fields li input[name=field_index]');
 				var forEach = Array.prototype.forEach;
 				forEach.call(inputs, function(input, index) {
 					input.value = index;
 				});
-			});
+			}
+		});
 
 		new InputPair({
 			source: document.querySelector("input[name=title]"),
