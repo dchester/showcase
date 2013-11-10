@@ -1,2 +1,3 @@
-var app = require('./index');
-app.run();
+var showcase = require('./index');
+showcase.run();
+

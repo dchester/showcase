@@ -10,6 +10,7 @@ var flash = require('connect-flash');
 var config = require('config');
 var mkdirp = require('mkdirp');
 var armrest = require('armrest');
+var util = require('util');
 
 tame.register({ catchExceptions : true });
 
@@ -77,6 +78,12 @@ require('./routes/login.tjs').initialize(app);
 require('./routes/files.tjs').initialize(app);
 
 var plugins = require('./lib/plugins');
+
+var Radio = function() {};
+util.inherits(Radio, require('events').EventEmitter);
+
+app.radio = new Radio();
+exports.radio = app.radio;
 
 var registerPlugins = function() {
 
