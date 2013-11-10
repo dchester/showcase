@@ -32,6 +32,7 @@ module.exports = {
 					file.url = "/files/" + file.path;
 					file.file_id = file.id;
 					delete file.id;
+					delete file.path;
 					delete file.entity_item_id;
 					delete file.meta_json;
 					delete file.description;

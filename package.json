@@ -17,7 +17,7 @@
     "tamejs": "*",
     "connect-flash": "*",
     "validator": "*",
-    "pagination": "https://github.com/vanng822/pagination/archive/master.tar.gz",
+    "pagination": "https://github.com/vanng822/pagination/archive/v0.3.3.tar.gz",
     "config": "*",
     "path": "*",
     "sha1": "*",

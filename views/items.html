@@ -17,6 +17,7 @@
 			<a class="btn dropdown-toggle" data-toggle="dropdown" href="#"><i class="icon-gear"></i><span class="caret"></span></a>
 			<ul class="dropdown-menu">
 				<li><a class="permission-editor" href="/workspaces/{{ workspace.handle }}/collections/{{ entity.id }}/edit">Configure Collection</a></li>
+				<li><a href="/workspaces/{{ workspace.handle }}/api/#{{ entity.name }}">REST API</a></li>
 			</ul>
 		</div>
 		<a class="btn btn-darker permission-editor" href="/workspaces/{{ workspace.handle }}/collections/{{ entity.id }}/items/new">
