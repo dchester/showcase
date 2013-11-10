@@ -6,7 +6,7 @@ Showcase.Plugins.ImageList = Showcase.Class.create({
 
 		this.container = args.container;
 		this.input = args.input;
-		this.files = args.files;
+		this.files = args.files || [];
 
 		var dropzone = new Dropzone(this.container, {
 			url: "/files",
