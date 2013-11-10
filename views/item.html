@@ -7,7 +7,11 @@
 		<li><a href="/workspaces">Workspaces</a></li>
 		<li><a href="/workspaces/{{ workspace.handle }}/collections">{{ workspace.title }}</a></li>
 		<li><a href="/workspaces/{{ workspace.handle }}/collections/{{ entity.id }}/items">{{ entity.title }}</a></li>
-		<li><a href="/workspaces/{{ workspace.handle }}/collections/{{ entity.id }}/items">#{{ item.id }}</a></li>
+		{% if item.id %}
+			<li><a>#{{ item.id }}</a></li>
+		{% else %}
+			<li><a>{{ action }}</a></li>
+		{% endif %}
 	</ul>
 {% endblock %}
 
@@ -18,7 +22,7 @@
 			{% if item.id %}
 				<li>#{{ item.id }}</li>
 			{% else %}
-				<li href="">{{ action }}</li>
+				<li>{{ action }}</li>
 			{% endif %}
 		</ul>
 		<br>
