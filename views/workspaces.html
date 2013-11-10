@@ -30,7 +30,7 @@
 								<i class="icon-pencil"></i>
 								Configure
 							</a>
-							<form action="/workspaces/{{ workspace.handle }}" method="post">
+							<form class="delete" action="/workspaces/{{ workspace.handle }}" method="post">
 								<input type="hidden" name="_method" value="delete">
 								<button type="submit" class="btn permission-administrator" href="/workspaces/{{ workspace.handle }}/edit">
 									<i class="icon-remove"></i>
@@ -47,3 +47,19 @@
 	</div>
 
 {% endblock %}
+
+{% block footer_js %}
+
+	<script>
+		var forms = document.querySelectorAll("form.delete");
+		[].forEach.call(forms, function(form) {
+			form.addEventListener("submit", function(e) {
+				if (!confirm("Are you sure you want to delete this workspace?")) {
+					e.preventDefault();
+				}
+			});
+		});
+	</script>
+
+{% endblock %}
+
