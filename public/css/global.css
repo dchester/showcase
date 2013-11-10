@@ -175,7 +175,6 @@ select, textarea, input[type="text"], input[type="password"], input[type="dateti
 	color: #333;
 }
 .pagetitle > a.btn {
-	margin-left: 20px;
 	color: white;
 	vertical-align: middle;
 	background: #a7aeb2;
