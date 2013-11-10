@@ -7,6 +7,8 @@ exports.initialize = function(app) {
 	var workspaceLoader = app.showcase.middleware.workspaceLoader;
 	var requireSuperuser = app.showcase.middleware.requireSuperuser;
 
+	var fields = ['title', 'handle', 'description'];
+
 	app.get("/workspaces", function(req, res) {
 
 		var workspaces;
@@ -59,6 +61,12 @@ exports.initialize = function(app) {
 
 		var errors = workspace.validate();
 
+		fields.forEach(function(field) {
+			if (workspace[field]) return;
+			errors = errors || {};
+			errors[field] = [field + ' is required'];
+		});
+
 		if (!errors) {
 
 			workspace.save()
@@ -89,13 +97,17 @@ exports.initialize = function(app) {
 
 		var workspace = req.showcase.workspace;
 
-		var fields = ['title', 'handle', 'description'];
-
 		fields.forEach(function(field) {
 			workspace[field] = req.body[field];
 		});
 
 		var errors = workspace.validate();
+
+		fields.forEach(function(field) {
+			if (workspace[field]) return;
+			errors = errors || {};
+			errors[field] = [field + ' is required'];
+		});
 
 		if (!errors) {
 			workspace.save()
