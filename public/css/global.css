@@ -361,6 +361,7 @@ textarea:focus, input[type="text"]:focus, input[type="password"]:focus, input[ty
 	font-size: 16px;
 	opacity: 0.8;
 	margin-left: 0.4em;
+	margin-top: 10px;
 }
 .pagination:first-line {
 	font-size: 0;
