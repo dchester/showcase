@@ -107,6 +107,10 @@ var Collection = function(args) {
 
 		var modal = row.querySelector('.overlay');
 
+		row.querySelector('.title').addEventListener('click', function(e) {
+			modal.classList.add('visible');
+		});
+
 		row.querySelector('.settings').addEventListener('click', function(e) {
 			modal.classList.add('visible');
 		});

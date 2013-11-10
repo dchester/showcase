@@ -40,6 +40,7 @@
 	font-size: 16px;
 	padding-left: 0.0em;
 	color: rgba(0, 0, 0, 0.7);
+	cursor: pointer;
 }
 .labels > div.tools {
 	display: inline-block;
