@@ -51,7 +51,7 @@
 						</td>
 
 						{% for field in fields %}
-							<td><p class="preview">{{ item[field.name] }}</p></td>
+							<td><p class="preview">{{ item[field.name]|raw }}</p></td>
 						{% endfor %}
 
 						<td>

@@ -79,8 +79,12 @@ require('./routes/files.tjs').initialize(app);
 var plugins = require('./lib/plugins');
 
 var registerPlugins = function() {
+
 	var image_list = require('./plugins/image_list');
 	plugins.register('field', image_list);
+
+	var image = require('./plugins/image');
+	plugins.register('field', image);
 }
 
 exports.plugins = plugins;

@@ -1,89 +1,86 @@
-.sc-image-list .dz {
+.sc-image .dz {
 	width: 90%;
 	padding-bottom: 58px;
 	position: relative;
 	margin-bottom: 10px;
 }
-.sc-image-list .dz.populated {
+.sc-image .dz.populated {
 	padding-bottom: 0;
 }
-.sc-image-list .dz.dz-drag-hover .target {
+.sc-image .dz.dz-drag-hover .target {
 	background: #ffc;
 }
-.sc-image-list .dz .dz-preview.ui-state-highlight {
+.sc-image .dz .dz-preview.ui-state-highlight {
 	background: #ffc;
 }
-.sc-image-list .dz .ui-sortable-helper {
+.sc-image .dz .ui-sortable-helper {
 	box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
 }
-.sc-image-list .dz .dz-preview {
+.sc-image .dz .dz-preview {
 	height: 50px;
 	overflow: hidden;
 	margin: 3px;
 	border: 1px solid #e6ecee;
 	background: #f3f9fb;
-	cursor: -moz-grab;
-	cursor: -webkit-grab;
-	cursor: grab;
 }
-.sc-image-list .dz-preview {
+.sc-image .dz-preview {
 	position: relative;
 }
-.sc-image-list .dz-details {
+.sc-image .dz-details {
 	position: relative;
 	padding-left: 15%;
 }
-.sc-image-list .dz-details > * {
+.sc-image .dz-details > * {
 	vertical-align: top;
 	line-height: 3.5;
 }
-.sc-image-list .dz-details img {
+.sc-image .dz-details img {
 	width: 10%;
 	position: absolute;
 	left: 2%;
 	top: 5px;
 }
-.sc-image-list .dz-details .dz-filename {
+.sc-image .dz-details .dz-filename {
 	padding-right: 3px;
 	display: inline-block;
 	text-overflow: ellipsis;
 	overflow: hidden;
 	white-space: nowrap;
 }
-.sc-image-list .dz-details .dz-size:before {
+.sc-image .dz-details .dz-size:before {
 	content: " (";
 }
-.sc-image-list .dz-details .dz-size:after {
+.sc-image .dz-details .dz-size:after {
 	content: ")";
 }
-.sc-image-list .dz-details .dz-size {
+.sc-image .dz-details .dz-size {
 	opacity: 0.4;
 	display: inline-block;
 	text-align: right;
 }
-.sc-image-list .dz-details .dz-size * {
+.sc-image .dz-details .dz-size * {
 	font-weight: normal;
 }
-.sc-image-list .dz-error-mark {
+.sc-image .dz-error-mark {
 	display: none;
 }
-.sc-image-list .dz-success-mark {
+.sc-image .dz-success-mark {
 	display: none;
 }
-.sc-image-list .dz-error-message {
+.sc-image .dz-error-message {
 	position: absolute;
 	background: #f8784c;
 	top: 0;
 	color: white;
 }
-.sc-image-list .dz-remove {
+.sc-image .dz-remove {
 	position: absolute;
 	top: 14px;
 	right: 4%;
 	width: 10px;
 	font-size: 0;
 }
-.sc-image-list .dz-remove:after {
+.sc-image .dz-remove:after {
 	position: absolute;
 	font-size: 14px;
 	right: 0;
@@ -92,7 +89,7 @@
 	color: steelblue;
 	color: rgba(0, 0, 0, 0.2);
 }
-.sc-image-list .dz-progress {
+.sc-image .dz-progress {
 	opacity: 0.3;
 	position: relative;
 	top: -30px;
@@ -106,16 +103,16 @@
 	transform: scaleX(0.2);
 	transform-origin-x: 0;
 }
-.sc-image-list .dz-preview[data-file-id] .dz-filename {
+.sc-image .dz-preview[data-file-id] .dz-filename {
 	font-weight: bold;
 }
-.sc-image-list .dz-preview[data-file-id] .dz-progress {
+.sc-image .dz-preview[data-file-id] .dz-progress {
 	display: none;	
 }
-.sc-image-list .dz.populated .target {
+.sc-image .dz.populated .target {
 	display: none;
 }
-.sc-image-list .dz .target {
+.sc-image .dz .target {
 	border-radius: 4px;
 	border: 3px dashed rgba(0, 0, 0, 0.1);
 	position: absolute;

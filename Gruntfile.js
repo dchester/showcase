@@ -15,7 +15,8 @@ module.exports = function(grunt) {
           'components/bootstrap/js/bootstrap.js',
           'components/EpicEditor/epiceditor/js/epiceditor.js',
           'components/swig/swig.js',
-          'components/dropzone/downloads/dropzone.js'
+          'components/dropzone/downloads/dropzone.js',
+          'public/js/showcase.js'
         ],
         dest: 'public/dist/js/global.js'
       },

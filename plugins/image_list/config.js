@@ -8,7 +8,7 @@ module.exports = {
 		try { var parsed_data = JSON.parse(value) } 
 		catch (e) { return "" }
 
-		return parsed_data.file_ids.length + " images";
+		return '<span class="badge">' + parsed_data.file_ids.length + '</span>';
 		
 	},
 	inflate: function(field, data, models, callback) {
@@ -17,7 +17,6 @@ module.exports = {
 
 		try { var parsed_data = JSON.parse(data[field.name]); }
 		catch (e) {
-			console.log("couldn't parse image list data");
 			return callback([]);
 		}
 
@@ -33,6 +32,9 @@ module.exports = {
 					file.url = "/files/" + file.path;
 					file.file_id = file.id;
 					delete file.id;
+					delete file.entity_item_id;
+					delete file.meta_json;
+					delete file.description;
 				});
 
 				var sorted_files = [];
