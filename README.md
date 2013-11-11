@@ -4,20 +4,12 @@ Lightweight pluggable CMS in Node.js with a RESTful API
 
 ## Getting Started
 
-Showcase requires Node.js and a MySQL, Postgres, or SQLite database.
+Create `app.js` for your project:
 
-Clone the repository and install dependencies:
+```javascript
+var showcase = require('showcase');
 
-```bash
-$ git clone https://github.com/dchester/showcase.git
-$ cd showcase
-$ npm install
-```
-
-Edit your database configuration in `config/default.json`:
-
-```json
-{
+showcase.initialize({
   "database": {
     "dialect": "mysql",
     "host": "localhost",
@@ -28,48 +20,104 @@ Edit your database configuration in `config/default.json`:
   "files": {
     "tmp_path": "/var/tmp",
     "storage_path": "/var/tmp"
-  }
-}
+  },
+  "port": 3000
+});
+
+showcase.run();
 ```
 
-Set up the database schema:
-```
-$ node app.js schema-sync
-```
-
-Then start your server:
+Initialize the database:
 
 ```
-$ PORT=4000 node app.js run
-Server listening on port 4000...
+$ node app schema-sync
 ```
 
-## Collections
+Start your server:
 
-Once the server is up and running, start by creating a new collection.  A collection is a set of like items.  Other CMSs might call a collection a "content type" or "custom post type".  In a relational database, a collection would be analogous to a table.  Define a collection and its fields, and then use the admin interface to add items.  
+```
+$ PORT=4000 node app run
+```
 
-## REST API
+Once your app is running, create an admin user and log in.  Then create a workspace, then create some collections, and start adding items.
 
-Access and modify data in collections through the built-in RESTful API.  Visit `/admin/api` in a running instance to see details for each collection.
 
-## Configuration
+## Workspaces, Collections, and Items
 
-This project uses [config](https://github.com/lorenwest/node-config).  Find configuration files under `config/`.
+Start by creating a new workspace.  A workspace can have an administrator, and will contain a set of collections.  You may often want to create a workspace per website, or per project.
 
-##### Database
+Within a workspace, create collections.  A collection is a set of like items.  Other CMSs might call a collection a "content type" or "custom post type".  In a relational database, a collection would be analogous to a table.  Define a collection and its fields, and then use the admin interface to add items.  
+
+Access and modify data in collections through the built-in RESTful API.
+
+## Showcase API
+
+### showcase.initialize(options)
+
+Initialize the application, given a set of options:
 
 Specify database connection details under the `database` key:
 
-- `dialect` can be `mysql`, `postgres`, or `sqlite`
-- `storage` specifies the file on disk for the `sqlite` dialect
-- `host`, `database`, `username`, and `password` are relevant connection parameters
+- `database.dialect` can be `mysql`, `postgres`, or `sqlite`
+- `database.storage` specifies the file on disk for the `sqlite` dialect
+- `database.host`, `database`, `username`, and `password` are relevant connection parameters
 
 Under the hood these are sent through to the [Sequelize constructor](http://sequelizejs.com/documentation#usage-options).
 
-##### Files
+- `files.tmp_path` specifies where incoming uploaded files should be stored during transfer
+- `files.storage_path` specifies long term storage where uploaded files should reside
 
-- `tmp_path` specifies where incoming uploaded files should be stored during transfer
-- `storage_path` specifies long term storage where uploaded files should reside
+### showcase.registerField(field)
+
+Register a custom field.  Supplied `field` should be an object specifying the following keys:
+
+##### field.config
+
+An object containing configuration information for the field.  Specify the following options:
+
+- `name` - name of the custom field type
+- `inflate` - function to populate item value from stored field data; accepts `field`, `data`, `models`, and `callback` parameters
+- `preview` - function to provide a lightweight preview of the data for rendering in HTML lists; accepts a `data` parameter containing the stored data
+- `validator` - function to validate input
+
+##### field.style
+
+A string containing CSS to style field elements
+
+##### field.script
+
+A string containing JavaScript library code to be executed on forms containing this field
+
+##### field.template
+
+A Swig template for rendering the form field
+
+### showcase.run()
+
+Start up the server.  Specify the HTTP port either via a `PORT` environment variable, or through a `port` key in options sent to `showcase.initialize`.
+
+## Events
+
+Subscribe to change events through `showcase.radio`, an event emitter.  For example to log changes to items:
+
+```javascript
+showcase.radio.on('itemUpdate', function(item) {
+    console.log("item was updated ", item);
+})
+```
+
+##### itemUpdate
+
+Fires when an item is updated.  Receives the updated item as a parameter.  
+
+##### itemCreate
+
+Fires when an item is created.  Receives the nascent item as a parameter.
+
+##### itemDestroy
+
+Fires when at item is destroyed.  Receives the moribund item as a parameter.
+
 
 ## License
 
