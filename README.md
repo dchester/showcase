@@ -50,9 +50,9 @@ Within a workspace, create collections.  A collection is a set of like items.  O
 
 Access and modify data in collections through the built-in RESTful API.
 
-# Showcase API
+## Showcase API
 
-## showcase.initialize(options)
+### showcase.initialize(options)
 
 Initialize the application, given a set of options:
 
@@ -67,7 +67,7 @@ Under the hood these are sent through to the [Sequelize constructor](http://sequ
 - `files.tmp_path` specifies where incoming uploaded files should be stored during transfer
 - `files.storage_path` specifies long term storage where uploaded files should reside
 
-## showcase.registerField(field)
+### showcase.registerField(field)
 
 Register a custom field.  Supplied `field` should be an object specifying the following keys:
 
@@ -92,9 +92,31 @@ A string containing JavaScript library code to be executed on forms containing t
 
 A Swig template for rendering the form field
 
-## showcase.run()
+### showcase.run()
 
 Start up the server.  Specify the HTTP port either via a `PORT` environment variable, or through a `port` key in options sent to `showcase.initialize`.
+
+## Events
+
+Subscribe to change events through `showcase.radio`, an event emitter.  For example to log changes to items:
+
+```javascript
+showcase.radio.on('itemUpdate', function(item) {
+    console.log("item was updated ", item);
+})
+```
+
+##### itemUpdate
+
+Fires when an item is updated.  Receives the updated item as a parameter.  
+
+##### itemCreate
+
+Fires when an item is created.  Receives the nascent item as a parameter.
+
+##### itemDestroy
+
+Fires when at item is destroyed.  Receives the moribund item as a parameter.
 
 
 ## License
