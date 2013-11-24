@@ -19,14 +19,15 @@ app.showcase = {};
 var views = __dirname + '/views';
 swig.init({ root: views, allowErrors: true });
 
-var dreamer = Dreamer.initialize({
-	app: app,
-	schema: "spec/schema.md"
-});
-
-app.dreamer = dreamer;
-
 exports.initialize = function(config) {
+
+	var dreamer = Dreamer.initialize({
+		app: app,
+		schema: "spec/schema.md",
+		database: config.database
+	});
+
+	app.dreamer = dreamer;
 
 	var storagePath;
 	if (!config.files.storage_path.match(/^\//)) {
@@ -105,6 +106,6 @@ exports.run = function() {
 	registerPlugins();
 	plugins.route(app);
 
-	dreamer.dream();
+	app.dreamer.dream();
 };
 

@@ -1,3 +1,5 @@
 runtime: node010
 build: npm install && bower install && grunt
 run: node app run
+test: nodeunit tests
+run_test_server: rm -f /var/tmp/showcase-test.sqlite ; node app schema-sync ; PORT=3000 node app run

@@ -2,6 +2,7 @@
   "name": "showcase",
   "version": "0.0.1",
   "devDependencies": {
+    "nodeunit": "*",
     "bower": "*",
     "grunt": "*",
     "grunt-cli": "*",
