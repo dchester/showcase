@@ -1,13 +1,13 @@
 {
   "name": "showcase",
   "dependencies": {
-    "underscore": "*",
-    "swig": "*",
+    "underscore": "1.5.2",
+    "swig": "https://raw.github.com/paularmstrong/swig/0056bc70e22dd85b94a9934deca59f714538b68f/js/swig.js",
     "bootstrap": "http://getbootstrap.com/2.3.2/assets/bootstrap.zip",
-    "jquery": "*",
+    "jquery": "2.0.3",
     "jquery-ui": "~1.10.3",
-    "font-awesome": "*",
-    "EpicEditor": "*",
+    "font-awesome": "3.2.0",
+    "EpicEditor": "0.2.2",
     "dropzone": "3.7.1"
   }
 }

@@ -14,7 +14,7 @@ module.exports = function(grunt) {
           'components/jquery-ui/ui/jquery.ui.sortable.js',
           'components/bootstrap/js/bootstrap.js',
           'components/EpicEditor/epiceditor/js/epiceditor.js',
-          'components/swig/swig.js',
+          'components/swig/index.js',
           'components/dropzone/downloads/dropzone.js',
           'public/js/showcase.js'
         ],
