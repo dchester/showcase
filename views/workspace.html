@@ -44,7 +44,7 @@
 					<div class="muted">Required</div>
 				</th>
 				<td>
-					<input type="text" name="handle" value="{{ workspace.handle }}">
+					<input type="text" name="handle" value="{{ workspace.handle }}" data-autoupdate="1">
 					<div class="description">
 						Name of the workspace for computers (all lowercase, no spaces)
 					</div>
@@ -73,4 +73,13 @@
 	</form>
 </div>
 
+{% endblock %}
+
+{% block footer_js %}
+	<script>
+		new Showcase.Form.Input.Pair({
+			source: document.querySelector('input[name=title]'),
+			target: document.querySelector('input[name=handle]')
+		});
+	</script>
 {% endblock %}
