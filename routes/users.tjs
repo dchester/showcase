@@ -137,7 +137,7 @@ exports.initialize = function(app) {
 				.error(req.error)
 				.success(function(_user) {
 					user = _user;
-					req.flash('success', 'Saved user');
+					req.flash('info', 'Saved user');
 					deferrals.run();
 				});
 

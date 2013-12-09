@@ -172,7 +172,7 @@ exports.initialize = function(app) {
 				});
 			},
 			success: function(item) {
-				req.flash('success', "Created item");
+				req.flash('info', "Created item");
 				res.redirect("/workspaces/" + workspace.handle + "/collections/" + entity_id + "/items");
 			}
 		});

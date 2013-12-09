@@ -95,7 +95,7 @@ exports.initialize = function(app) {
 			fields: fields,
 			error: req.error,
 			success: function() {
-				req.flash('success', 'Created new collection');
+				req.flash('info', 'Created new collection');
 				res.redirect('/workspaces/' + workspace.handle + '/collections');
 			}
 		});
