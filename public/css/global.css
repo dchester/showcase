@@ -323,7 +323,7 @@ form .table.table-condensed select {
 	opacity: 0.5;
 	margin-bottom: 0.5em;
 }
-.pagetitle + .alert.alert-block {
+.alert.alert-block {
 	border-radius: 0;
 }
 .alert.alert-block {

@@ -26,30 +26,30 @@ DONE
 - fix not propagating fields with errors
 - namespaces / workspaces
 - access control / roles
+- fix type validation
+- new fields out-of-order
+- write tests
+- custom fields: selects
+- customized preview
 
 
 NEXT
 
+- log all changes
 - use node domains for exception handling
-- fix type validation
-- new fields out-of-order
 - deal w/ high number of fields in listing
 - settings: jsonp 
 - storage engines
-- log all changes
 - references
 - bulk import/export for data
 - bulk import/export for collections schemas
-- custom fields: selects
 - custom fields: display order w/ dnd
 - file browser
 - generic files upload
 - document adding permissions for a user?
 - explain what are fields
-- write tests
 - custom fields
 - internationalization
-- customized preview
 - oauth / user sessions
 - csrf tokens
 - soft deletes
