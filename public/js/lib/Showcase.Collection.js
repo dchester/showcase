@@ -39,22 +39,22 @@ Showcase.Collection = function(args) {
 			row.parentNode.removeChild(row);
 		});
 
-		new InputPair({
+		new Showcase.Form.Input.Pair({
 			source: row.querySelector('input[name=field_title]'),
 			target: row.querySelector('input[name=field_name]')
 		});
 
-		new InputReflector({
+		new Showcase.Form.Input.Reflector({
 			source: row.querySelector('.inputs .title'),
 			target: row.querySelector('.labels .title')
 		});
 
-		new InputReflector({
+		new Showcase.Form.Input.Reflector({
 			source: row.querySelector('.inputs .data_type'),
 			target: row.querySelector('.labels .data_type')
 		});
 
-		new InputReflector({
+		new Showcase.Form.Input.Reflector({
 			source: row.querySelector('.inputs .required'),
 			target: row.querySelector('.labels .required'),
 			transform: function(is_required) { return Number(is_required) ? 'required' : 'optional' }
