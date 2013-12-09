@@ -16,7 +16,9 @@ module.exports = function(grunt) {
           'components/EpicEditor/epiceditor/js/epiceditor.js',
           'components/swig/index.js',
           'components/dropzone/downloads/dropzone.js',
-          'public/js/showcase.js'
+          'public/js/lib/Showcase.js',
+          'public/js/lib/Showcase.Collection.js',
+          'public/js/lib/Showcase.Form.Input.js'
         ],
         dest: 'public/dist/js/global.js'
       },

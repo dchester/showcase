@@ -165,13 +165,13 @@
 
 {% block footer_js %}
 
-	<script src="/js/collection.js"></script>
+	<script src="/js/page/collection.js"></script>
 
 	<script>
 
 		var data_types = {{ controls|json_encode|raw }};
 
-		var collection = new Collection({ element: document.querySelector('#collection') });
+		var collection = new Showcase.Collection({ element: document.querySelector('#collection') });
 
 		var fields = {{ fields|json_encode|raw }} || [];
 		fields.forEach(function(field, index) {
@@ -190,7 +190,7 @@
 			}
 		});
 
-		new InputPair({
+		new Showcase.Form.Input.Pair({
 			source: document.querySelector("input[name=title]"),
 			target: document.querySelector("input[name=name]")
 		});
