@@ -88,9 +88,8 @@
 					Delete
 				</button>
 			</form>
+			<span class="muted light">Last updated by {{ item.updated_username }} {{ item.updated_relative_time }}</span>
 		{% endif %}
-
-		<span class="muted light">Last updated by {{ item.updated_username }} {{ item.updated_relative_time }}</span>
 
 		{% if revisions.length %}
 			<br><br><br><hr><br>

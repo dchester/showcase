@@ -327,12 +327,17 @@ form .table.table-condensed select {
 	margin-bottom: 0.5em;
 }
 .alert.alert-block {
-	border-radius: 0;
-}
-.alert.alert-block {
-	padding-left: 20px;
 	font-size: 16px;
-	margin: 0;
+	position: absolute;
+	width: 50%;
+	left: 25%;
+	text-shadow: none;
+	color: white;
+	border: none;
+	top: 56px;
+	background: rgba(40,40,40,0.87);
+	border-radius: 3px;
+	text-align: center;
 }
 textarea:focus, input[type="text"]:focus, input[type="password"]:focus, input[type="datetime"]:focus, input[type="datetime-local"]:focus, input[type="date"]:focus, input[type="month"]:focus, input[type="time"]:focus, input[type="week"]:focus, input[type="number"]:focus, input[type="email"]:focus, input[type="url"]:focus, input[type="search"]:focus, input[type="tel"]:focus, input[type="color"]:focus, .uneditable-input:focus {
 	-webkit-box-shadow: none;
@@ -438,4 +443,18 @@ footer {
 }
 .muted.light {
 	color: #bbb;
+}
+.alert.alert-block {
+	-webkit-animation-duration: 1s;
+	-webkit-animation-name: flashout;
+	-webkit-animation-delay: 3s;
+	-webkit-animation-fill-mode: forwards;
+}
+@-webkit-keyframes flashout {
+	from {
+		opacity: 1;
+	}
+	to {
+		opacity: 0;
+	}
 }
