@@ -6,6 +6,7 @@ showcase.initialize(config.showcase);
 
 var dream = require('dreamer').instance;
 var error = function(e) { console.warn(e) };
+var models = dream.models;
 
 var Item = require('../lib/item.tjs');
 var Entity = require('../lib/entity.tjs');
@@ -13,14 +14,17 @@ var Entity = require('../lib/entity.tjs');
 exports.setUp = function(callback) {
 	dream.db.drop().success(function() {
 		dream.db.sync().success(function() { 
-			var entity = Entity.create({
-				title: 'Books',
-				description: 'Books for reading',
-				name: 'books',
-				workspace_handle: 'test',
-				fields: config.fixtures.book_fields,
-				success: function() { callback() }
-			});
+			models.users.create({ username: 'bob' })
+				.success(function() {
+					Entity.create({
+						title: 'Books',
+						description: 'Books for reading',
+						name: 'books',
+						workspace_handle: 'test',
+						fields: config.fixtures.book_fields,
+						success: function() { callback() }
+					});
+				});
 		});
 	});
 };
@@ -42,6 +46,7 @@ exports.create = function(test) {
 		},
 		error: error,
 		invalid: error,
+		user_id: 1,
 		success: function(item) {
 			test.equal(item.title, "Rung Ho!");
 			test.equal(item.author, "Talbot Mundy");
@@ -62,9 +67,11 @@ exports.update = function(test) {
 		},
 		error: error,
 		invalid: error,
+		user_id: 1,
 		success: function(item) {
 			Item.update({
 				id: item.id,
+				user_id: 1,
 				data: {
 					title: "Rung Ho!",
 					author: "Talbot Mundy",
@@ -91,6 +98,7 @@ exports.find = function(test) {
 			isbn: "1557424047",
 			is_public_domain: true
 		},
+		user_id: 1,
 		error: error,
 		invalid: error,
 		success: function(item) {
@@ -118,6 +126,7 @@ exports.validateRequired = function(test) {
 			author: "Talbot Mundy",
 			isbn: "1557424047"
 		},
+		user_id: 1,
 		error: error,
 		success: error,
 		invalid: function(item_data) {
@@ -136,6 +145,7 @@ exports.validateType = function(test) {
 			author: "Talbot Mundy",
 			isbn: "alpha"
 		},
+		user_id: 1,
 		error: error,
 		success: error,
 		invalid: function(item_data) {
@@ -154,6 +164,7 @@ exports.findAll = function(test) {
 			author: "Talbot Mundy",
 			isbn: "1557424047"
 		},
+		user_id: 1,
 		error: error,
 		invalid: error,
 		success: function(item) {
@@ -182,6 +193,7 @@ exports.destroy = function(test) {
 			author: "Talbot Mundy",
 			isbn: "1557424047"
 		},
+		user_id: 1,
 		error: error,
 		invalid: error,
 		success: function(item) {
@@ -203,8 +215,6 @@ exports.destroy = function(test) {
 		}
 	});
 };
-
-
 
 
 

@@ -1,0 +1,17 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+
+<div class="content">
+	<h2>Revision Details</h2>
+
+	By {{ revision.username }}, {{ revision.relative_time }} <span class="muted">({{ revision.create_time }})</span>
+
+	<br><br>
+	<h4 class="muted">Raw Data</h4>
+	<pre><code>{{ revision.data }}</pre></code>
+
+</div>
+
+{% endblock %}
+

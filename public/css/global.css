@@ -6,6 +6,9 @@
 h1, h2, h3, h4, h5, h6 {
 	text-rendering: optimizespeed;
 }
+h1.light, h2.light, h3.light, h4.light, h5.light, h6.light {
+	font-weight: normal;
+}
 a {
 	color: #368cb1;
 }
@@ -433,4 +436,6 @@ footer {
 	pointer-events: none;
 	opacity: 0.5;
 }
-
+.muted.light {
+	color: #bbb;
+}

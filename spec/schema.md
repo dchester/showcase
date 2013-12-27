@@ -43,6 +43,19 @@ Data comprising the item record
 - entity_item_id
 - data             text
 - content_type
+- user_id
+```
+
+### Entity Item Data Revisions
+
+Data comprising the item record
+
+```
+- entity_item_id
+- data             text
+- content_type
+- create_time      default=now
+- user_id
 ```
 
 ### Files

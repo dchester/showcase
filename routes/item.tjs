@@ -71,7 +71,6 @@ exports.initialize = function(app) {
 
 	app.get("/workspaces/:workspace_handle/collections/:entity_id/items/:entity_item_id/edit", workspaceLoader, workspaceEditor, function(req, res) {
 
-		var entity_id = req.params.entity_id;
 		var entity_item_id = req.params.entity_item_id;
 
 		var entity, item, fields, item_data;
@@ -81,17 +80,58 @@ exports.initialize = function(app) {
 			error: req.error,
 			success: function(item) {
 
-				var action = 'Edit';
+				Item.loadRevisions({
+					item_id: entity_item_id,
+					success: function(revisions) {
 
-				var fields = item._entity.fields;
+						var action = 'Edit';
+						var fields = item._entity.fields;
 
-				res.render("item.html", {
-					item: item,
-					entity: item._entity,
-					fields: item._entity.fields,
-					action: action
+						res.render("item.html", {
+							item: item,
+							entity: item._entity,
+							fields: item._entity.fields,
+							action: action,
+							revisions: revisions
+						});
+					}
 				});
+
 			}
+		});
+	});
+
+	app.get("/workspaces/:workspace_handle/collections/:entity_id/items/:entity_item_id/revisions/:revision_id", workspaceLoader, workspaceEditor, function(req, res) {
+
+		var entity_item_id = req.params.entity_item_id;
+		var revision_id = req.params.revision_id;
+
+		Item.loadRevision({
+			item_id: entity_item_id,
+			revision_id: revision_id,
+			success: function(revision) {
+				console.log("RV", revision);
+				res.render("revision.html", { revision: revision });
+			}
+		});
+	});
+
+	app.post("/workspaces/:workspace_handle/collections/:entity_id/items/:entity_item_id/restore", workspaceLoader, workspaceEditor, function(req, res) {
+
+		var revision_id = req.body.revision_id;
+		var workspace = req.showcase.workspace;
+		var item_id = req.params.entity_item_id;
+		var user_id = req.session.user_id;
+
+		Item.restore({
+			id: item_id,
+			user_id: user_id,
+			revision_id: revision_id,
+			success: function() {
+				req.flash('info', "Restored prior version for item #" + item_id);
+				res.redirect('/workspaces/' + workspace.handle + '/collections/' + req.params.entity_id + '/items/' + item_id + '/edit');
+			},
+			error: req.error
 		});
 	});
 
@@ -101,12 +141,14 @@ exports.initialize = function(app) {
 		var entity_item_id = req.params.entity_item_id;
 		var status = req.body._status;
 		var workspace = req.showcase.workspace;
+		var user_id = req.session.user_id;
 
 		Item.update({
 			id: entity_item_id,
 			status: status,
 			data: req.body,
 			error: req.error,
+			user_id: user_id,
 			invalid: function(item) {
 
 				var action = "Edit";
@@ -151,12 +193,14 @@ exports.initialize = function(app) {
 		var entity_id = req.params.entity_id;
 		var status = req.body._status;
 		var workspace = req.showcase.workspace;
+		var user_id = req.session.user_id;
 
 		Item.create({
 			entity_id: entity_id,
 			status: status,
 			data: req.body,
 			error: req.error,
+			user_id: user_id,
 			invalid: function(item) {
 
 				var action = "New";
