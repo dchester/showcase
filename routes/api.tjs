@@ -3,7 +3,7 @@ var armrest = require('armrest');
 var Deferrals = require('../lib/deferrals');
 var Item = require('../lib/item');
 
-var Entity = require('../lib/entity.tjs');
+var Collection = require('../lib/collection.tjs');
 var EXAMPLE_LENGTH = 1500;
 
 exports.initialize = function(app) {
@@ -11,35 +11,35 @@ exports.initialize = function(app) {
 	var models = app.dreamer.models;
 	var workspaceLoader = app.showcase.middleware.workspaceLoader;
 
-	app.get('/api/:workspace_handle/:entity_handle', workspaceLoader, function(req, res) {
+	app.get('/api/:workspace_handle/:collection_handle', workspaceLoader, function(req, res) {
 
-		var name = req.params.entity_handle;
+		var name = req.params.collection_handle;
 		var per_page = req.query.per_page || 40;
 		var page = req.query.page || 0;
-		var entity, items;
+		var collection, items;
 		var workspace = req.showcase.workspace;
 
 		await {
 			var deferrals = new Deferrals(defer());
 
-			Entity.find({
+			Collection.find({
 				name: name,
 				error: req.error,
 				workspace_handle: workspace.handle,
-				success: function(_entity) {
-					entity = _entity;
+				success: function(_collection) {
+					collection = _collection;
 					deferrals.run();
 				}
 			});
 		}
 
-		if (!entity) {
+		if (!collection) {
 			return req.error(404, "collection not found");
 		}
 
 		var criteria = {};
 
-		entity.fields.forEach(function(field) {
+		collection.fields.forEach(function(field) {
 			if (field.name in req.query) {
 				criteria[field.name] = req.query[field.name];
 			}
@@ -49,7 +49,7 @@ exports.initialize = function(app) {
 			var deferrals = new Deferrals(defer());
 
 			Item.findAll({
-				entity_id: entity.id,
+				collection_id: collection.id,
 				criteria: criteria,
 				page: page,
 				per_page: per_page,
@@ -62,7 +62,7 @@ exports.initialize = function(app) {
 		}
 
 		items.forEach(function(item) {
-			item._entity = entity;
+			item._collection = collection;
 		});
 
 		async.forEach(items, function(item, callback) {
@@ -85,21 +85,21 @@ exports.initialize = function(app) {
 		});
 	});
 
-	app.get('/api/:entity_key/:id', function(req, res) {
+	app.get('/api/:collection_key/:id', function(req, res) {
 
 		var id = req.params.id;
-		var name = req.params.entity_key;
+		var name = req.params.collection_key;
 
-		var entity, item;
+		var collection, item;
 
 		await {
 			var deferrals = new Deferrals(defer());
 
-			Entity.find({
+			Collection.find({
 				name: name,
 				error: req.error,
-				success: function(_entity) {
-					entity = _entity;
+				success: function(_collection) {
+					collection = _collection;
 					deferrals.run();
 				}
 			});
@@ -109,7 +109,7 @@ exports.initialize = function(app) {
 			var deferrals = new Deferrals(defer());
 			Item.findAll({
 				criteria:{ id: id },
-				entity_id: entity.id,
+				collection_id: collection.id,
 				success: function(items) {
 					item = items.shift();
 					deferrals.run();
@@ -125,19 +125,19 @@ exports.initialize = function(app) {
 
 	});
 
-	app.post('/api/:entity_key', function(req, res) {
+	app.post('/api/:collection_key', function(req, res) {
 
-		var name = req.params.entity_key;
-		var entity;
+		var name = req.params.collection_key;
+		var collection;
 
 		await {
 			var deferrals = new Deferrals(defer());
 
-			Entity.find({
+			Collection.find({
 				name: name,
 				error: req.error,
-				success: function(_entity) {
-					entity = _entity;
+				success: function(_collection) {
+					collection = _collection;
 					deferrals.run();
 				}
 			});
@@ -145,12 +145,12 @@ exports.initialize = function(app) {
 
 		var data = {};
 
-		entity.fields.forEach(function(field) {
+		collection.fields.forEach(function(field) {
 			data[field.name] = String(req.body[field.name]);
 		});
 
 		Item.create({
-			entity_id: entity.id,
+			collection_id: collection.id,
 			data: data,
 			success: function(item) {
 				var location = '/api/' + name + '/' + item.id;
@@ -162,20 +162,20 @@ exports.initialize = function(app) {
 		});
 	});
 
-	app.post('/api/:entity_key/:entity_item_id', function(req, res) {
+	app.post('/api/:collection_key/:item_id', function(req, res) {
 
-		var name = req.params.entity_key;
-		var entity_item_id = req.params.entity_item_id;
-		var entity;
+		var name = req.params.collection_key;
+		var item_id = req.params.item_id;
+		var collection;
 
 		await {
 			var deferrals = new Deferrals(defer());
 
-			Entity.find({
+			Collection.find({
 				name: name,
 				error: req.error,
-				success: function(_entity) {
-					entity = _entity;
+				success: function(_collection) {
+					collection = _collection;
 					deferrals.run();
 				}
 			});
@@ -183,13 +183,13 @@ exports.initialize = function(app) {
 
 		var data = {};
 
-		entity.fields.forEach(function(field) {
+		collection.fields.forEach(function(field) {
 			data[field.name] = String(req.body[field.name]);
 		});
 
 		Item.update({
-			id: entity_item_id,
-			entity_id: entity.id,
+			id: item_id,
+			collection_id: collection.id,
 			data: data,
 			success: function(item) { res.json(200, { id: item.id } ); },
 			invalid: function(item) { res.json(400, { errors: item._errors } ); },
@@ -202,15 +202,15 @@ exports.initialize = function(app) {
 		var workspace = req.showcase.workspace;
 		var api = armrest.client("localhost:" + app.get('port'));
 
-		Entity.findAll({
+		Collection.findAll({
 			workspace_handle: workspace.handle,
-			success: function(entities) {
+			success: function(collections) {
 
-				var entity_resources = [];
+				var collection_resources = [];
 
-				async.forEach(entities, function(entity, cb) {
+				async.forEach(collections, function(collection, cb) {
 
-					var route = '/api/' + workspace.handle  + '/' + entity.name;
+					var route = '/api/' + workspace.handle  + '/' + collection.name;
 
 					api.get({
 						url: route,
@@ -218,7 +218,7 @@ exports.initialize = function(app) {
 						success: function(items, response) {
 
 							var resources = [];
-							resources.entity = entity;
+							resources.collection = collection;
 
 							var example_response = response.body;
 							if (example_response && example_response.length > EXAMPLE_LENGTH) {
@@ -229,7 +229,7 @@ exports.initialize = function(app) {
 								method: 'GET',
 								route: route,
 								preview: route,
-								description: 'Get a listing of ' + entity.title.toLowerCase(),
+								description: 'Get a listing of ' + collection.title.toLowerCase(),
 								example_uri: route
 							};
 
@@ -242,20 +242,20 @@ exports.initialize = function(app) {
 							var write_resource = {
 								method: 'POST',
 								route: route,
-								description: 'Create ' + entity.title.toLowerCase(),
-								parameters: entity.fields
+								description: 'Create ' + collection.title.toLowerCase(),
+								parameters: collection.fields
 							}
 
 							resources.push(write_resource);
 
-							entity_resources.push(resources);
+							collection_resources.push(resources);
 							cb();
 						}
 					});
 
 				}, function() {
-					entity_resources = entity_resources.sort(function(a, b) { return a.entity.title.localeCompare(b.entity.title); });
-					res.render("api.html", { entity_resources: entity_resources });
+					collection_resources = collection_resources.sort(function(a, b) { return a.collection.title.localeCompare(b.collection.title); });
+					res.render("api.html", { collection_resources: collection_resources });
 				});
 
 			}

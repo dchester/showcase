@@ -10,8 +10,8 @@
 	<ul class="nav">
 		<li><a href="/workspaces">Workspaces</a></li>
 		<li><a href="/workspaces/{{ workspace.handle }}/collections">{{ workspace.title }}</a></li>
-		{% if entity %}
-			<li><a href="/workspaces/{{ workspace.handle }}/collections/{{ entity.id }}/items">{{ entity.title }}</a></li>
+		{% if collection %}
+			<li><a href="/workspaces/{{ workspace.handle }}/collections/{{ collection.id }}/items">{{ collection.title }}</a></li>
 			<li><a href="">Configure</a></li>
 		{% else %}
 			<li><a href="">New Collection</a></li>
@@ -21,8 +21,8 @@
 
 {% block pagetitle %}
 	<div class="pagetitle">
-		{% if entity %}
-			<h1>{{ entity.title }}</h1>
+		{% if collection %}
+			<h1>{{ collection.title }}</h1>
 		{% else %}
 			<h1>New Collection</h1>
 		{% endif %}
@@ -36,25 +36,25 @@
 
 		<form id="collection" method="post">
 			<input type="hidden" name="workspace_handle" value="{{ workspace.handle }}">
-			<table class="table" id="entity_form">
+			<table class="table" id="collection_form">
 				<tr>
 					<th>Collection Title</th>
 					<td>
-						<input type="text" name="title" value="{{ entity.title }}">
+						<input type="text" name="title" value="{{ collection.title }}">
 						<div class="description">Title of the collection (e.g., Featured Books of the Month)</div>
 					</td>
 				</tr>
 				<tr>
 					<th>Handle</th>
 					<td>
-						<input type="text" name="name" value="{{ entity.name }}" data-autoupdate="{% if entity.name %}0{% else %}1{% endif %}">
+						<input type="text" name="name" value="{{ collection.name }}" data-autoupdate="{% if collection.name %}0{% else %}1{% endif %}">
 						<div class="description">Short name for computers; lowercase with no spaces (e.g., featured_books)</div>
 					</td>
 				</tr>
 				<tr>
 					<th>Description</th>
 					<td>
-						<input type="text" name="description" value="{{ entity.description }}">
+						<input type="text" name="description" value="{{ collection.description }}">
 						<div class="description">What goes in this collection and how is it used?</div>
 					</td>
 				</tr>

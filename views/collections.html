@@ -29,22 +29,22 @@
 
 {% block content %}
 	<div class="content">
-		{% if entities.length %}
+		{% if collections.length %}
 			<table class="table">
-				{% for entity in entities %}
+				{% for collection in collections %}
 					<tr>
 						<td>
-							<a href="/workspaces/{{ workspace.handle }}/collections/{{ entity.id }}/items">{{ entity.title }}</a>
-							<span class="badge">{{ entity_counts[entity.id]|default(0) }}</span>
+							<a href="/workspaces/{{ workspace.handle }}/collections/{{ collection.id }}/items">{{ collection.title }}</a>
+							<span class="badge">{{ collection_counts[collection.id]|default(0) }}</span>
 						</td>
-						<td>{{ entity.description }}</td>
+						<td>{{ collection.description }}</td>
 
 						<td class="nowrap actions">
-							<a class="btn permission-administrator" href="/workspaces/{{ workspace.handle }}/collections/{{ entity.id }}/edit">
+							<a class="btn permission-administrator" href="/workspaces/{{ workspace.handle }}/collections/{{ collection.id }}/edit">
 								<i class="icon-pencil"></i>
 								Configure
 							</a>
-							<form action="/workspaces/{{ workspace.handle }}/collections/{{ entity.id }}" method="post" class="delete">
+							<form action="/workspaces/{{ workspace.handle }}/collections/{{ collection.id }}" method="post" class="delete">
 								<input type="hidden" name="_method" value="delete">
 								<button class="btn permission-administrator">
 									<i class="icon-remove"></i>

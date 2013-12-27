@@ -6,7 +6,7 @@
 	<ul class="nav">
 		<li><a href="/workspaces">Workspaces</a></li>
 		<li><a href="/workspaces/{{ workspace.handle }}/collections">{{ workspace.title }}</a></li>
-		<li><a href="/workspaces/{{ workspace.handle }}/collections/{{ entity.id }}/items">{{ entity.title }}</a></li>
+		<li><a href="/workspaces/{{ workspace.handle }}/collections/{{ collection.id }}/items">{{ collection.title }}</a></li>
 		{% if item.id %}
 			<li><a>#{{ item.id }}</a></li>
 		{% else %}
@@ -18,7 +18,7 @@
 {% block pagetitle %}
 	<div class="pagetitle">
 		<ul class="nav">
-			<li><a href="/workspaces/{{ workspace.handle }}/collections/{{ entity.id }}/items">{{ entity.title }}</a></li>
+			<li><a href="/workspaces/{{ workspace.handle }}/collections/{{ collection.id }}/items">{{ collection.title }}</a></li>
 			{% if item.id %}
 				<li>#{{ item.id }}</li>
 			{% else %}
@@ -81,7 +81,7 @@
 		{% endif %}
 
 		{% if item.id %}
-			<form action="/workspaces/{{ workspace.handle }}/collections/{{ entity.id }}/items/{{ item.id }}" method="post" class="delete">
+			<form action="/workspaces/{{ workspace.handle }}/collections/{{ collection.id }}/items/{{ item.id }}" method="post" class="delete">
 				<input type="hidden" name="_method" value="delete">
 				<button class="btn btn-large btn-text permission-editor">
 					<i class="icon-remove"></i>
@@ -104,8 +104,8 @@
 							<td>{{ revision.relative_time }}</td>
 							<td>{{ revision.data }}</td>
 							<td>
-								<a href="/workspaces/{{ workspace.handle }}/collections/{{ entity.id }}/items/{{ item.id }}/revisions/{{ revision.id }}" class="btn">View</a>
-								<form class="restore" method="post" action="/workspaces/{{ workspace.handle }}/collections/{{ entity.id }}/items/{{ item.id }}/restore">
+								<a href="/workspaces/{{ workspace.handle }}/collections/{{ collection.id }}/items/{{ item.id }}/revisions/{{ revision.id }}" class="btn">View</a>
+								<form class="restore" method="post" action="/workspaces/{{ workspace.handle }}/collections/{{ collection.id }}/items/{{ item.id }}/restore">
 									<input type="hidden" name="revision_id" value="{{ revision.id }}">
 									<button class="btn">Restore</b>
 								</form>

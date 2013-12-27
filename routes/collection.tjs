@@ -1,5 +1,5 @@
 var Deferrals = require('../lib/deferrals');
-var Entity = require('../lib/entity.tjs');
+var Entity = require('../lib/collection.tjs');
 var async = require('async');
 var controls = require('../lib/fields').controls;
 
@@ -15,7 +15,7 @@ exports.initialize = function(app) {
 
 	app.get("/workspaces/:workspace_handle/collections", workspaceLoader, workspaceAdmin, function(req, res) {
 
-		var entities, entity_counts;
+		var collections, collection_counts;
 		var workspace_handle = req.params.workspace_handle;
 
 		await {
@@ -25,8 +25,8 @@ exports.initialize = function(app) {
 			Entity.findAll({
 				error: req.error,
 				workspace_handle: workspace_handle,
-				success: function(_entities) {
-					entities = _entities;
+				success: function(_collections) {
+					collections = _collections;
 					deferrals.run();
 				}
 			});
@@ -34,16 +34,16 @@ exports.initialize = function(app) {
 			Entity.itemCounts({
 				error: req.error,
 				workspace_handle: workspace_handle,
-				success: function(_entity_counts) {
-					entity_counts = _entity_counts;
+				success: function(_collection_counts) {
+					collection_counts = _collection_counts;
 					deferrals.run();
 				}
 			});
 		}
 
 		res.render("collections.html", { 
-			entities: entities,
-			entity_counts: entity_counts
+			collections: collections,
+			collection_counts: collection_counts
 		});
 	});
 
@@ -103,7 +103,7 @@ exports.initialize = function(app) {
 
 	app.post("/workspaces/:workspace_handle/collections/:id/edit", workspaceLoader, workspaceAdmin, function(req, res) {
 
-		var entity_id = req.params.id;
+		var collection_id = req.params.id;
 
 		var title = req.body.title;
 		var description = req.body.description;
@@ -120,7 +120,7 @@ exports.initialize = function(app) {
 
 		field_attributes.name.forEach(function(field_name, index) {
 
-			var field_data = { name: field_name, entity_id: entity_id };
+			var field_data = { name: field_name, collection_id: collection_id };
 
 			Entity.field_attribute_names.forEach(function(name) {
 				if (name == 'name') return;
@@ -132,14 +132,14 @@ exports.initialize = function(app) {
 		});
 
 		Entity.update({
-			id: entity_id,
+			id: collection_id,
 			title: title,
 			description: description,
 			name: name,
 			fields: fields,
 			error: req.error,
-			success: function(entity) {
-				req.flash('info', 'Saved ' +  entity.title + ' Collection');
+			success: function(collection) {
+				req.flash('info', 'Saved ' +  collection.title + ' Collection');
 				res.redirect('/workspaces/' + workspace.handle + '/collections');
 			}
 		});
@@ -147,17 +147,17 @@ exports.initialize = function(app) {
 
 	app.get("/workspaces/:workspace_handle/collections/:id/edit", workspaceLoader, workspaceAdmin, function(req, res) {
 
-		var entity_id = req.params.id;
+		var collection_id = req.params.id;
 
 		Entity.find({
-			id: entity_id,
+			id: collection_id,
 			error: req.error,
-			success: function(entity) {
+			success: function(collection) {
 				res.render("collection.html", {
 					controls: controls,
-					entity: entity,
-					fields: entity.fields,
-					subtitle: " › " + entity.title 
+					collection: collection,
+					fields: collection.fields,
+					subtitle: " › " + collection.title 
 				});
 			}
 		});
@@ -165,11 +165,11 @@ exports.initialize = function(app) {
 
 	app.del("/workspaces/:workspace_handle/collections/:id", workspaceLoader, workspaceAdmin, function(req, res) {
 
-		var entity_id = req.params.id;
+		var collection_id = req.params.id;
 		var workspace = req.showcase.workspace;
 
 		Entity.destroy({
-			id: entity_id,
+			id: collection_id,
 			error: req.error,
 			success: function() { 
 				res.redirect("/workspaces/" + workspace.handle + "/collections");

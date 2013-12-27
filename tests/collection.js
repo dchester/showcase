@@ -6,7 +6,7 @@ showcase.initialize(config.showcase);
 
 var dream = require('dreamer').instance;
 var error = function(e) { console.warn(e) };
-var Entity = require('../lib/entity.tjs');
+var Collection = require('../lib/collection.tjs');
 
 exports.setUp = function(callback) {
 	dream.db.drop().success(function() {
@@ -24,17 +24,17 @@ exports.tearDown = function(callback) {
 
 exports.create = function(test) {
 
-	var entity = Entity.create({
+	var collection = Collection.create({
 		title: 'Books',
 		description: 'Books for reading',
 		name: 'books',
 		workspace_handle: 'test',
 		fields: config.fixtures.book_fields,
 		error: error,
-		success: function(entity) {
-			test.equal(entity.title, 'Books');
-			test.equal(entity.description, 'Books for reading');
-			test.equal(entity.workspace_handle, 'test');
+		success: function(collection) {
+			test.equal(collection.title, 'Books');
+			test.equal(collection.description, 'Books for reading');
+			test.equal(collection.workspace_handle, 'test');
 			test.done();
 		}
 	});
@@ -42,24 +42,24 @@ exports.create = function(test) {
 
 exports.update = function(test) {
 
-	var entity = Entity.create({
+	var collection = Collection.create({
 		title: 'Books',
 		description: 'Books for reading',
 		name: 'books',
 		workspace_handle: 'test',
 		fields: config.fixtures.book_fields,
 		error: error,
-		success: function(entity) {
+		success: function(collection) {
 
-			Entity.update({
+			Collection.update({
 				title: "Wonderful Books",
 				description: 'Books for reading',
 				name: 'books',
 				workspace_handle: 'test',
 				fields: config.fixtures.book_fields,
-				id: entity.id,
-				success: function(entity) {
-					test.equal(entity.title, "Wonderful Books");
+				id: collection.id,
+				success: function(collection) {
+					test.equal(collection.title, "Wonderful Books");
 					test.done();
 				}
 			});
@@ -70,21 +70,21 @@ exports.update = function(test) {
 
 exports.find = function(test) {
 
-	var entity = Entity.create({
+	var collection = Collection.create({
 		title: 'Books',
 		description: 'Books for reading',
 		name: 'books',
 		workspace_handle: 'test',
 		fields: config.fixtures.book_fields,
 		error: error,
-		success: function(entity) {
+		success: function(collection) {
 
-			Entity.find({
-				id: entity.id,
-				success: function(entity) {
-					test.equal(entity.title, 'Books');
-					test.equal(entity.description, 'Books for reading');
-					test.equal(entity.workspace_handle, 'test');
+			Collection.find({
+				id: collection.id,
+				success: function(collection) {
+					test.equal(collection.title, 'Books');
+					test.equal(collection.description, 'Books for reading');
+					test.equal(collection.workspace_handle, 'test');
 					test.done();
 				}
 			});
@@ -95,19 +95,19 @@ exports.find = function(test) {
 
 exports.findAll = function(test) {
 
-	var entity = Entity.create({
+	var collection = Collection.create({
 		title: 'Books',
 		description: 'Books for reading',
 		name: 'books',
 		workspace_handle: 'test',
 		fields: config.fixtures.book_fields,
 		error: error,
-		success: function(entity) {
+		success: function(collection) {
 
-			Entity.findAll({
+			Collection.findAll({
 				workspace_handle: 'test',
-				success: function(entities) {
-					test.equal(entities.length, 1);
+				success: function(collections) {
+					test.equal(collections.length, 1);
 					test.done();
 				}
 			});
@@ -118,21 +118,21 @@ exports.findAll = function(test) {
 
 exports.destroy = function(test) {
 
-	var entity = Entity.create({
+	var collection = Collection.create({
 		title: 'Books',
 		description: 'Books for reading',
 		name: 'books',
 		workspace_handle: 'test',
 		fields: config.fixtures.book_fields,
 		error: error,
-		success: function(entity) {
+		success: function(collection) {
 
-			Entity.destroy({
-				id: entity.id,
-				success: function(entity) {
-					test.equal(entity.title, 'Books');
-					test.equal(entity.description, 'Books for reading');
-					test.equal(entity.workspace_handle, 'test');
+			Collection.destroy({
+				id: collection.id,
+				success: function(collection) {
+					test.equal(collection.title, 'Books');
+					test.equal(collection.description, 'Books for reading');
+					test.equal(collection.workspace_handle, 'test');
 					test.done();
 				}
 			});

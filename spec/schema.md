@@ -1,4 +1,4 @@
-### Entities
+### Collections
 
 Different types of entities or models
 
@@ -9,12 +9,12 @@ Different types of entities or models
 - workspace_handle  fk=workspaces.handle
 ```
 
-### Entity Fields
+### Collection Fields
 
 Possible fields or attributes an entity might have
 
 ```
-- entity_id
+- collection_id
 - title
 - name
 - data_type
@@ -24,34 +24,34 @@ Possible fields or attributes an entity might have
 - meta          text
 ```
 
-### Entity Items
+### Items
 
 Instances of entities; records
 
 ```
-- entity_id
+- collection_id
 - status       enum=(draft|published|deleted)
 - create_time  default=now
 - update_time  default=now
 ```
 
-### Entity Item Data
+### Item Data
 
 Data comprising the item record
 
 ```
-- entity_item_id
+- item_id
 - data             text
 - content_type
 - user_id
 ```
 
-### Entity Item Data Revisions
+### Item Data Revisions
 
 Data comprising the item record
 
 ```
-- entity_item_id
+- item_id
 - data             text
 - content_type
 - create_time      default=now
@@ -63,7 +63,7 @@ Data comprising the item record
 Uploaded files associated with items
 
 ```
-- entity_item_id     nullable
+- item_id     nullable
 - path
 - original_filename  nullable
 - description        nullable

@@ -9,14 +9,14 @@ var error = function(e) { console.warn(e) };
 var models = dream.models;
 
 var Item = require('../lib/item.tjs');
-var Entity = require('../lib/entity.tjs');
+var Collection = require('../lib/collection.tjs');
 
 exports.setUp = function(callback) {
 	dream.db.drop().success(function() {
 		dream.db.sync().success(function() { 
 			models.users.create({ username: 'bob' })
 				.success(function() {
-					Entity.create({
+					Collection.create({
 						title: 'Books',
 						description: 'Books for reading',
 						name: 'books',
@@ -38,7 +38,7 @@ exports.tearDown = function(callback) {
 exports.create = function(test) {
 
 	Item.create({
-		entity_id: 1,
+		collection_id: 1,
 		data: {
 			title: "Rung Ho!",
 			author: "Talbot Mundy",
@@ -59,7 +59,7 @@ exports.create = function(test) {
 exports.update = function(test) {
 
 	Item.create({
-		entity_id: 1,
+		collection_id: 1,
 		data: {
 			title: "Rung Ho!",
 			author: "Talbot Mundy",
@@ -91,7 +91,7 @@ exports.update = function(test) {
 exports.find = function(test) {
 
 	Item.create({
-		entity_id: 1,
+		collection_id: 1,
 		data: {
 			title: "Rung Ho!",
 			author: "Talbot Mundy",
@@ -120,7 +120,7 @@ exports.find = function(test) {
 exports.validateRequired = function(test) {
 
 	Item.create({
-		entity_id: 1,
+		collection_id: 1,
 		data: {
 			title: "",
 			author: "Talbot Mundy",
@@ -139,7 +139,7 @@ exports.validateRequired = function(test) {
 exports.validateType = function(test) {
 
 	Item.create({
-		entity_id: 1,
+		collection_id: 1,
 		data: {
 			title: "Rung Ho!",
 			author: "Talbot Mundy",
@@ -158,7 +158,7 @@ exports.validateType = function(test) {
 exports.findAll = function(test) {
 
 	Item.create({
-		entity_id: 1,
+		collection_id: 1,
 		data: {
 			title: "Rung Ho!",
 			author: "Talbot Mundy",
@@ -171,12 +171,12 @@ exports.findAll = function(test) {
 
 			Item.findAll({
 				id: item.id,
-				entity_id: 1,
+				collection_id: 1,
 				success: function(items) {
 					test.equal(items.length, 1);
 					test.equal(items.totalCount, 1);
 					test.equal(items[0].title, "Rung Ho!");
-					test.equal(items.entity.name, "books");
+					test.equal(items.collection.name, "books");
 					test.done();
 				}
 			});
@@ -187,7 +187,7 @@ exports.findAll = function(test) {
 exports.destroy = function(test) {
 
 	Item.create({
-		entity_id: 1,
+		collection_id: 1,
 		data: {
 			title: "Rung Ho!",
 			author: "Talbot Mundy",
@@ -202,7 +202,7 @@ exports.destroy = function(test) {
 				success: function(item) {
 					test.equal(item.title, "Rung Ho!");
 					Item.findAll({
-						entity_id: 1,
+						collection_id: 1,
 						success: function(items) {
 							test.equal(items.totalCount, 0);
 							test.done();

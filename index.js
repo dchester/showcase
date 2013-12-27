@@ -72,7 +72,7 @@ exports.initialize = function(config) {
 
 	require('./routes/setup.tjs').initialize(app);
 	require('./routes/workspaces.tjs').initialize(app);
-	require('./routes/entity.tjs').initialize(app);
+	require('./routes/collection.tjs').initialize(app);
 	require('./routes/item.tjs').initialize(app);
 	require('./routes/api.tjs').initialize(app);
 	require('./routes/users.tjs').initialize(app);

@@ -10,7 +10,7 @@ exports.initialize = function(app) {
 
 	app.post('/files', function(req, res) {
 
-		var entity_item_id = req.params.entity_item_id;
+		var item_id = req.params.item_id;
 		var file_keys = Object.keys(req.files);
 
 		var files = [];
@@ -31,7 +31,7 @@ exports.initialize = function(app) {
 				var content_type = upload.type || upload.headers['content-type'] || 'application/octet-stream';
 
 				var file = models.files.build({
-					entity_item_id: entity_item_id,
+					item_id: item_id,
 					path: filename,
 					original_filename: upload.name,
 					size: upload.size,
