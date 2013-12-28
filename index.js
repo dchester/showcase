@@ -10,6 +10,10 @@ var flash = require('connect-flash');
 var mkdirp = require('mkdirp');
 var armrest = require('armrest');
 var util = require('util');
+var gnode = require('gnode');
+
+var genny = require('genny');
+genny.longStackSupport = true;
 
 tame.register({ catchExceptions : true });
 
@@ -72,7 +76,7 @@ exports.initialize = function(config) {
 
 	require('./routes/setup.tjs').initialize(app);
 	require('./routes/workspaces.tjs').initialize(app);
-	require('./routes/collection.tjs').initialize(app);
+	require('./routes/collection.js').initialize(app);
 	require('./routes/item.tjs').initialize(app);
 	require('./routes/api.tjs').initialize(app);
 	require('./routes/users.tjs').initialize(app);
