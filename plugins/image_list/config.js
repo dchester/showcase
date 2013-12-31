@@ -11,11 +11,11 @@ module.exports = {
 		return '<span class="badge">' + parsed_data.file_ids.length + '</span>';
 		
 	},
-	inflate: function(field, data, models, callback) {
+	inflate: function(field, item, models, callback) {
 
-		if (!data[field.name]) return callback(null);
+		if (!item.data[field.name]) return callback(null);
 
-		try { var parsed_data = JSON.parse(data[field.name]); }
+		try { var parsed_data = JSON.parse(item.data[field.name]); }
 		catch (e) {
 			return callback([]);
 		}

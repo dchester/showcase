@@ -5,17 +5,12 @@ var swig = require('swig');
 var consolidate = require('consolidate');
 var Dreamer = require('dreamer');
 var async = require('async');
-var tame = require('tamejs')
 var flash = require('connect-flash');
 var mkdirp = require('mkdirp');
 var armrest = require('armrest');
 var util = require('util');
-var gnode = require('gnode');
-
+var router = require('./lib/genny-express-router');
 var genny = require('genny');
-genny.longStackSupport = true;
-
-tame.register({ catchExceptions : true });
 
 var app = express();
 app.showcase = {};
@@ -49,6 +44,7 @@ exports.initialize = function(config) {
 
 	app.configure(function(){
 		app.engine('.html', consolidate.swig);
+		app.set('router', router);
 		app.set('view engine', 'html');
 		app.set('views', views);
 		app.set('port', process.env.PORT || config.port || 3000);
@@ -74,14 +70,14 @@ exports.initialize = function(config) {
 		res.redirect("/workspaces");
 	});
 
-	require('./routes/setup.tjs').initialize(app);
-	require('./routes/workspaces.tjs').initialize(app);
+	require('./routes/setup.js').initialize(app);
+	require('./routes/workspaces.js').initialize(app);
 	require('./routes/collection.js').initialize(app);
-	require('./routes/item.tjs').initialize(app);
-	require('./routes/api.tjs').initialize(app);
-	require('./routes/users.tjs').initialize(app);
-	require('./routes/login.tjs').initialize(app);
-	require('./routes/files.tjs').initialize(app);
+	require('./routes/item.js').initialize(app);
+	require('./routes/api.js').initialize(app);
+	require('./routes/users.js').initialize(app);
+	require('./routes/login.js').initialize(app);
+	require('./routes/files.js').initialize(app);
 
 	var Radio = function() {};
 	util.inherits(Radio, require('events').EventEmitter);

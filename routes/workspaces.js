@@ -9,21 +9,11 @@ exports.initialize = function(app) {
 
 	var fields = ['title', 'handle', 'description'];
 
-	app.get("/workspaces", function(req, res) {
-
-		var workspaces;
-
-		await {
-
-			var deferrals = new Deferrals(defer());
-
-			models.workspaces.findAll({})
-				.error(req.error)
-				.success(function(_workspaces) {
-					workspaces = _workspaces;
-					deferrals.run();
-				});
-		}
+	app.get("/workspaces", function* (req, res, resume) {
+		
+		var workspaces = yield models.workspaces
+			.findAll({})
+			.complete(resume());
 
 		res.render("workspaces.html", { workspaces: workspaces });
 	});
@@ -51,7 +41,7 @@ exports.initialize = function(app) {
 		});
 	});
 
-	app.post("/workspaces/new", requireSuperuser, function(req, res) {
+	app.post("/workspaces/new", requireSuperuser, function* (req, res, resume) {
 
 		var workspace = models.workspaces.build({
 			title: req.body.title,
@@ -68,32 +58,24 @@ exports.initialize = function(app) {
 		});
 
 		if (!errors) {
-
-			workspace.save()
-				.error(req.error)
-				.success(function() {
-					req.flash('info', 'Saved new workspace');
-					res.redirect("/workspaces");
-				});
+			yield workspace.save().complete(resume());
+			req.flash('info', 'Saved new workspace');
+			res.redirect("/workspaces");
 		} else {
 			req.flash('danger', 'There was an error: ' + JSON.stringify(errors));
 			res.redirect("/workspaces/new");
 		}
-
 	});
 
-	app.delete("/workspaces/:workspace_handle", workspaceLoader, workspaceAdmin, function(req, res) {
+	app.delete("/workspaces/:workspace_handle", workspaceLoader, workspaceAdmin, function* (req, res, resume) {
 
 		var workspace = req.showcase.workspace;
-		workspace.destroy()
-			.error(req.error)
-			.success(function() {
-				req.flash('info', 'Deleted workspace');
-				res.redirect('/workspaces');
-			});
+		yield workspace.destroy().complete(resume());
+		req.flash('info', 'Deleted workspace');
+		res.redirect('/workspaces');
 	});
 
-	app.post("/workspaces/:workspace_handle/edit", workspaceLoader, workspaceAdmin, function(req, res) {
+	app.post("/workspaces/:workspace_handle/edit", workspaceLoader, workspaceAdmin, function* (req, res, resume) {
 
 		var workspace = req.showcase.workspace;
 
@@ -110,12 +92,9 @@ exports.initialize = function(app) {
 		});
 
 		if (!errors) {
-			workspace.save()
-				.error(req.error)
-				.success(function() {
-					req.flash('info', 'Saved new workspace');
-					res.redirect("/workspaces");
-				});
+			yield workspace.save().complete(resume());
+			req.flash('info', 'Saved new workspace');
+			res.redirect("/workspaces");
 		} else {
 			req.flash('danger', 'There was an error: ' + JSON.stringify(errors));
 			res.redirect("/workspaces/new");

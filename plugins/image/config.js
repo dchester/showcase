@@ -10,11 +10,11 @@ module.exports = {
 
 		return '<h4><i class="muted large icon-picture"></i></h4>';
 	},
-	inflate: function(field, data, models, callback) {
+	inflate: function(field, item, models, callback) {
 
-		if (!data[field.name]) return callback(null);
+		if (!item.data[field.name]) return callback(null);
 
-		try { var parsed_data = JSON.parse(data[field.name]); }
+		try { var parsed_data = JSON.parse(item.data[field.name]); }
 		catch (e) {
 			console.log("couldn't parse image list data");
 			return callback([]);

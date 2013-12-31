@@ -6,12 +6,18 @@
 	<link rel="stylesheet" href="/css/user.css">
 {% endblock %}
 
-{% block page_header %}
+{% block pagetitle %}
 
-	<h1 class="pagetitle">
-		<a href="/admin/users">Users</a>
-		<span class="transparent">{{ subtitle }}</span>
-	</h1>
+	<div class="pagetitle">
+		<ul class="nav">
+			<li><a href="/admin/users">Users</a></li>
+			{% if user.username %}
+				<li>{{ user.username }}</li>
+			{% endif %}
+			<li><span class="transparent">{{ action }}</span></li>
+		</ul>
+		<br>
+	</div>
 
 {% endblock %}
 
@@ -34,7 +40,7 @@
 				</tr>
 				<tr>
 					<th>
-						Flight Superuser
+						Showcase Superuser
 					</th>
 					<td>
 						<select name="is_superuser">

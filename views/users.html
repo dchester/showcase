@@ -2,14 +2,14 @@
 
 {% set title = 'Users' %}
 
-{% block page_header %}
-	<h1 class="pagetitle">
-		Users
-		<a class="btn btn-darker btn-large" href="/admin/users/new">
+{% block pagetitle %}
+	<div class="pagetitle">
+		<h1>Users</h1>
+		<a class="btn btn-darker" href="/admin/users/new">
 			<i class="icon-plus icon-white"></i>
 			New User
 		</a>
-	</h1>
+	</div>
 {% endblock %}
 
 {% block content %}

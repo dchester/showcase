@@ -1,6 +1,7 @@
 var fs = require('fs');
 var showcase = require('../index');
 var config = require('./lib/config');
+var execute = require('genny').run;
 
 showcase.initialize(config.showcase);
 
@@ -8,8 +9,8 @@ var dream = require('dreamer').instance;
 var error = function(e) { console.warn(e) };
 var models = dream.models;
 
-var Item = require('../lib/item.tjs');
-var Collection = require('../lib/collection.tjs');
+var Item = require('../lib/item.js');
+var Collection = require('../lib/collection.js');
 
 exports.setUp = function(callback) {
 	dream.db.drop().success(function() {
@@ -22,7 +23,10 @@ exports.setUp = function(callback) {
 						name: 'books',
 						workspace_handle: 'test',
 						fields: config.fixtures.book_fields,
-						success: function() { callback() }
+
+					}, function(err, collection) {
+						if (err) throw err;
+						callback();
 					});
 				});
 		});
@@ -37,184 +41,208 @@ exports.tearDown = function(callback) {
 
 exports.create = function(test) {
 
-	Item.create({
-		collection_id: 1,
-		data: {
-			title: "Rung Ho!",
-			author: "Talbot Mundy",
-			isbn: "1557424047"
-		},
-		error: error,
-		invalid: error,
-		user_id: 1,
-		success: function(item) {
-			test.equal(item.title, "Rung Ho!");
-			test.equal(item.author, "Talbot Mundy");
-			test.equal(item.isbn, "1557424047");
-			test.done();
-		}
+	execute (function* (resume) {
+
+		var item = yield Item.create({
+			collection_id: 1,
+			user_id: 1,
+			data: {
+				title: "Rung Ho!",
+				author: "Talbot Mundy",
+				isbn: "1557424047"
+			},
+		}, resume());
+
+		test.equal(item.data.title, "Rung Ho!");
+		test.equal(item.data.author, "Talbot Mundy");
+		test.equal(item.data.isbn, "1557424047");
+		test.done();
 	});
 };
 
 exports.update = function(test) {
 
-	Item.create({
-		collection_id: 1,
-		data: {
-			title: "Rung Ho!",
-			author: "Talbot Mundy",
-			isbn: "1557424047"
-		},
-		error: error,
-		invalid: error,
-		user_id: 1,
-		success: function(item) {
-			Item.update({
-				id: item.id,
-				user_id: 1,
-				data: {
-					title: "Rung Ho!",
-					author: "Talbot Mundy",
-					isbn: "9781557424044"
-				},
-				success: function(item) {
-					test.equal(item.title, "Rung Ho!");
-					test.equal(item.author, "Talbot Mundy");
-					test.equal(item.isbn, "9781557424044");
-					test.done();
-				}
-			});
-		}
-	});
-};
+	execute (function* (resume) {
 
-exports.find = function(test) {
+		var item = yield Item.create({
+			collection_id: 1,
+			user_id: 1,
+			data: {
+				title: "Rung Ho!",
+				author: "Talbot Mundy",
+				isbn: "1557424047"
+			},
+		}, resume());
 
-	Item.create({
-		collection_id: 1,
-		data: {
-			title: "Rung Ho!",
-			author: "Talbot Mundy",
-			isbn: "1557424047",
-			is_public_domain: true
-		},
-		user_id: 1,
-		error: error,
-		invalid: error,
-		success: function(item) {
+		item.update({
+			data: {
+				title: "Rung Ho!",
+				author: "Talbot Mundy",
+				isbn: "9781557424044"
+			}
+		});
 
-			Item.find({
-				id: item.id,
-				success: function(item) {
-					test.equal(item.title, "Rung Ho!");
-					test.equal(item.author, "Talbot Mundy");
-					test.equal(item.isbn, "1557424047");
-					test.strictEqual(item.is_public_domain, true);
-					test.done();
-				}
-			});
-		}
+		var item = yield item.save({ user_id: 1 }, resume());
+
+		test.equal(item.data.title, "Rung Ho!");
+		test.equal(item.data.author, "Talbot Mundy");
+		test.equal(item.data.isbn, "9781557424044");
+		test.done();
 	});
 };
 
 exports.validateRequired = function(test) {
 
-	Item.create({
-		collection_id: 1,
-		data: {
-			title: "",
-			author: "Talbot Mundy",
-			isbn: "1557424047"
-		},
-		user_id: 1,
-		error: error,
-		success: error,
-		invalid: function(item_data) {
-			test.equal(item_data._errors.title, 'Required');
-			test.done();
-		}
+	execute (function* (resume) {
+
+		var item = yield Item.create({
+			collection_id: 1,
+			user_id: 1,
+			data: {
+				title: "Rung Ho!",
+				author: "Talbot Mundy",
+				isbn: "1557424047"
+			},
+		}, resume());
+
+		item.update({
+			data: {
+				title: "Rung Ho!",
+				author: "",
+				isbn: "9781557424044"
+			}
+		});
+
+		var errors = item.validate();
+
+		test.deepEqual(errors, { author: 'Required' });
+		test.done();
 	});
 };
 
 exports.validateType = function(test) {
 
-	Item.create({
-		collection_id: 1,
-		data: {
-			title: "Rung Ho!",
-			author: "Talbot Mundy",
-			isbn: "alpha"
-		},
-		user_id: 1,
-		error: error,
-		success: error,
-		invalid: function(item_data) {
-			test.equal(item_data._errors.isbn, 'Failed assertion: isNumeric');
-			test.done();
-		}
+	execute (function* (resume) {
+
+		var item = yield Item.create({
+			collection_id: 1,
+			user_id: 1,
+			data: {
+				title: "Rung Ho!",
+				author: "Talbot Mundy",
+				isbn: "1557424047"
+			},
+		}, resume());
+
+		item.update({
+			data: {
+				title: "Rung Ho!",
+				author: "Talbot Mundy",
+				isbn: "alpha"
+			}
+		});
+
+		var errors = item.validate();
+
+		test.deepEqual(errors, { isbn: 'Failed assertion: isNumeric' });
+		test.done();
 	});
 };
 
-exports.findAll = function(test) {
+exports.build = function(test) {
 
-	Item.create({
-		collection_id: 1,
-		data: {
-			title: "Rung Ho!",
-			author: "Talbot Mundy",
-			isbn: "1557424047"
-		},
-		user_id: 1,
-		error: error,
-		invalid: error,
-		success: function(item) {
+	execute (function* (resume) {
 
-			Item.findAll({
-				id: item.id,
-				collection_id: 1,
-				success: function(items) {
-					test.equal(items.length, 1);
-					test.equal(items.totalCount, 1);
-					test.equal(items[0].title, "Rung Ho!");
-					test.equal(items.collection.name, "books");
-					test.done();
-				}
-			});
-		}
+		var item = yield Item.build({
+			collection_id: 1,
+			user_id: 1,
+			data: {
+				title: "Rung Ho!",
+				author: "Talbot Mundy",
+				isbn: "1557424047"
+			},
+		}, resume());
+
+		test.equal(item.data.title, "Rung Ho!");
+		test.equal(item.data.author, "Talbot Mundy");
+		test.equal(item.data.isbn, "1557424047");
+
+		test.done();
+	});
+};
+
+exports.load = function(test) {
+
+	execute (function* (resume) {
+
+		var item = yield Item.create({
+			collection_id: 1,
+			user_id: 1,
+			data: {
+				title: "Rung Ho!",
+				author: "Talbot Mundy",
+				isbn: "1557424047",
+				is_public_domain: true
+			}
+		}, resume());
+
+		item = yield Item.load({ id: item.id }, resume());
+
+		test.equal(item.data.title, "Rung Ho!");
+		test.equal(item.data.author, "Talbot Mundy");
+		test.equal(item.data.isbn, "1557424047");
+		test.strictEqual(item.data.is_public_domain, true);
+		test.done();
+	})
+};
+
+exports.all = function(test) {
+
+	execute (function* (resume) {
+
+		var item = yield Item.create({
+			collection_id: 1,
+			user_id: 1,
+			data: {
+				title: "Rung Ho!",
+				author: "Talbot Mundy",
+				isbn: "1557424047"
+			},
+		}, resume());
+
+		var items = yield Item.all({ collection_id: 1 }, resume());
+			
+		test.equal(items.length, 1);
+		test.equal(items.totalCount, 1);
+		test.equal(items[0].data.title, "Rung Ho!");
+		test.equal(items.collection.name, "books");
+		test.done();
 	});
 };
 
 exports.destroy = function(test) {
 
-	Item.create({
-		collection_id: 1,
-		data: {
-			title: "Rung Ho!",
-			author: "Talbot Mundy",
-			isbn: "1557424047"
-		},
-		user_id: 1,
-		error: error,
-		invalid: error,
-		success: function(item) {
-			Item.destroy({
-				id: item.id,
-				success: function(item) {
-					test.equal(item.title, "Rung Ho!");
-					Item.findAll({
-						collection_id: 1,
-						success: function(items) {
-							test.equal(items.totalCount, 0);
-							test.done();
-						}
-					});
+	execute (function* (resume) {
 
-					
-				}
-			})
-		}
+		var item = yield Item.create({
+			collection_id: 1,
+			user_id: 1,
+			data: {
+				title: "Rung Ho!",
+				author: "Talbot Mundy",
+				isbn: "1557424047"
+			},
+		}, resume());
+
+		yield item.destroy(resume());
+
+		test.equal(item.data.title, "Rung Ho!");
+
+		var items = yield Item.all({ collection_id: 1 }, resume());
+
+		test.equal(items.totalCount, 0);
+		test.done();
+
 	});
 };
-
-
 
