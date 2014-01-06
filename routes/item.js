@@ -11,26 +11,26 @@ exports.initialize = function(app) {
 	var workspaceLoader = app.showcase.middleware.workspaceLoader;
 	var workspaceEditor = app.showcase.middleware.workspacePermission('editor');
 
-	app.del("/workspaces/:workspace_handle/collections/:collection_id/items/:item_id", workspaceLoader, workspaceEditor, function* (req, res, resume) {
+	app.del("/workspaces/:workspace_handle/collections/:collection_id/items/:item_id", workspaceLoader, workspaceEditor, function*(req, res) {
 
 		var collection_id = req.params.collection_id;
 		var item_id = req.params.item_id;
 		var workspace = req.showcase.workspace;
 
-		var item = yield Item.load({ id: item_id }, resume());
+		var item = yield Item.load({ id: item_id });
 
-		yield item.destroy(resume());
+		yield item.destroy();
 
 		res.redirect("/workspaces/" + workspace.handle + "/collections/" + collection_id + "/items");
 	});
 
-	app.get("/workspaces/:workspace_handle/collections/:collection_id/items", workspaceLoader, workspaceEditor, function* (req, res, resume) {
+	app.get("/workspaces/:workspace_handle/collections/:collection_id/items", workspaceLoader, workspaceEditor, function*(req, res) {
 
 		var collection_id = req.params.collection_id;
 		var page = Number(req.query.page) || 1;
 		var per_page = 10;
 
-		var items = yield Item.all({ collection_id: collection_id }, resume());
+		var items = yield Item.all({ collection_id: collection_id });
 
 		var pagination = new Pagination({
 			rowsPerPage: per_page,
@@ -60,14 +60,14 @@ exports.initialize = function(app) {
 		});
 	});
 
-	app.get("/workspaces/:workspace_handle/collections/:collection_id/items/:item_id/edit", workspaceLoader, workspaceEditor, function* (req, res, resume) {
+	app.get("/workspaces/:workspace_handle/collections/:collection_id/items/:item_id/edit", workspaceLoader, workspaceEditor, function*(req, res) {
 
 		var item_id = req.params.item_id;
 
 		var collection, item, fields, item_data;
 
-		var item = yield Item.load({ id: item_id }, resume());
-		var revisions = yield item.revisions(resume());
+		var item = yield Item.load({ id: item_id });
+		var revisions = yield item.revisions();
 
 		var action = 'Edit';
 		var fields = item.collection.fields;
@@ -81,18 +81,18 @@ exports.initialize = function(app) {
 		});
 	});
 
-	app.get("/workspaces/:workspace_handle/collections/:collection_id/items/:item_id/revisions/:revision_id", workspaceLoader, workspaceEditor, function* (req, res, resume) {
+	app.get("/workspaces/:workspace_handle/collections/:collection_id/items/:item_id/revisions/:revision_id", workspaceLoader, workspaceEditor, function*(req, res) {
 
 		var item_id = req.params.item_id;
 		var revision_id = req.params.revision_id;
 
-		var item = yield Item.load({ id: item_id }, resume());
-		var revision = yield item.revision({ revision_id: revision_id }, resume());
+		var item = yield Item.load({ id: item_id });
+		var revision = yield item.revision({ revision_id: revision_id });
 
 		res.render("revision.html", { revision: revision });
 	});
 
-	app.post("/workspaces/:workspace_handle/collections/:collection_id/items/:item_id/restore", workspaceLoader, workspaceEditor, function* (req, res, resume) {
+	app.post("/workspaces/:workspace_handle/collections/:collection_id/items/:item_id/restore", workspaceLoader, workspaceEditor, function*(req, res) {
 
 		var revision_id = req.body.revision_id;
 		var workspace = req.showcase.workspace;
@@ -103,13 +103,13 @@ exports.initialize = function(app) {
 			id: item_id,
 			user_id: user_id,
 			revision_id: revision_id,
-		}, resume());
+		});
 
 		req.flash('info', "Restored prior version for item #" + item_id);
 		res.redirect('/workspaces/' + workspace.handle + '/collections/' + req.params.collection_id + '/items/' + item_id + '/edit');
 	});
 
-	app.post("/workspaces/:workspace_handle/collections/:collection_id/items/:item_id/edit", workspaceLoader, workspaceEditor, function* (req, res, resume) {
+	app.post("/workspaces/:workspace_handle/collections/:collection_id/items/:item_id/edit", workspaceLoader, workspaceEditor, function*(req, res) {
 
 		var collection_id = req.params.collection_id;
 		var item_id = req.params.item_id;
@@ -117,7 +117,7 @@ exports.initialize = function(app) {
 		var workspace = req.showcase.workspace;
 		var user_id = req.session.user_id;
 
-		var item = yield Item.load({ id: item_id }, resume());
+		var item = yield Item.load({ id: item_id });
 
 		item.update({
 			status: status,
@@ -140,17 +140,17 @@ exports.initialize = function(app) {
 			});
 		}
 
-		yield item.save({ user_id: user_id }, resume());
+		yield item.save({ user_id: user_id });
 
 		req.flash('info', 'Saved item #' + item_id);
 		res.redirect("/workspaces/" + workspace.handle + "/collections/" + collection_id + "/items");
 	});
 
-	app.get("/workspaces/:workspace_handle/collections/:collection_id/items/new", workspaceLoader, workspaceEditor, function* (req, res, resume) {
+	app.get("/workspaces/:workspace_handle/collections/:collection_id/items/new", workspaceLoader, workspaceEditor, function*(req, res) {
 
 		var collection_id = req.params.collection_id;
 
-		var collection = yield Collection.load({ id: collection_id }, resume());
+		var collection = yield Collection.load({ id: collection_id });
 
 		res.render("item.html", {
 			collection: collection,
@@ -159,7 +159,7 @@ exports.initialize = function(app) {
 		});
 	});
 
-	app.post("/workspaces/:workspace_handle/collections/:collection_id/items/new", workspaceLoader, workspaceEditor, function* (req, res, resume) {
+	app.post("/workspaces/:workspace_handle/collections/:collection_id/items/new", workspaceLoader, workspaceEditor, function*(req, res) {
 
 		var collection_id = req.params.collection_id;
 		var status = req.body._status;
@@ -171,7 +171,7 @@ exports.initialize = function(app) {
 			status: status,
 			data: req.body,
 			user_id: user_id,
-		}, resume());
+		});
 
 		var errors = item.validate();
 
@@ -186,7 +186,7 @@ exports.initialize = function(app) {
 			});
 		}
 
-		yield item.save({ user_id: user_id }, resume());
+		yield item.save({ user_id: user_id });
 
 		req.flash('info', "Created item");
 		res.redirect("/workspaces/" + workspace.handle + "/collections/" + collection_id + "/items");

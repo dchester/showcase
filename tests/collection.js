@@ -1,7 +1,8 @@
 var fs = require('fs');
+var gx = require('gx');
+
 var showcase = require('../index');
 var config = require('./lib/config');
-var execute = require('genny').run;
 
 showcase.initialize(config.showcase);
 
@@ -25,7 +26,7 @@ exports.tearDown = function(callback) {
 
 exports.create = function(test) {
 
-	execute (function* (resume) {
+	gx(function*() {
 
 		var collection = yield Collection.create({
 			title: 'Books',
@@ -33,18 +34,19 @@ exports.create = function(test) {
 			name: 'books',
 			workspace_handle: 'test',
 			fields: config.fixtures.book_fields,
-		}, resume());
+		});
 
 		test.equal(collection.title, 'Books');
 		test.equal(collection.description, 'Books for reading');
 		test.equal(collection.workspace_handle, 'test');
 		test.done();
+
 	});
 };
 
 exports.load = function(test) {
 
-	execute (function* (resume) {
+	gx(function*() {
 
 		var collection = yield Collection.create({
 			title: 'Books',
@@ -52,9 +54,9 @@ exports.load = function(test) {
 			name: 'books',
 			workspace_handle: 'test',
 			fields: config.fixtures.book_fields,
-		}, resume());
+		});
 
-		collection = yield Collection.load({ id: collection.id }, resume());
+		collection = yield Collection.load({ id: collection.id });
 
 		test.equal(collection.title, 'Books');
 		test.equal(collection.description, 'Books for reading');
@@ -65,7 +67,7 @@ exports.load = function(test) {
 
 exports.update = function(test) {
 
-	execute (function* (resume) {
+	gx(function*() {
 
 		var collection = yield Collection.create({
 			title: 'Books',
@@ -73,12 +75,12 @@ exports.update = function(test) {
 			name: 'books',
 			workspace_handle: 'test',
 			fields: config.fixtures.book_fields
-		}, resume());
+		});
 
-		collection = yield Collection.load({ id: collection.id }, resume());
+		collection = yield Collection.load({ id: collection.id });
 
-		yield collection.update({ title: "Wonderful Books" }, resume());
-		collection = yield Collection.load({ id: collection.id }, resume());
+		yield collection.update({ title: "Wonderful Books" });
+		collection = yield Collection.load({ id: collection.id });
 
 		test.equal(collection.title, "Wonderful Books");
 		test.done();
@@ -87,7 +89,7 @@ exports.update = function(test) {
 
 exports.all = function(test) {
 
-	execute (function* (resume) {
+	gx(function*() {
 
 		var collection = yield Collection.create({
 			title: 'Books',
@@ -95,9 +97,9 @@ exports.all = function(test) {
 			name: 'books',
 			workspace_handle: 'test',
 			fields: config.fixtures.book_fields,
-		}, resume());
+		});
 
-		var collections = yield Collection.all({ workspace_handle: 'test' }, resume());
+		var collections = yield Collection.all({ workspace_handle: 'test' });
 
 		test.equal(collections.length, 1);
 		test.done();
@@ -106,7 +108,7 @@ exports.all = function(test) {
 
 exports.destroy = function(test) {
 
-	execute (function* (resume) {
+	gx(function*() {
 
 		var collection = yield Collection.create({
 			title: 'Books',
@@ -114,15 +116,15 @@ exports.destroy = function(test) {
 			name: 'books',
 			workspace_handle: 'test',
 			fields: config.fixtures.book_fields,
-		}, resume());
+		});
 
 		var collection_id = collection.id;
 
-		yield collection.destroy({ id: collection_id }, resume());
-		collection = yield Collection.load({ id: collection_id }, resume());
+		yield collection.destroy();
+		collection = yield Collection.load({ id: collection_id });
 
 		test.equal(collection, undefined);
 		test.done();
-	})
+	});
 };
 

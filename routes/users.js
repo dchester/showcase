@@ -1,15 +1,16 @@
 var Deferrals = require('../lib/deferrals');
 var async = require('async');
+var gx = require('gx');
 
 exports.initialize = function(app) {
 
 	var models = app.dreamer.models;
 
-	app.get("/admin/users", function* (req, res, resume) {
+	app.get("/admin/users", function*(req, res) {
 
 		var users = yield models.users
 			.findAll({})
-			.complete(resume());
+			.complete(gx.resume);
 
 		res.render("users.html", { users: users });
 	});
@@ -19,26 +20,26 @@ exports.initialize = function(app) {
 		res.render("user.html", { action: 'New' });
 	});
 
-	app.get("/admin/users/:user_id/edit", function* (req, res, resume) {
+	app.get("/admin/users/:user_id/edit", function*(req, res) {
 
 		var user_id = req.params.user_id;
 		var user, workspaces, permissions;
 
 		models.users
 			.find({ where: { id: user_id } })
-			.complete(resume());
+			.complete(gx.resume);
 
 		models.workspaces
 			.findAll({})
-			.complete(resume());
+			.complete(gx.resume);
 
 		models.workspace_user_permissions
 			.findAll({ where: { user_id: user_id } })
-			.complete(resume());
+			.complete(gx.resume);
 
-		var user = yield resume;
-		var workspaces = yield resume;
-		var permissions = yield resume;
+		var user = yield null;
+		var workspaces = yield null;
+		var permissions = yield null;
 
 		workspaces.forEach(function(workspace) {
 
@@ -58,13 +59,13 @@ exports.initialize = function(app) {
 		});
 	});
 
-	app.post("/admin/users/:user_id/edit", function* (req, res, resume) {
+	app.post("/admin/users/:user_id/edit", function*(req, res) {
 
 		var user_id = req.params.user_id;
 
-		var user = models.users
+		var user = yield models.users
 			.find({ where: { id: user_id } })
-			.complete(resume());
+			.complete(gx.resume);
 
 		var fields = ['username', 'is_superuser'];
 
@@ -96,16 +97,14 @@ exports.initialize = function(app) {
 			workspace_permissions.push(permission);
 		});
 
-		console.log(workspace_permissions);
-
-		yield user.save().complete(resume());
+		yield user.save().complete(gx.resume);
 		req.flash('info', 'Saved user');
 
 		var query = 'delete from workspace_user_permissions where user_id = ?';
 
 		yield app.dreamer.db
 			.query(query, null, {raw: true}, [user_id])
-			.complete(resume());
+			.complete(gx.resume);
 
 		async.forEach(workspace_permissions, function(permission, callback) {
 
@@ -119,7 +118,7 @@ exports.initialize = function(app) {
 		});
 	});
 
-	app.post("/admin/users/new", function(req, res, resume) {
+	app.post("/admin/users/new", function*(req, res) {
 
 		var user = models.users.build({
 			username: req.body.username
@@ -128,7 +127,7 @@ exports.initialize = function(app) {
 		var errors = user.validate();
 
 		if (!errors) {
-			user.save().complete(resume());
+			yield user.save().complete(gx.resume);
 			req.flash('info', 'Created new user');
 			res.redirect("/admin/users");
 		} else {

@@ -1,4 +1,5 @@
 var Deferrals = require('../lib/deferrals');
+var gx = require('gx');
 
 exports.initialize = function(app) {
 
@@ -9,11 +10,11 @@ exports.initialize = function(app) {
 
 	var fields = ['title', 'handle', 'description'];
 
-	app.get("/workspaces", function* (req, res, resume) {
-		
+	app.get("/workspaces", function*(req, res) {
+
 		var workspaces = yield models.workspaces
 			.findAll({})
-			.complete(resume());
+			.complete(gx.resume);
 
 		res.render("workspaces.html", { workspaces: workspaces });
 	});
@@ -41,7 +42,7 @@ exports.initialize = function(app) {
 		});
 	});
 
-	app.post("/workspaces/new", requireSuperuser, function* (req, res, resume) {
+	app.post("/workspaces/new", requireSuperuser, function*(req, res) {
 
 		var workspace = models.workspaces.build({
 			title: req.body.title,
@@ -58,7 +59,7 @@ exports.initialize = function(app) {
 		});
 
 		if (!errors) {
-			yield workspace.save().complete(resume());
+			yield workspace.save().complete(gx.resume);
 			req.flash('info', 'Saved new workspace');
 			res.redirect("/workspaces");
 		} else {
@@ -67,15 +68,15 @@ exports.initialize = function(app) {
 		}
 	});
 
-	app.delete("/workspaces/:workspace_handle", workspaceLoader, workspaceAdmin, function* (req, res, resume) {
+	app.delete("/workspaces/:workspace_handle", workspaceLoader, workspaceAdmin, function*(req, res) {
 
 		var workspace = req.showcase.workspace;
-		yield workspace.destroy().complete(resume());
+		yield workspace.destroy().complete(gx.resume);
 		req.flash('info', 'Deleted workspace');
 		res.redirect('/workspaces');
 	});
 
-	app.post("/workspaces/:workspace_handle/edit", workspaceLoader, workspaceAdmin, function* (req, res, resume) {
+	app.post("/workspaces/:workspace_handle/edit", workspaceLoader, workspaceAdmin, function*(req, res) {
 
 		var workspace = req.showcase.workspace;
 
@@ -92,7 +93,7 @@ exports.initialize = function(app) {
 		});
 
 		if (!errors) {
-			yield workspace.save().complete(resume());
+			yield workspace.save().complete(gx.resume);
 			req.flash('info', 'Saved new workspace');
 			res.redirect("/workspaces");
 		} else {

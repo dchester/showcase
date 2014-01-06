@@ -11,7 +11,7 @@ exports.initialize = function(app) {
 	var models = app.dreamer.models;
 	var workspaceLoader = app.showcase.middleware.workspaceLoader;
 
-	app.get('/api/:workspace_handle/:collection_handle', workspaceLoader, function* (req, res, resume) {
+	app.get('/api/:workspace_handle/:collection_handle', workspaceLoader, function* (req, res) {
 
 		var name = req.params.collection_handle;
 		var per_page = req.query.per_page || 40;
@@ -19,7 +19,7 @@ exports.initialize = function(app) {
 		var collection, items;
 		var workspace = req.showcase.workspace;
 
-		var collection = yield Collection.load({ name: name, workspace_handle: workspace.handle }, resume());
+		var collection = yield Collection.load({ name: name, workspace_handle: workspace.handle });
 
 		if (!collection) {
 			return req.error(404, "collection not found");
@@ -38,7 +38,7 @@ exports.initialize = function(app) {
 			criteria: criteria,
 			page: page,
 			per_page: per_page,
-		}, resume());
+		});
 
 		items.forEach(function(item) {
 			item.collection = collection;
@@ -66,12 +66,12 @@ exports.initialize = function(app) {
 		});
 	});
 
-	app.get('/workspaces/:workspace_handle/api', workspaceLoader, function* (req, res, resume) {
+	app.get('/workspaces/:workspace_handle/api', workspaceLoader, function* (req, res) {
 
 		var workspace = req.showcase.workspace;
 		var api = armrest.client("localhost:" + app.get('port'));
 
-		var collections = yield Collection.all({ workspace_handle: workspace.handle }, resume());
+		var collections = yield Collection.all({ workspace_handle: workspace.handle });
 		console.warn("fetched collections");
 
 		var collection_resources = [];

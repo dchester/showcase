@@ -28,7 +28,6 @@
     "mysql": "*",
     "connect-domain": "*",
     "moment": "*",
-    "gnode": "*",
-    "genny": "*"
+    "gx": "https://github.com/dchester/gx/archive/master.tar.gz"
   }
 }

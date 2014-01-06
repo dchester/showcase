@@ -1,7 +1,7 @@
 var fs = require('fs');
 var showcase = require('../index');
 var config = require('./lib/config');
-var execute = require('genny').run;
+var gx = require('gx');
 
 showcase.initialize(config.showcase);
 
@@ -41,7 +41,7 @@ exports.tearDown = function(callback) {
 
 exports.create = function(test) {
 
-	execute (function* (resume) {
+	gx(function*() {
 
 		var item = yield Item.create({
 			collection_id: 1,
@@ -51,7 +51,7 @@ exports.create = function(test) {
 				author: "Talbot Mundy",
 				isbn: "1557424047"
 			},
-		}, resume());
+		});
 
 		test.equal(item.data.title, "Rung Ho!");
 		test.equal(item.data.author, "Talbot Mundy");
@@ -62,7 +62,7 @@ exports.create = function(test) {
 
 exports.update = function(test) {
 
-	execute (function* (resume) {
+	gx(function*() {
 
 		var item = yield Item.create({
 			collection_id: 1,
@@ -72,7 +72,7 @@ exports.update = function(test) {
 				author: "Talbot Mundy",
 				isbn: "1557424047"
 			},
-		}, resume());
+		});
 
 		item.update({
 			data: {
@@ -82,7 +82,7 @@ exports.update = function(test) {
 			}
 		});
 
-		var item = yield item.save({ user_id: 1 }, resume());
+		var item = yield item.save({ user_id: 1 });
 
 		test.equal(item.data.title, "Rung Ho!");
 		test.equal(item.data.author, "Talbot Mundy");
@@ -93,7 +93,7 @@ exports.update = function(test) {
 
 exports.validateRequired = function(test) {
 
-	execute (function* (resume) {
+	gx(function*() {
 
 		var item = yield Item.create({
 			collection_id: 1,
@@ -103,7 +103,7 @@ exports.validateRequired = function(test) {
 				author: "Talbot Mundy",
 				isbn: "1557424047"
 			},
-		}, resume());
+		});
 
 		item.update({
 			data: {
@@ -122,7 +122,7 @@ exports.validateRequired = function(test) {
 
 exports.validateType = function(test) {
 
-	execute (function* (resume) {
+	gx(function*() {
 
 		var item = yield Item.create({
 			collection_id: 1,
@@ -132,7 +132,7 @@ exports.validateType = function(test) {
 				author: "Talbot Mundy",
 				isbn: "1557424047"
 			},
-		}, resume());
+		});
 
 		item.update({
 			data: {
@@ -151,7 +151,7 @@ exports.validateType = function(test) {
 
 exports.build = function(test) {
 
-	execute (function* (resume) {
+	gx(function*() {
 
 		var item = yield Item.build({
 			collection_id: 1,
@@ -161,7 +161,7 @@ exports.build = function(test) {
 				author: "Talbot Mundy",
 				isbn: "1557424047"
 			},
-		}, resume());
+		});
 
 		test.equal(item.data.title, "Rung Ho!");
 		test.equal(item.data.author, "Talbot Mundy");
@@ -173,7 +173,7 @@ exports.build = function(test) {
 
 exports.load = function(test) {
 
-	execute (function* (resume) {
+	gx(function*() {
 
 		var item = yield Item.create({
 			collection_id: 1,
@@ -184,9 +184,9 @@ exports.load = function(test) {
 				isbn: "1557424047",
 				is_public_domain: true
 			}
-		}, resume());
+		});
 
-		item = yield Item.load({ id: item.id }, resume());
+		item = yield Item.load({ id: item.id });
 
 		test.equal(item.data.title, "Rung Ho!");
 		test.equal(item.data.author, "Talbot Mundy");
@@ -198,7 +198,7 @@ exports.load = function(test) {
 
 exports.all = function(test) {
 
-	execute (function* (resume) {
+	gx(function*() {
 
 		var item = yield Item.create({
 			collection_id: 1,
@@ -208,9 +208,9 @@ exports.all = function(test) {
 				author: "Talbot Mundy",
 				isbn: "1557424047"
 			},
-		}, resume());
+		});
 
-		var items = yield Item.all({ collection_id: 1 }, resume());
+		var items = yield Item.all({ collection_id: 1 });
 			
 		test.equal(items.length, 1);
 		test.equal(items.totalCount, 1);
@@ -222,7 +222,7 @@ exports.all = function(test) {
 
 exports.destroy = function(test) {
 
-	execute (function* (resume) {
+	gx(function*() {
 
 		var item = yield Item.create({
 			collection_id: 1,
@@ -232,13 +232,13 @@ exports.destroy = function(test) {
 				author: "Talbot Mundy",
 				isbn: "1557424047"
 			},
-		}, resume());
+		});
 
-		yield item.destroy(resume());
+		yield item.destroy();
 
 		test.equal(item.data.title, "Rung Ho!");
 
-		var items = yield Item.all({ collection_id: 1 }, resume());
+		var items = yield Item.all({ collection_id: 1 });
 
 		test.equal(items.totalCount, 0);
 		test.done();

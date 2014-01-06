@@ -12,13 +12,13 @@ exports.initialize = function(app) {
 	var workspaceLoader = app.showcase.middleware.workspaceLoader;
 	var workspaceAdmin = app.showcase.middleware.workspacePermission('administrator');
 
-	app.get("/workspaces/:workspace_handle/collections", workspaceLoader, workspaceAdmin, function* (req, res, resume) {
+	app.get("/workspaces/:workspace_handle/collections", workspaceLoader, workspaceAdmin, function*(req, res) {
 
 		var collections, collection_counts;
 		var workspace_handle = req.params.workspace_handle;
 
-		var collections = yield Collection.all({ workspace_handle: workspace_handle }, resume());
-		var collection_counts = yield Collection.itemCounts(null, resume());
+		var collections = yield Collection.all({ workspace_handle: workspace_handle });
+		var collection_counts = yield Collection.itemCounts();
 
 		res.render("collections.html", { 
 			collections: collections,
@@ -38,7 +38,7 @@ exports.initialize = function(app) {
 		});
 	});
 
-	app.post("/workspaces/:workspace_handle/collections/new", workspaceLoader, workspaceAdmin, function* (req, res, resume) {
+	app.post("/workspaces/:workspace_handle/collections/new", workspaceLoader, workspaceAdmin, function*(req, res) {
 
 		var title = req.body.title;
 		var description = req.body.description;
@@ -72,13 +72,13 @@ exports.initialize = function(app) {
 			name: name,
 			workspace_handle: workspace.handle,
 			fields: fields,
-		}, resume());
+		});
 
 		req.flash('info', 'Created new collection');
 		res.redirect('/workspaces/' + workspace.handle + '/collections');
 	});
 
-	app.post("/workspaces/:workspace_handle/collections/:id/edit", workspaceLoader, workspaceAdmin, function* (req, res, resume) {
+	app.post("/workspaces/:workspace_handle/collections/:id/edit", workspaceLoader, workspaceAdmin, function*(req, res) {
 
 		var collection_id = req.params.id;
 
@@ -108,23 +108,23 @@ exports.initialize = function(app) {
 			fields.push(field_data);
 		});
 
-		var collection = yield Collection.load({ id: collection_id }, resume());
+		var collection = yield Collection.load({ id: collection_id });
 
 		yield collection.update({
 			title: title,
 			description: description,
 			name: name,
 			fields: fields,
-		}, resume());
+		});
 
 		req.flash('info', 'Saved ' +  collection.title + ' Collection');
 		res.redirect('/workspaces/' + workspace.handle + '/collections');
 	});
 
-	app.get("/workspaces/:workspace_handle/collections/:id/edit", workspaceLoader, workspaceAdmin, function* (req, res, resume) {
+	app.get("/workspaces/:workspace_handle/collections/:id/edit", workspaceLoader, workspaceAdmin, function*(req, res) {
 
 		var collection_id = req.params.id;
-		var collection = yield Collection.load({ id: collection_id }, resume());
+		var collection = yield Collection.load({ id: collection_id });
 
 		res.render("collection.html", {
 			controls: controls,
@@ -134,13 +134,13 @@ exports.initialize = function(app) {
 		});
 	});
 
-	app.del("/workspaces/:workspace_handle/collections/:id", workspaceLoader, workspaceAdmin, function* (req, res, resume) {
+	app.del("/workspaces/:workspace_handle/collections/:id", workspaceLoader, workspaceAdmin, function*(req, res) {
 
 		var workspace = req.showcase.workspace;
 		var collection_id = req.params.id;
-		var collection = yield Collection.load({ id: collection_id }, resume());
+		var collection = yield Collection.load({ id: collection_id });
 
-		yield collection.destroy(resume());
+		yield collection.destroy();
 
 		res.redirect("/workspaces/" + workspace.handle + "/collections");
 	});

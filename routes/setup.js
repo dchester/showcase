@@ -1,3 +1,5 @@
+var gx = require('gx');
+
 exports.initialize = function(app) {
 
 	var models = app.dreamer.models;
@@ -6,20 +8,20 @@ exports.initialize = function(app) {
 		res.render("setup.html");
 	});
 
-	app.post('/admin/setup', function* (req, res, resume) {
+	app.post('/admin/setup', function*(req, res) {
 
-		var count = yield models.users.count().complete(resume());
+		var count = yield models.users
+			.count()
+			.complete(gx.resume);
 
 		if (count) {
 			req.flash('danger', 'Already set up');
-			res.redirect('/admin/users');
+			return res.redirect('/admin/users');
 		}
-
-		// insert the one user
 
 		yield models.users
 			.create({ username: req.body.username, is_superuser: 1 })
-			.complete(resume());
+			.complete(gx.resume);
 
 		req.flash('info', 'Created superuser.  Time to log in now...');
 		res.redirect('/admin/login');
