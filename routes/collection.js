@@ -1,4 +1,3 @@
-var execute = require('genny').run;
 var Collection = require('../lib/collection.js');
 var controls = require('../lib/fields').controls;
 

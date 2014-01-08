@@ -10,7 +10,6 @@ var mkdirp = require('mkdirp');
 var armrest = require('armrest');
 var util = require('util');
 var router = require('./lib/gx-express-router');
-var genny = require('genny');
 
 var app = express();
 app.showcase = {};

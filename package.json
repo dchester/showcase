@@ -28,6 +28,7 @@
     "mysql": "*",
     "connect-domain": "*",
     "moment": "*",
-    "gx": "https://github.com/dchester/gx/archive/master.tar.gz"
+    "gx": "https://github.com/dchester/gx/archive/master.tar.gz",
+    "gnode": "*"
   }
 }
