@@ -36,10 +36,12 @@ $ node app schema-sync
 Start your server:
 
 ```
-$ PORT=4000 node app run
+$ PORT=4000 node --harmony-generators app run
 ```
 
 Once your app is running, create an admin user and log in.  Then create a workspace, then create some collections, and start adding items.
+
+> Node version 0.11.3 is recommended.  Showcase requires support for ES6 generators, so node v0.11.2 or greater.  You may also try your luck with [gnode](https://github.com/TooTallNate/gnode) and node v0.10.x.  Also note that if you need sqlite support, node v0.11.3 is the latest supported version of node for that library.
 
 
 ## Workspaces, Collections, and Items
