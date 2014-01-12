@@ -2,6 +2,7 @@ var async = require('async');
 var armrest = require('armrest');
 var Deferrals = require('../lib/deferrals');
 var Item = require('../lib/item');
+var api = require('../lib/api.js');
 
 var Collection = require('../lib/collection.js');
 var EXAMPLE_LENGTH = 1500;
@@ -15,16 +16,9 @@ exports.initialize = function(app) {
 
 		var workspace = req.showcase.workspace;
 		var status = req.body._status;
-		var user_id = req.body._user_id;
 		var collection_name = req.params.collection_handle;
 		var data = req.body;
-
-		if (!user_id) {
-			return res.json(400, {
-				message: "_user_id is required",
-				code: "user_id_required"
-			});
-		}
+		var user_id = api.user.id;
 
 		var collection = yield Collection.load({ name: collection_name });
 
@@ -74,15 +68,8 @@ exports.initialize = function(app) {
 		var workspace = req.showcase.workspace;
 		var item_id = req.params.item_id;
 		var status = req.body._status;
-		var user_id = req.body._user_id;
 		var data = req.body;
-
-		if (!user_id) {
-			return res.json(400, {
-				message: "_user_id is required",
-				code: "user_id_required"
-			});
-		}
+		var user_id = api.user.id;
 
 		var item = yield Item.load({ id: item_id });
 
@@ -171,7 +158,6 @@ exports.initialize = function(app) {
 		var api = armrest.client("localhost:" + app.get('port'));
 
 		var collections = yield Collection.all({ workspace_handle: workspace.handle });
-		console.warn("fetched collections");
 
 		var collection_resources = [];
 
