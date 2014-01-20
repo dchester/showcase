@@ -19,11 +19,18 @@ app.showcase = {};
 var views = __dirname + '/views';
 swig.init({ root: views, allowErrors: true });
 
+var externalMiddleware = [];
+
+exports.middleware = function(fn) {
+	externalMiddleware.push(fn);
+};
+
 exports.initialize = function(config) {
 
 	var dreamer = Dreamer.initialize({
 		app: app,
-		schema: "spec/schema.md",
+		schema: __dirname + "/spec/schema.md",
+		resources: __dirname + "/spec/resources.md",
 		database: config.database
 	});
 
@@ -64,6 +71,7 @@ exports.initialize = function(config) {
 		app.use(middleware.flashLoader);
 		app.use(middleware.sessionLocalizer);
 		app.use(middleware.setupChecker);
+		externalMiddleware.forEach(function(fn) { fn(app) });
 		app.use(app.router);
 	});
 
@@ -113,4 +121,6 @@ exports.run = function() {
 		app.dreamer.dream();
 	});
 };
+
+exports.app = app;
 
