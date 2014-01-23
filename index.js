@@ -116,9 +116,8 @@ exports.run = function() {
 
 		registerPlugins();
 		plugins.route(app);
-		yield api.setupUser();
-
 		app.dreamer.dream();
+		yield api.setupUser();
 	});
 };
 
