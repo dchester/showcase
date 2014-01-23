@@ -47,12 +47,34 @@ exports.initialize = function(app) {
 		res.json(201, Item.distill(item));
 	});
 
+	app.get('/api/:workspace_handle/:collection_handle/:item_id', workspaceLoader, function*(req, res) {
+
+		var workspace = req.showcase.workspace;
+		var item_id = req.params.item_id;
+
+		var criteria = resolveCriteria(item_id);
+		var item = yield Item.load(criteria);
+
+		if (!item) {
+			return res.json(404, {
+				message: "couldn't find item",
+				code: "no_item_found"
+			});
+		}
+
+		var inflated_item = yield Item._inflate(item);
+		var distilled_item = Item.distill(inflated_item);
+
+		res.json(200, distilled_item);
+	});
+
 	app.delete('/api/:workspace_handle/:collection_handle/:item_id', workspaceLoader, function*(req, res) {
 
 		var workspace = req.showcase.workspace;
 		var item_id = req.params.item_id;
 
-		var item = yield Item.load({ id: item_id });
+		var criteria = resolveCriteria(item_id);
+		var item = yield Item.load(criteria);
 
 		if (!item) return res.json(404, {
 			message: "couldn't find item",
@@ -71,7 +93,8 @@ exports.initialize = function(app) {
 		var data = req.body;
 		var user_id = api.user.id;
 
-		var item = yield Item.load({ id: item_id });
+		var criteria = resolveCriteria(item_id);
+		var item = yield Item.load(criteria);
 
 		if (!item) return res.json(404, {
 			message: "couldn't find item",
@@ -216,3 +239,11 @@ exports.initialize = function(app) {
 	});
 };
 
+function resolveCriteria(identifier) {
+
+	var criteria = {};
+	var field = identifier.match(/[a-z]/) ? 'key' : 'id';
+	criteria[field] = identifier;
+
+	return criteria;
+};

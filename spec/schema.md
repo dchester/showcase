@@ -31,6 +31,7 @@ Instances of entities; records
 ```
 - collection_id
 - status       enum=(draft|published|deleted)
+- key          nullable
 - create_time  default=now
 - update_time  default=now
 ```
