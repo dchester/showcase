@@ -29,11 +29,6 @@ exports.initialize = function(app) {
 			user_id: user_id
 		});
 
-		if (!item) return res.json(404, {
-			message: "couldn't find item",
-			code: "no_item_found"
-		});
-
 		var errors = item.validate();
 
 		if (errors) return res.json(400, {
@@ -45,6 +40,42 @@ exports.initialize = function(app) {
 		yield item.save({ user_id: user_id });
 
 		res.json(201, Item.distill(item));
+	});
+
+	app.put('/api/:workspace_handle/:collection_handle/:item_id', workspaceLoader, function*(req, res) {
+
+		var workspace = req.showcase.workspace;
+		var status = req.body._status;
+		var collection_name = req.params.collection_handle;
+		var data = req.body;
+		var user_id = api.user.id;
+		var item_id = req.params.item_id;
+
+		var criteria = resolveCriteria(item_id);
+
+		if (criteria.key) data.key = item_id;
+
+		var collection = yield Collection.load({ name: collection_name });
+
+		var item = yield Item.build({
+			collection_id: collection.id,
+			status: status,
+			data: data,
+			user_id: user_id
+		});
+
+		var errors = item.validate();
+
+		if (errors) return res.json(400, {
+			message: "validation failed",
+			code: "validation_failed",
+			errors: errors
+		});
+
+		yield item.merge({ user_id: user_id });
+
+		res.json(200, Item.distill(item));
+
 	});
 
 	app.get('/api/:workspace_handle/:collection_handle/:item_id', workspaceLoader, function*(req, res) {

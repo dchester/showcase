@@ -36,6 +36,8 @@ Instances of entities; records
 - update_time  default=now
 ```
 
+> unique: key,collection_id
+
 ### Item Data
 
 Data comprising the item record
@@ -96,5 +98,4 @@ Uploaded files associated with items
 - handle
 - description
 ```
-
 
