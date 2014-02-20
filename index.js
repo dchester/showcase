@@ -27,6 +27,17 @@ exports.middleware = function(fn) {
 
 exports.initialize = function(config) {
 
+	config = config || {};
+	config.files = config.files || {};
+
+	if (!config.files.tmp_path) {
+		throw new Error("please specify files.tmp_path in config");
+	}
+
+	if (!config.files.storage_path) {
+		throw new Error("please specify files.storage_path in config");
+	}
+
 	var dreamer = Dreamer.initialize({
 		app: app,
 		schema: __dirname + "/spec/schema.md",
@@ -38,7 +49,8 @@ exports.initialize = function(config) {
 
 	var storagePath;
 	if (!config.files.storage_path.match(/^\//)) {
-		storagePath = path.join(__dirname, config.files.storage_path); 
+		var relativeBase = path.dirname(require.main.filename);
+		storagePath = path.join(relativeBase, config.files.storage_path);
 	} else {
 		storagePath = config.files.storage_path; 
 	}
@@ -49,6 +61,8 @@ exports.initialize = function(config) {
 
 	var middleware = require('./lib/middleware').initialize(app);
 	app.showcase.middleware = middleware;
+
+	app.showcase.config = config;
 
 	app.configure(function(){
 		app.engine('.html', consolidate.swig);

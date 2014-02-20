@@ -1,4 +1,3 @@
-var config = require('config');
 var path = require('path');
 var mv = require('mv');
 var sha1 = require('sha1');
@@ -22,7 +21,7 @@ exports.initialize = function(app) {
 			if (upload.size == 0) return callback();
 
 			var filename = sha1(upload.path + Math.random()) + '-' + upload.name;
-			var target_path = path.join(config.files.storage_path, 'files', filename); 
+			var target_path = path.join(app.showcase.config.files.storage_path, 'files', filename);
 
 			mv(upload.path, target_path, function(err) {
 

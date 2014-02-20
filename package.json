@@ -18,7 +18,6 @@
     "connect-flash": "0.1.1",
     "validator": "2.0.0",
     "pagination": "https://github.com/vanng822/pagination/archive/v0.3.3.tar.gz",
-    "config": "0.4.33",
     "path": "0.4.9",
     "sha1": "1.1.0",
     "mv": "1.0.0",
