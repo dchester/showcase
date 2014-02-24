@@ -30,7 +30,11 @@ exports.initialize = function(app) {
 		var page = Number(req.query.page) || 1;
 		var per_page = 10;
 
-		var items = yield Item.all({ collection_id: collection_id });
+		var items = yield Item.all({
+			collection_id: collection_id,
+			per_page: per_page,
+			page: page
+		});
 
 		var pagination = new Pagination({
 			rowsPerPage: per_page,
