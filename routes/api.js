@@ -22,6 +22,11 @@ exports.initialize = function(app) {
 
 		var collection = yield Collection.load({ name: collection_name });
 
+		if (!collection) return res.json(404, {
+			message: "couldn't find collection",
+			code: "no_collection_found"
+		});
+
 		var item = yield Item.build({
 			collection_id: collection.id,
 			status: status,
@@ -130,9 +135,10 @@ exports.initialize = function(app) {
 
 		var collection = yield Collection.load({ name: name, workspace_handle: workspace.handle });
 
-		if (!collection) {
-			return req.error(404, "collection not found");
-		}
+		if (!collection) return res.json(404, {
+			message: "couldn't find collection",
+			code: "no_collection_found"
+		});
 
 		var criteria = {};
 
