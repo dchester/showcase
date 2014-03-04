@@ -10,7 +10,6 @@ var mkdirp = require('mkdirp');
 var armrest = require('armrest');
 var util = require('util');
 var router = require('./lib/gx-express-router');
-var api = require('./lib/api.js');
 var gx = require('gx');
 
 var app = express();
@@ -86,6 +85,7 @@ exports.initialize = function(config) {
 		app.use(middleware.sessionLocalizer);
 		app.use(middleware.setupChecker);
 		externalMiddleware.forEach(function(fn) { fn(app) });
+		app.use(middleware.fixturesLoader);
 		app.use(app.router);
 	});
 
@@ -125,14 +125,9 @@ exports.registerField = function(field) {
 };
 
 exports.run = function() {
-
-	gx(function*() {
-
-		registerPlugins();
-		plugins.route(app);
-		app.dreamer.dream();
-		yield api.setupUser();
-	});
+	registerPlugins();
+	plugins.route(app);
+	app.dreamer.dream();
 };
 
 exports.app = app;

@@ -1,6 +1,7 @@
 var fs = require('fs');
 var gx = require('gx');
 
+var suite = require('./lib');
 var showcase = require('../index');
 var config = require('./lib/config');
 
@@ -10,19 +11,8 @@ var dream = require('dreamer').instance;
 var error = function(e) { console.warn(e) };
 var Collection = require('../lib/collection.js');
 
-exports.setUp = function(callback) {
-	dream.db.drop().success(function() {
-		dream.db.sync().success(function() { 
-			callback()
-		});
-	});
-};
-
-exports.tearDown = function(callback) {
-	dream.db.drop().success(function() {
-		callback();
-	});
-};
+exports.setUp = suite.setUp;
+exports.tearDown = suite.tearDown;
 
 exports.create = function(test) {
 

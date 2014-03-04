@@ -30,10 +30,16 @@ Instances of entities; records
 
 ```
 - collection_id
-- status       enum=(draft|published|deleted)
+- status_id
 - key          nullable
 - create_time  default=now
 - update_time  default=now
+```
+
+### Statuses
+
+```
+- name
 ```
 
 ### Item Data
@@ -80,13 +86,18 @@ Uploaded files associated with items
 - is_superuser      boolean
 - external_user_id  nullable
 ```
+### Permissions
+
+```
+- name
+```
 
 ### Workspace User Permissions
 
 ```
 - user_id
 - workspace_handle
-- permission  enum=(administrator|editor|viewer)
+- permission_id
 ```
 
 ### Workspaces

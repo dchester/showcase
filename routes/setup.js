@@ -11,7 +11,7 @@ exports.initialize = function(app) {
 	app.post('/admin/setup', function*(req, res) {
 
 		var count = yield models.users
-			.count()
+			.count({ where: "username != 'api'" })
 			.complete(gx.resume);
 
 		if (count) {

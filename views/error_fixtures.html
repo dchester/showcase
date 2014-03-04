@@ -1,0 +1,17 @@
+{% extends 'layout.html' %}
+
+{% set title = 'Fixtures Error' %}
+
+{% block page_header %}
+	<h1 class="pagetitle">Fixtures Error</h1>
+{% endblock %}
+
+{% block content %}
+	<div class="content">
+		<div class="center-box">
+			<h3 class="muted">Couldn't find fixtures data!</h3>
+			Try <code>node app fixtures-sync</code> to install fixtures data.
+		</div>
+	</div>
+{% endblock %}
+

@@ -1,43 +1,35 @@
-var fs = require('fs');
-var showcase = require('../index');
-var config = require('./lib/config');
 var gx = require('gx');
-
-showcase.initialize(config.showcase);
+var suite = require('./lib');
+var config = require('./lib/config');
 
 var dream = require('dreamer').instance;
-var error = function(e) { console.warn(e) };
 var models = dream.models;
 
 var Item = require('../lib/item.js');
 var Collection = require('../lib/collection.js');
 
 exports.setUp = function(callback) {
-	dream.db.drop().success(function() {
-		dream.db.sync().success(function() { 
-			models.users.create({ username: 'bob' })
-				.success(function() {
-					Collection.create({
-						title: 'Books',
-						description: 'Books for reading',
-						name: 'books',
-						workspace_handle: 'test',
-						fields: config.fixtures.book_fields,
 
-					}, function(err, collection) {
-						if (err) throw err;
-						callback();
-					});
-				});
+	suite.setUp(function() {
+
+		gx(function*() {
+
+			yield models.users.create({ username: 'bob', is_superuser: true }).complete(gx.resume);
+
+			yield Collection.create({
+				title: 'Books',
+				description: 'Books for reading',
+				name: 'books',
+				workspace_handle: 'test',
+				fields: config.fixtures.book_fields,
+			});
+
+			callback();
 		});
 	});
 };
 
-exports.tearDown = function(callback) {
-	dream.db.drop().success(function() {
-		callback();
-	});
-};
+exports.tearDown = suite.tearDown;
 
 exports.create = function(test) {
 
@@ -56,6 +48,7 @@ exports.create = function(test) {
 		test.equal(item.data.title, "Rung Ho!");
 		test.equal(item.data.author, "Talbot Mundy");
 		test.equal(item.data.isbn, "1557424047");
+		test.equal(item.status, "draft");
 		test.done();
 	});
 };
@@ -75,6 +68,7 @@ exports.update = function(test) {
 		});
 
 		item.update({
+			status: 'published',
 			data: {
 				title: "Rung Ho!",
 				author: "Talbot Mundy",
@@ -87,6 +81,7 @@ exports.update = function(test) {
 		test.equal(item.data.title, "Rung Ho!");
 		test.equal(item.data.author, "Talbot Mundy");
 		test.equal(item.data.isbn, "9781557424044");
+		test.equal(item.status, "published");
 		test.done();
 	});
 };

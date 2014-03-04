@@ -1,6 +1,6 @@
-var Deferrals = require('../lib/deferrals');
 var async = require('async');
 var gx = require('gx');
+var Permission = require('../lib/permission');
 
 exports.initialize = function(app) {
 
@@ -48,7 +48,7 @@ exports.initialize = function(app) {
 				.shift();
 
 			if (workspace_permission) {
-				workspace.permission = workspace_permission.permission;
+				workspace.permission = Permission.name(workspace_permission.permission_id);
 			}
 		});
 
@@ -62,16 +62,15 @@ exports.initialize = function(app) {
 	app.post("/admin/users/:user_id/edit", function*(req, res) {
 
 		var user_id = req.params.user_id;
+		var username = req.body.username;
+		var is_superuser = Number(req.body.is_superuser) || 0;
 
 		var user = yield models.users
 			.find({ where: { id: user_id } })
 			.complete(gx.resume);
 
-		var fields = ['username', 'is_superuser'];
-
-		fields.forEach(function(field) {
-			user[field] = req.body[field];
-		});
+		user.username = username;
+		user.is_superuser = is_superuser;
 
 		var errors = user.validate();
 
@@ -91,7 +90,7 @@ exports.initialize = function(app) {
 		workspace_handles.forEach(function(handle, index) {
 			permission = {
 				user_id: user.id,
-				permission: permissions[index],
+				permission_id: Permission.id(permissions[index]),
 				workspace_handle: handle
 			};
 			workspace_permissions.push(permission);
@@ -120,8 +119,12 @@ exports.initialize = function(app) {
 
 	app.post("/admin/users/new", function*(req, res) {
 
+		var is_superuser = Number(req.body.is_superuser) || 0;
+		var username = req.body.username;
+
 		var user = models.users.build({
-			username: req.body.username
+			username: username,
+			is_superuser: is_superuser
 		});
 
 		var errors = user.validate();
@@ -136,5 +139,5 @@ exports.initialize = function(app) {
 		}
 	});
 };
-	
+
 
