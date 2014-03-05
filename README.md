@@ -27,10 +27,16 @@ showcase.initialize({
 showcase.run();
 ```
 
-Initialize the database:
+Initialize the database schema:
 
 ```
-$ node app schema-sync
+$ node --harmony-generators app schema-sync
+```
+
+Initialize the application fixtures data:
+
+```
+$ node --harmony-generators app fixtures-sync
 ```
 
 Start your server:
@@ -62,7 +68,13 @@ Specify database connection details under the `database` key:
 
 - `database.dialect` can be `mysql`, `postgres`, or `sqlite`
 - `database.storage` specifies the file on disk for the `sqlite` dialect
-- `database.host`, `database`, `username`, and `password` are relevant connection parameters
+- `database.host` specifies the database connection host
+- `database.port` specifies the database connection port
+- `database.database` specifies the database database name
+- `database.username` sepcifies the database username
+- `database.password` specifies the database password
+- `database.logging` is a boolean to specify whether to log each database query
+- `database.define` is a passthrough to Sequelize's default model definitions for any extra customization
 
 Under the hood these are sent through to the [Sequelize constructor](http://sequelizejs.com/documentation#usage-options).
 
