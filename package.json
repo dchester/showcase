@@ -1,6 +1,6 @@
 {
   "name": "showcase",
-  "version": "0.0.1",
+  "version": "1.0.2",
   "devDependencies": {
     "nodeunit": "*",
     "bower": "*",
@@ -10,7 +10,7 @@
     "grunt-contrib-copy": "*"
   },
   "dependencies": {
-    "dreamer": "https://github.com/dchester/dreamer/archive/v1.0.1.tar.gz",
+    "dreamer": "https://github.com/dchester/dreamer/archive/v1.0.3.tar.gz",
     "async": "0.2.9",
     "express": "3.4.7",
     "swig": "= v0.14.0",
