@@ -32,8 +32,8 @@ Instances of entities; records
 - collection_id
 - status_id
 - key          nullable
-- create_time  default=now
-- update_time  default=now
+- create_time
+- update_time
 ```
 
 ### Statuses
