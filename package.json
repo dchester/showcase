@@ -10,7 +10,7 @@
     "grunt-contrib-copy": "*"
   },
   "dependencies": {
-    "dreamer": "https://github.com/dchester/dreamer/archive/master.tar.gz",
+    "dreamer": "https://github.com/dchester/dreamer/archive/v1.0.1.tar.gz",
     "async": "0.2.9",
     "express": "3.4.7",
     "swig": "= v0.14.0",
@@ -26,7 +26,7 @@
     "mysql": "2.0.0-rc2",
     "connect-domain": "0.5.0",
     "moment": "2.5.0",
-    "gx": "https://github.com/dchester/gx/archive/master.tar.gz",
+    "gx": "https://github.com/dchester/gx/archive/v0.1.0.tar.gz",
     "gnode": "0.0.5"
   }
 }
