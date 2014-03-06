@@ -10,7 +10,7 @@
     "grunt-contrib-copy": "*"
   },
   "dependencies": {
-    "dreamer": "https://github.com/dchester/dreamer/archive/v1.0.3.tar.gz",
+    "dreamer": "https://github.com/dchester/dreamer/archive/v1.0.4.tar.gz",
     "async": "0.2.9",
     "express": "3.4.7",
     "swig": "= v0.14.0",
