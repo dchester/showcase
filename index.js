@@ -41,6 +41,7 @@ exports.initialize = function(config) {
 		app: app,
 		schema: __dirname + "/spec/schema.md",
 		resources: __dirname + "/spec/resources.md",
+		fixtures: __dirname + "/spec/fixtures.md",
 		database: config.database
 	});
 
