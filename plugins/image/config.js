@@ -20,6 +20,7 @@ module.exports = {
 			return callback([]);
 		}
 
+		if (!parsed_data) return callback(null);
 		var file_id = parsed_data.file_id;
 
 		models.files.find({ where: { id: file_id } })

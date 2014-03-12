@@ -11,7 +11,7 @@
 (function() {
 
 	try {
-		var files = {{ item[field.name]|json_encode|raw }};
+		var files = {{ item.data[field.name]|json_encode|raw }};
 	} catch(e) {
 		return;
 	}
