@@ -20,7 +20,7 @@ exports.initialize = function(app) {
 		var data = req.body;
 		var user_id = api.user.id;
 
-		var collection = yield Collection.load({ name: collection_name });
+		var collection = yield Collection.load({ name: collection_name, workspace_handle: workspace.handle });
 
 		if (!collection) return res.json(404, {
 			message: "couldn't find collection",
