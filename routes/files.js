@@ -1,11 +1,11 @@
-var path = require('path');
-var mv = require('mv');
-var sha1 = require('sha1');
 var async = require('async');
+var path = require('path');
+var File = require('../lib/file');
 
 exports.initialize = function(app) {
 
 	var models = app.dreamer.models;
+	var storage_path = app.showcase.config.files.storage_path;
 
 	app.post('/files', function(req, res) {
 
@@ -19,32 +19,19 @@ exports.initialize = function(app) {
 			var upload = req.files[key];
 
 			if (upload.size == 0) return callback();
+			var content_type = upload.type || upload.headers['content-type'] || 'application/octet-stream';
 
-			var filename = sha1(upload.path + Math.random()) + '-' + upload.name;
-			var target_path = path.join(app.showcase.config.files.storage_path, 'files', filename);
+			File.create({ 
+				original_filename: upload.name,
+				source_path: upload.path,
+				size: upload.size,
+				item_id: item_id,
+				content_type: content_type,
+				storage_path: storage_path
 
-			mv(upload.path, target_path, function(err) {
-
-				if (err) return req.error(err);
-
-				var content_type = upload.type || upload.headers['content-type'] || 'application/octet-stream';
-
-				var file = models.files.build({
-					item_id: item_id,
-					path: filename,
-					original_filename: upload.name,
-					size: upload.size,
-					content_type: content_type,
-					meta_json: '{}',
-					description: ''
-				});
-
-				file.save()
-					.error(req.error)
-					.success(function(file) {
-						files.push(file);
-						callback();
-					});
+			}, function(err, file) {
+				files.push(File.distill(file));
+				callback();
 			});
 
 		}, function(err) {

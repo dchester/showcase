@@ -57,6 +57,9 @@ exports.initialize = function(config) {
 
 	mkdirp.sync(config.files.storage_path + "/files");
 
+	var File = require('./lib/file');
+	File.methods(config.files);
+
 	var secret = 'arthur is fond of jimz';
 
 	var middleware = require('./lib/middleware').initialize(app);

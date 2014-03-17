@@ -1,3 +1,5 @@
+var File = require('../../lib/file');
+
 module.exports = {
 	name: 'image',
 	template: 'image',
@@ -23,22 +25,18 @@ module.exports = {
 		if (!parsed_data) return callback(null);
 		var file_id = parsed_data.file_id;
 
-		models.files.find({ where: { id: file_id } })
-			.error(console.warn)
-			.success(function(file) {
+		File.load({ id: file_id }, function(err, file) {
 
-				file = JSON.parse(JSON.stringify(file));
+			var inflated_file = {
+				url: file.url,
+				size: file.size,
+				original_filename: file.original_filename,
+				content_type: file.content_type,
+				file_id: file.id
+			}
 
-				file.url = "/files/" + file.path;
-				file.file_id = file.id;
-				delete file.id;
-				delete file.path;
-				delete file.item_id;
-				delete file.meta_json;
-				delete file.description;
-
-				callback(file);
-			});
+			callback(inflated_file);
+		});
 	}
 };
 

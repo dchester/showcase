@@ -70,8 +70,9 @@ Data comprising the item record
 Uploaded files associated with items
 
 ```
-- item_id     nullable
+- item_id            nullable
 - path
+- url
 - original_filename  nullable
 - description        nullable
 - content_type
