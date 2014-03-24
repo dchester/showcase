@@ -28,7 +28,8 @@ exports.initialize = function(app) {
 
 		var collection_id = req.params.collection_id;
 		var page = Number(req.query.page) || 1;
-		var per_page = 10;
+		var per_page = app.showcase.config.items_per_page || 100;
+		var fields_count = app.showcase.config.item_summary_display_fields_count || 8;
 
 		var items = yield Item.all({
 			collection_id: collection_id,
@@ -47,19 +48,21 @@ exports.initialize = function(app) {
 
 		items.forEach(function(item) {
 			item = Item._preview(item, items.collection);
-			Object.keys(item).forEach(function(key) {
-				if (typeof item[key] == 'string') {
-					if (item[key].length > 255) {
-						item[key] = item[key].substring(0, 127) + '...';
+			Object.keys(item.data).forEach(function(key) {
+				if (typeof item.data[key] == 'string') {
+					if (item.data[key].length > 255) {
+						item.data[key] = item.data[key].substring(0, 127) + '...';
 					} 
 				}
 			});
 		});
 
+		var fields = items.collection.fields.slice(0, fields_count - 1);
+
 		res.render("items.html", { 
 			items: items,
 			collection: items.collection,
-			fields: items.collection.fields,
+			fields: fields,
 			pagination: pagination.data
 		});
 	});
