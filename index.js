@@ -128,7 +128,8 @@ exports.registerField = function(field) {
 exports.run = function() {
 	registerPlugins();
 	plugins.route(app);
-	app.dreamer.dream();
+	var server = app.dreamer.dream();
+	return server;
 };
 
 exports.app = app;
