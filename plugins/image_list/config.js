@@ -1,5 +1,4 @@
 var File = require('../../lib/file');
-var async = require('async');
 
 module.exports = {
 	name: 'image_list',
@@ -27,36 +26,26 @@ module.exports = {
 		var file_ids = parsed_data.file_ids;
 		var inflated_files = [];
 		var tasks = [];
-		file_ids.forEach( function( file_id ) {
-			tasks.push(function(cb){
-				File.load({ id: file_id }, function(err, files) {
-
-							file = JSON.parse(JSON.stringify(files));
-
-							var inflated_file = {
-								url: file.url,
-								size: file.size,
-								original_filename: file.original_filename,
-								content_type: file.content_type,
-								file_id: file.id
-							}
-
-							inflated_files.push(inflated_file);
-							cb();
-					});
-			});
-
-		});
-		async.parallel(tasks, function(err,results){
-			// All tasks are done now
+		File.all({ id: file_ids }, function(err, files) {
+			var inflated_files = [];
 			var sorted_files = [];
+			files.forEach( function(file) {
+				var inflated_file = {
+					url: file.url,
+					size: file.size,
+					original_filename: file.original_filename,
+					content_type: file.content_type,
+					file_id: file.id
+				}
+
+				inflated_files.push(inflated_file);
+			});
 			file_ids.forEach(function(file_id) {
 				var file = inflated_files.filter(function(f) { return f.file_id == file_id })[0];
 				sorted_files.push(file);
 			});
-			callback(sorted_files);
+			return callback(sorted_files);
 		});
-
 	}
 };
 
