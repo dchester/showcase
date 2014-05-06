@@ -147,6 +147,9 @@ exports.initialize = function(app) {
 				criteria[field.name] = req.query[field.name];
 			}
 		});
+		if (req.query['status']) {
+			criteria['status'] = req.query['status'];
+		}
 
 		var items = yield Item.all({
 			collection_id: collection.id,
@@ -192,7 +195,7 @@ exports.initialize = function(app) {
 
 		async.forEach(collections, function(collection, cb) {
 
-			var route = '/api/' + workspace.handle  + '/' + collection.name;
+			var route = '/api/' + workspace.handle + '/' + collection.name;
 
 			api.get({
 				url: route,
