@@ -155,6 +155,16 @@ exports.initialize = function(app) {
 			per_page: per_page,
 		});
 
+		if (sort_by_field = req.query['sort_by']) {
+			items = items.sort(function(a,b) {
+				if (req.query['order'] && req.query['order'].toLowerCase() === 'desc') {
+					return a.data[sort_by_field] > b.data[sort_by_field] ? -1 : (a.data[sort_by_field] < b.data[sort_by_field] ? 1 : 0);
+				} else {
+					return a.data[sort_by_field] < b.data[sort_by_field] ? -1 : (a.data[sort_by_field] > b.data[sort_by_field] ? 1 : 0);
+				}
+			});
+		}
+
 		items.forEach(function(item) {
 			item.collection = collection;
 		});
