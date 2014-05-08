@@ -147,9 +147,12 @@ exports.initialize = function(app) {
 				criteria[field.name] = req.query[field.name];
 			}
 		});
-		if (req.query['status']) {
-			criteria['status'] = req.query['status'];
-		}
+		var standard_fields = ['status', 'id'];
+		standard_fields.forEach(function(field) {
+			if (field in req.query) {
+				criteria[field] = req.query[field];
+			}
+		});
 
 		var items = yield Item.all({
 			collection_id: collection.id,
