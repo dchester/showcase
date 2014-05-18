@@ -198,6 +198,7 @@ exports.all = function(test) {
 		var item = yield Item.create({
 			collection_id: 1,
 			user_id: 1,
+			status: 'published',
 			data: {
 				title: "Rung Ho!",
 				author: "Talbot Mundy",
@@ -205,11 +206,29 @@ exports.all = function(test) {
 			},
 		});
 
+		item = yield Item.create({
+			collection_id: 1,
+			user_id: 1,
+			status: 'draft',
+			data: {
+				title: "Harry Potter",
+				author: "JK Rowling",
+				isbn: "1532352423"
+			},
+		});
+
 		var items = yield Item.all({ collection_id: 1 });
 			
+		test.equal(items.length, 2);
+		test.equal(items.totalCount, 2);
+		test.equal(items[0].data.title, "Harry Potter");
+		test.equal(items[1].data.title, "Rung Ho!");
+		test.equal(items.collection.name, "books");
+
+		items = yield Item.all({ collection_id: 1, criteria: { status: 'draft' }});
 		test.equal(items.length, 1);
 		test.equal(items.totalCount, 1);
-		test.equal(items[0].data.title, "Rung Ho!");
+		test.equal(items[0].data.title, "Harry Potter");
 		test.equal(items.collection.name, "books");
 		test.done();
 	});
