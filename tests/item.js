@@ -218,7 +218,6 @@ exports.all = function(test) {
 		});
 
 		var items = yield Item.all({ collection_id: 1 });
-			
 		test.equal(items.length, 2);
 		test.equal(items.totalCount, 2);
 		test.equal(items[0].data.title, "Harry Potter");
@@ -230,6 +229,19 @@ exports.all = function(test) {
 		test.equal(items.totalCount, 1);
 		test.equal(items[0].data.title, "Harry Potter");
 		test.equal(items.collection.name, "books");
+
+		items = yield Item.all({ collection_id: 1, sort: { field_name: 'title' } });
+		test.equal(items[0].data.title, "Harry Potter");
+		test.equal(items[1].data.title, "Rung Ho!");
+
+		items = yield Item.all({ collection_id: 1, sort: { field_name: 'title', order: 'desc' } });
+		test.equal(items[0].data.title, "Rung Ho!");
+		test.equal(items[1].data.title, "Harry Potter");
+
+		items = yield Item.all({ collection_id: 1, sort: { field_name: 'status' } });
+		test.equal(items[0].status, "draft");
+		test.equal(items[1].status, "published");
+
 		test.done();
 	});
 };
