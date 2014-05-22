@@ -32,6 +32,14 @@ exports.fixtures = {
 			is_required: 0,
 			index: 3,
 			meta: ''
+		}, {
+			title: 'Book Image',
+			name: 'book_image',
+			description: 'A cover image for the book',
+			data_type: 'image',
+			is_required: 0,
+			index: 4,
+			meta: ''
 		}
 	]
 };

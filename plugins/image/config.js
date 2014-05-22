@@ -12,6 +12,14 @@ module.exports = {
 
 		return '<h4><i class="muted large icon-picture"></i></h4>';
 	},
+	deflate: function(field, item, models, callback) {
+		if (!item.data[field.name]) return callback('');
+		var json_string;
+		if (typeof item.data[field.name] === 'object') {
+			json_string = JSON.stringify(item.data[field.name]);
+		}
+		callback(json_string || item.data[field.name]);
+	},
 	inflate: function(field, item, models, callback) {
 
 		if (!item.data[field.name]) return callback(null);
