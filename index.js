@@ -11,6 +11,8 @@ var armrest = require('armrest');
 var util = require('util');
 var router = require('./lib/gx-express-router');
 var gx = require('gx');
+var passport = require('passport');
+var strategy = require('./lib/passport-strategy');
 
 var app = express();
 app.showcase = {};
@@ -28,6 +30,7 @@ exports.initialize = function(config) {
 
 	config = config || {};
 	config.files = config.files || {};
+	config.auth = config.auth || {};
 
 	if (!config.files.tmp_path) {
 		throw new Error("please specify files.tmp_path in config");
@@ -46,6 +49,8 @@ exports.initialize = function(config) {
 	});
 
 	app.dreamer = dreamer;
+
+	passport.use(config.auth.passport_strategy || strategy.local);
 
 	var storagePath;
 	if (!config.files.storage_path.match(/^\//)) {
@@ -83,6 +88,7 @@ exports.initialize = function(config) {
 		app.use('/admin', express.cookieSession({ secret: secret }));
 		app.use(flash());
 		app.use(middleware.flashLoader);
+		app.use(passport.initialize());
 		app.use(middleware.sessionLocalizer);
 		app.use(middleware.setupChecker);
 		externalMiddleware.forEach(function(fn) { fn(app) });

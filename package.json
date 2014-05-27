@@ -28,6 +28,8 @@
     "moment": "2.5.0",
     "gx": "https://github.com/dchester/gx/archive/v0.1.0.tar.gz",
     "gnode": "0.0.5",
-    "config": "~0.4.35"
+    "config": "~0.4.35",
+    "passport": "^0.2.0",
+    "passport-local": "^1.0.0"
   }
 }
