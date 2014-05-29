@@ -84,6 +84,12 @@ Under the hood these are sent through to the [Sequelize constructor](http://sequ
 
 - `files.tmp_path` specifies where incoming uploaded files should be stored during transfer
 - `files.storage_path` specifies long term storage where uploaded files should reside
+- `files.store` specifies a function to store an uploaded file; defaults writing to `files.storage_path`
+- `files.retrieve` specifies a function to retrieve a stored file
+- `files.public_url` specifies a function to generate a public url for a stored file
+- `files.name` specifies a function to generate a filename for an uploaded file
+
+By default files will be stored directly to `files.storage_path`, but you may override this functionality by specifying override methods to `store` and `retrieve`, etc.  These override methods take a callback as a parameter and are bound to `File` instances. See `examples/files.js` for an example.
 
 ### showcase.registerField(field)
 
