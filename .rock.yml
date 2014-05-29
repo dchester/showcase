@@ -1,6 +1,6 @@
 runtime: node010
 build: npm install && bower install && grunt
-run: gnode app run
+run: gnode examples/basic run
 test: |
   if [[ -n "$ROCK_ARG1" ]];then
     gnode node_modules/.bin/nodeunit "tests/${ROCK_ARG1}"
@@ -8,4 +8,4 @@ test: |
     gnode node_modules/.bin/nodeunit tests
   fi
 
-run_test_server: rm -f /var/tmp/showcase-test.sqlite ; node app schema-sync ; PORT=3000 node app run
+run_test_server: rm -f /var/tmp/showcase-test.sqlite ; gnode examples/basic schema-sync ; gnode examples/basic fixtures-sync ; PORT=9800 gnode examples/basic run
