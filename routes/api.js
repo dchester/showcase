@@ -67,8 +67,7 @@ exports.initialize = function(app) {
 			});
 		}
 
-		var inflated_item = yield Item._inflate(item);
-		var distilled_item = Item.distill(inflated_item);
+		var distilled_item = Item.distill(item);
 
 		res.json(200, distilled_item);
 	});
@@ -147,10 +146,26 @@ exports.initialize = function(app) {
 				criteria[field.name] = req.query[field.name];
 			}
 		});
+		var standard_fields = ['status', 'id'];
+		standard_fields.forEach(function(field) {
+			if (field in req.query) {
+				criteria[field] = req.query[field];
+			}
+		});
+
+		if (req.query.sort) {
+			var sort = [];
+			var indicators = String(req.query.sort).split(',');
+			indicators.forEach(function(indicator) {
+				var components = indicator.split(':');
+				sort.push({ field_name: components[0], order: components[1] || 'asc' });
+			});
+		}
 
 		var items = yield Item.all({
 			collection_id: collection.id,
 			criteria: criteria,
+			sort: sort,
 			page: page,
 			per_page: per_page,
 		});
@@ -159,26 +174,17 @@ exports.initialize = function(app) {
 			item.collection = collection;
 		});
 
-		async.forEach(items, function(item, callback) {
+		var distilled_items = [];
 
-			Item._inflate(item, function(item) {
-				callback();
-			});
-
-		}, function() {
-
-			var distilled_items = [];
-
-			items.forEach(function(item) {
-				distilled_items.push(Item.distill(item));
-			});
-
-			var totalCount = items.totalCount;
-			var content_range = "items 0-" + (totalCount - 1) + "/" + totalCount;
-
-			res.header('Content-Range', content_range);
-			res.json(distilled_items);
+		items.forEach(function(item) {
+			distilled_items.push(Item.distill(item));
 		});
+
+		var totalCount = items.totalCount;
+		var content_range = "items 0-" + (totalCount - 1) + "/" + totalCount;
+
+		res.header('Content-Range', content_range);
+		res.json(distilled_items);
 	});
 
 	app.get('/workspaces/:workspace_handle/api', workspaceLoader, function* (req, res) {
@@ -192,7 +198,7 @@ exports.initialize = function(app) {
 
 		async.forEach(collections, function(collection, cb) {
 
-			var route = '/api/' + workspace.handle  + '/' + collection.name;
+			var route = '/api/' + workspace.handle + '/' + collection.name;
 
 			api.get({
 				url: route,

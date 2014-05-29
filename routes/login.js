@@ -1,31 +1,46 @@
-exports.initialize = function(app) {
+var passport = require('passport');
+var gx = require('gx');
 
-	var models = app.dreamer.models;
+exports.initialize = function(app) {
 
 	app.get('/admin/login', function(req, res) {
 		res.render("login.html");
 	});
 
-	app.post('/admin/login', function(req, res) {
+	app.post('/admin/login', function*(req, res, next) {
 
-		var username = req.body.username;
-		models.users.find({ where: { username: username } })
-			.error(req.error)
-			.success(function(user) {
+		// passport requires a truthy password
+		req.body.password = 'password' in req.body ? req.body.password : 'password';
 
-				if (user) {
-					req.session.username = user.username;
-					req.session.user_id = user.id;
-					req.session.is_superuser = user.is_superuser;
-					res.redirect('/workspaces');
-				} else {
-					req.flash('danger', 'No user by that username');
-					res.redirect('/admin/login');
-				}
-			});
+		var handler = function(err, user, info) {
+
+			if (err) return req.error(err);
+			if (!user) {
+				req.flash('danger', info.message);
+				return res.redirect('/admin/login');
+			}
+
+			req.logIn(user, gx.fn(function*(err) {
+
+				var models = app.dreamer.models;
+				var username = user.username;
+
+				var showcase_user = yield models.users
+					.findOrCreate({ username: username }, { is_superuser: false })
+					.complete(gx.resume);
+
+				req.session.username = showcase_user.username;
+				req.session.user_id = showcase_user.id;
+				req.session.is_superuser = showcase_user.is_superuser;
+				res.redirect('/workspaces');
+			}));
+		};
+
+		passport.authenticate('local', handler).call(null, req, res, next);
 	});
 
 	app.get('/admin/logout', function(req, res) {
+		req.logout();
 		req.session = null;
 		res.redirect('/');
 	});

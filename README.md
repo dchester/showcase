@@ -64,6 +64,10 @@ Access and modify data in collections through the built-in RESTful API.
 
 Initialize the application, given a set of options:
 
+Sepcify authentication and authorization parameters under the `auth` key:
+
+- `auth.passport_strategy` specifies an instance of a [passport](http://passportjs.org) strategy; defaults to local authentication
+
 Specify database connection details under the `database` key:
 
 - `database.dialect` can be `mysql`, `postgres`, or `sqlite`
