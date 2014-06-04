@@ -8,6 +8,7 @@ var models = dream.models;
 var Item = require('../lib/item.js');
 var Collection = require('../lib/collection.js');
 
+
 exports.setUp = function(callback) {
 
 	suite.setUp(function() {
@@ -23,6 +24,7 @@ exports.setUp = function(callback) {
 				workspace_handle: 'test',
 				fields: config.fixtures.book_fields,
 			});
+
 
 			callback();
 		});
@@ -57,15 +59,30 @@ exports.update = function(test) {
 
 	gx(function*() {
 
+		var file = models.files.build({
+			id: 4,
+			path: '/tmp/super-cool-image.jpg',
+			original_filename: 'super-cool-image.jpg',
+			content_type: 'image/jpeg',
+			size: 2132,
+			url: '/files/0cceddac0d9ecc44b8905cbd29234e406d598d34-super-cool-image.jpg'
+		});
+		file.save();
+
 		var item = yield Item.create({
 			collection_id: 1,
 			user_id: 1,
 			data: {
 				title: "Rung Ho!",
 				author: "Talbot Mundy",
-				isbn: "1557424047"
+				isbn: "1557424047",
+				book_image: {
+					file_id: 4
+				}
 			},
 		});
+		var item_id = item.id;
+
 
 		item.update({
 			status: 'published',
@@ -82,6 +99,13 @@ exports.update = function(test) {
 		test.equal(item.data.author, "Talbot Mundy");
 		test.equal(item.data.isbn, "9781557424044");
 		test.equal(item.status, "published");
+		test.equal(item.data.book_image.original_filename, "super-cool-image.jpg");
+
+		// confirm successful retrieval of image file
+		item = yield Item.load({ id: item_id });
+		test.equal(item.data.book_image.original_filename, "super-cool-image.jpg");
+		test.equal(item.data.book_image.size, "2132");
+
 		test.done();
 	});
 };

@@ -19,6 +19,9 @@ exports.setUp = function(callback) {
 		yield dreamer.Fixtures.sync(dream, dream.fixtures, gx.resume);
 		yield Status.load();
 		yield Permission.load();
+		var plugins = require('../../lib/plugins');
+		var image = require('../../plugins/image');
+		plugins.register('field', image);
 		callback();
 	});
 };
