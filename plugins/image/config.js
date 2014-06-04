@@ -7,9 +7,12 @@ module.exports = {
 	placeholder: '',
 	preview: function(value) {
 
-		try { var parsed_data = JSON.parse(value) } 
-		catch (e) { return "" }
-
+		if (typeof value !== 'object') {
+			try { JSON.parse(value) }
+			catch(e) { return '' }
+		} else if (value === null) {
+			return '';
+		}
 		return '<h4><i class="muted large icon-picture"></i></h4>';
 	},
 	deflate: function(field, item, models, callback) {
