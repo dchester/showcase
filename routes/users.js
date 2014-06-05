@@ -81,11 +81,8 @@ exports.initialize = function(app) {
 
 		var workspace_permissions = [];
 
-		var workspace_handles = Array.isArray(req.body.workspace_handle) ? 
-			req.body.workspace_handle : [ req.body.workspace_handle ];
-
-		var permissions = Array.isArray(req.body.permission) ? 
-			req.body.permission : [ req.body.permission ];
+		var workspace_handles = arrayify(req.body.workspace_handle);
+		var permissions = arrayify(req.body.permission);
 
 		workspace_handles.forEach(function(handle, index) {
 			permission = {
@@ -140,4 +137,8 @@ exports.initialize = function(app) {
 	});
 };
 
-
+function arrayify(data) {
+	if (Array.isArray(data)) return data;
+	else if (data === undefined) return [];
+	else return [ data ];
+};
