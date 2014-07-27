@@ -13,6 +13,7 @@ var router = require('./lib/gx-express-router');
 var gx = require('gx');
 var passport = require('passport');
 var strategy = require('./lib/passport-strategy');
+var User = require('./lib/user');
 
 var app = express();
 app.showcase = {};
@@ -50,7 +51,8 @@ exports.initialize = function(config) {
 
 	app.dreamer = dreamer;
 
-	passport.use(config.auth.passport_strategy || strategy.local);
+	config.auth.passport_strategy = config.auth.passport_strategy || strategy.local;
+	passport.use(config.auth.passport_strategy);
 
 	var storagePath;
 	if (!config.files.storage_path.match(/^\//)) {
@@ -142,4 +144,6 @@ exports.run = function() {
 };
 
 exports.app = app;
+
+exports.mergeUser = User.merge;
 

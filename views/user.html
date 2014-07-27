@@ -77,11 +77,14 @@
 					</tr>
 				{% endif %}
 			</table>
-
-			<button class="btn btn-primary btn-large">
-				<i class="icon-ok icon-white"></i>
-				Save
-			</button>
+			{% if is_config_superuser %}
+				<div class="muted">User is configured as a superuser in showcase configuration file, so cannot be edited via this interface.</div>
+			{% else %}
+				<button class="btn btn-primary btn-large">
+					<i class="icon-ok icon-white"></i>
+					Save
+				</button>
+			{% endif %}
 		</form>
 	</div>
 
