@@ -42,7 +42,7 @@ exports.initialize = function(app) {
 		var workspaces = yield null;
 		var permissions = yield null;
 
-		var is_config_superuser = config.auth.superusers
+		var is_config_superuser = (config.auth.superusers || [])
 			.filter(function(username) { return username === user.username })
 			.length;
 
