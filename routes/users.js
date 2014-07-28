@@ -6,8 +6,9 @@ var config = require('config');
 exports.initialize = function(app) {
 
 	var models = app.dreamer.models;
+	var requireSuperuser = app.showcase.middleware.requireSuperuser;
 
-	app.get("/admin/users", function*(req, res) {
+	app.get("/admin/users", requireSuperuser, function*(req, res) {
 
 		var users = yield models.users
 			.findAll({})
@@ -16,12 +17,12 @@ exports.initialize = function(app) {
 		res.render("users.html", { users: users });
 	});
 
-	app.get("/admin/users/new", function(req, res) {
+	app.get("/admin/users/new", requireSuperuser, function(req, res) {
 
 		res.render("user.html", { action: 'New' });
 	});
 
-	app.get("/admin/users/:user_id/edit", function*(req, res) {
+	app.get("/admin/users/:user_id/edit", requireSuperuser, function*(req, res) {
 
 		var user_id = req.params.user_id;
 		var user, workspaces, permissions;
@@ -65,7 +66,7 @@ exports.initialize = function(app) {
 		});
 	});
 
-	app.post("/admin/users/:user_id/edit", function*(req, res) {
+	app.post("/admin/users/:user_id/edit", requireSuperuser, function*(req, res) {
 
 		var user_id = req.params.user_id;
 		var username = req.body.username;
@@ -120,7 +121,7 @@ exports.initialize = function(app) {
 		});
 	});
 
-	app.post("/admin/users/new", function*(req, res) {
+	app.post("/admin/users/new", requireSuperuser, function*(req, res) {
 
 		var is_superuser = Number(req.body.is_superuser) || 0;
 		var username = req.body.username;
