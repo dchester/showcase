@@ -1,6 +1,7 @@
 var async = require('async');
 var gx = require('gx');
 var Permission = require('../lib/permission');
+var config = require('config');
 
 exports.initialize = function(app) {
 
@@ -41,6 +42,10 @@ exports.initialize = function(app) {
 		var workspaces = yield null;
 		var permissions = yield null;
 
+		var is_config_superuser = config.auth.superusers
+			.filter(function(username) { return username === user.username })
+			.length;
+
 		workspaces.forEach(function(workspace) {
 
 			var workspace_permission = permissions
@@ -55,7 +60,8 @@ exports.initialize = function(app) {
 		res.render("user.html", { 
 			action: 'Edit',
 			user: user,
-			workspaces: workspaces
+			workspaces: workspaces,
+			is_config_superuser: is_config_superuser
 		});
 	});
 
