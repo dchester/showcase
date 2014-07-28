@@ -41,6 +41,13 @@ exports.initialize = function(config) {
 		throw new Error("please specify files.storage_path in config");
 	}
 
+	var secret = config.secret;
+
+	if (!secret) {
+		console.warn("falling back to default session secret; please send a secret to showcase.initialize");
+		secret = "arthur is fond of jimz";
+	}
+
 	var dreamer = Dreamer.initialize({
 		app: app,
 		schema: __dirname + "/spec/schema.md",
@@ -66,8 +73,6 @@ exports.initialize = function(config) {
 
 	var File = require('./lib/file');
 	File.methods(config.files);
-
-	var secret = 'arthur is fond of jimz';
 
 	var middleware = require('./lib/middleware').initialize(app);
 	app.showcase.middleware = middleware;
