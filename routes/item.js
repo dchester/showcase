@@ -1,3 +1,4 @@
+var querystring = require('querystring');
 var async = require('async');
 var Pagination = require('pagination').ItemPaginator;
 
@@ -5,6 +6,7 @@ var Deferrals = require('../lib/deferrals');
 var Collection = require('../lib/collection');
 var Item = require('../lib/item');
 var Sort = require('../lib/sort');
+var clone = require('../lib/clone');
 
 exports.initialize = function(app) {
 
@@ -32,12 +34,14 @@ exports.initialize = function(app) {
 		var per_page = app.showcase.config.items_per_page || 100;
 		var fields_count = app.showcase.config.item_summary_display_fields_count || 8;
 		var sort = Sort.deserialize(req.query.sort);
+		var search = req.query.q;
 
 		var items = yield Item.all({
 			collection_id: collection_id,
 			per_page: per_page,
 			page: page,
-			sort: sort
+			sort: sort,
+			search: search
 		});
 
 		var pagination = new Pagination({
@@ -71,11 +75,17 @@ exports.initialize = function(app) {
 		);
 
 		column_fields.forEach(function(f) {
+
+			var query = clone(req.query);
+			delete query.page;
+
 			if (sort_attribute.field_name == f.name) {
-				f.sort_url = '?sort=' + f.name + (sort_attribute.order == 'desc' ? ':asc' : ':desc');
+				query.sort = f.name + (sort_attribute.order == 'desc' ? ':asc' : ':desc');
+				f.sort_url = '?' + querystring.stringify(query);
 				f.sort_indicator = sort_attribute.order == 'desc' ? '▾' : '▴';
 			} else {
-				f.sort_url = '?sort=' + f.name;
+				query.sort = f.name;
+				f.sort_url = '?' + querystring.stringify(query);
 			}
 		});
 
@@ -84,7 +94,8 @@ exports.initialize = function(app) {
 			collection: items.collection,
 			fields: fields,
 			pagination: pagination.data,
-			column_fields: column_fields
+			column_fields: column_fields,
+			q: search
 		});
 	});
 

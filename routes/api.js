@@ -133,6 +133,7 @@ exports.initialize = function(app) {
 		var collection, items;
 		var workspace = req.showcase.workspace;
 		var sort = Sort.deserialize(req.query.sort);
+		var search = req.query.q;
 
 		var collection = yield Collection.load({ name: name, workspace_handle: workspace.handle });
 
@@ -161,6 +162,7 @@ exports.initialize = function(app) {
 			sort: sort,
 			page: page,
 			per_page: per_page,
+			search: search
 		});
 
 		items.forEach(function(item) {
@@ -173,8 +175,11 @@ exports.initialize = function(app) {
 			distilled_items.push(Item.distill(item));
 		});
 
-		var totalCount = items.totalCount;
-		var content_range = "items 0-" + (totalCount - 1) + "/" + totalCount;
+		var total_count = items.totalCount;
+		var range_start = (items.page - 1) * items.per_page;
+		var range_end = range_start + distilled_items.length - 1;
+
+		var content_range = "items " + range_start + "-" + range_end + "/" + total_count;
 
 		res.header('Content-Range', content_range);
 		res.json(distilled_items);

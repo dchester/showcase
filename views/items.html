@@ -29,6 +29,10 @@
 			{% set icon_color = "icon-black" %}
 			{% include "pagination.html" %}
 		</div>
+		<form class="search_form">
+			<input type="text" name="q" value="{{ q }}" placeholder="Search...">
+			<button class="btn"><i class="icon-search"></i></button>
+		</form>
 		<hr>
 		<h3 class="muted">{{ collection.description }}</h3>
 	</div>
