@@ -1,6 +1,6 @@
 # Showcase
 
-Lightweight pluggable CMS in Node.js with a RESTful API
+Lightweight pluggable CMS in Node.js with an admin interface and RESTful API
 
 ## Getting Started
 
