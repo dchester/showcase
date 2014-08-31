@@ -3,6 +3,7 @@ var armrest = require('armrest');
 var Deferrals = require('../lib/deferrals');
 var Item = require('../lib/item');
 var api = require('../lib/api.js');
+var Sort = require('../lib/sort');
 
 var Collection = require('../lib/collection.js');
 var EXAMPLE_LENGTH = 1500;
@@ -131,6 +132,7 @@ exports.initialize = function(app) {
 		var page = req.query.page || 0;
 		var collection, items;
 		var workspace = req.showcase.workspace;
+		var sort = Sort.deserialize(req.query.sort);
 
 		var collection = yield Collection.load({ name: name, workspace_handle: workspace.handle });
 
@@ -152,15 +154,6 @@ exports.initialize = function(app) {
 				criteria[field] = req.query[field];
 			}
 		});
-
-		if (req.query.sort) {
-			var sort = [];
-			var indicators = String(req.query.sort).split(',');
-			indicators.forEach(function(indicator) {
-				var components = indicator.split(':');
-				sort.push({ field_name: components[0], order: components[1] || 'asc' });
-			});
-		}
 
 		var items = yield Item.all({
 			collection_id: collection.id,

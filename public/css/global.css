@@ -458,3 +458,10 @@ footer {
 		opacity: 0;
 	}
 }
+.sort_indicator {
+	color: #ccc;
+	margin-left: 0.2em;
+}
+.sort_indicator:empty {
+	display: none;
+}
