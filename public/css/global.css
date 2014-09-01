@@ -485,3 +485,10 @@ footer {
 .sort_indicator:empty {
 	display: none;
 }
+hr.heavy {
+	height: 0.3em;
+	background-image: repeating-linear-gradient(45deg, #fff, #fff 2px, #ccc 2px, #ccc 4px);
+	background-size: 6px 6px;
+	margin: 2em 0;
+	border: none;
+}

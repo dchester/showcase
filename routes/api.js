@@ -90,7 +90,7 @@ exports.initialize = function(app) {
 		res.send(204);
 	});
 
-	app.post('/api/:workspace_handle/:collection_handle/:item_id', workspaceLoader, function*(req, res) {
+	var patchItem = function*(req, res) {
 
 		var workspace = req.showcase.workspace;
 		var item_id = req.params.item_id;
@@ -123,7 +123,10 @@ exports.initialize = function(app) {
 		yield item.save({ user_id: user_id });
 
 		res.json(Item.distill(item));
-	});
+	};
+
+	app.patch('/api/:workspace_handle/:collection_handle/:item_id', workspaceLoader, patchItem);
+	app.post('/api/:workspace_handle/:collection_handle/:item_id', workspaceLoader, patchItem);
 
 	app.get('/api/:workspace_handle/:collection_handle', workspaceLoader, function*(req, res) {
 
@@ -203,38 +206,18 @@ exports.initialize = function(app) {
 				params: { per_page: 1 },
 				success: function(items, response) {
 
-					var resources = [];
-					resources.collection = collection;
+					var resource = { collection: collection };
 
 					var example_response = response.body;
 					if (example_response && example_response.length > EXAMPLE_LENGTH) {
 						example_response = example_response.substring(0, EXAMPLE_LENGTH) + '...';
 					}
 
-					var resource = {
-						method: 'GET',
-						route: route,
-						preview: route,
-						description: 'Get a listing of ' + collection.title.toLowerCase(),
-						example_uri: route
-					};
-
 					if (response.body !== '[]') {
-						resource.example_response = example_response;
+						resource.example_listing_response = example_response;
 					}
 
-					resources.push(resource);
-
-					var write_resource = {
-						method: 'POST',
-						route: route,
-						description: 'Create ' + collection.title.toLowerCase(),
-						parameters: collection.fields
-					}
-
-					resources.push(write_resource);
-
-					collection_resources.push(resources);
+					collection_resources.push(resource);
 					cb();
 				}
 			});
