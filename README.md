@@ -2,6 +2,19 @@
 
 Lightweight pluggable CMS in Node.js with an admin interface and RESTful API
 
+#### Features:
+
+- Admin interface
+- Respectable read/write REST+JSON API
+- Pluggable file storage
+- User management w/ roles and permissions
+- Workspaces for multi-tentant support
+- Optional [Passport](http://passportjs.org) / OAuth integration
+- Custom fields via plugins
+- Events via [EventEmitter](http://nodejs.org/api/events.html#events_class_events_eventemitter) radio
+- Basic searching & sorting
+
+
 ## Getting Started
 
 Create `app.js` for your project:
