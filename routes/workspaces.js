@@ -1,4 +1,3 @@
-var Deferrals = require('../lib/deferrals');
 var gx = require('gx');
 
 exports.initialize = function(app) {
@@ -94,11 +93,11 @@ exports.initialize = function(app) {
 
 		if (!errors) {
 			yield workspace.save().complete(gx.resume);
-			req.flash('info', 'Saved new workspace');
+			req.flash('info', 'Saved workspace');
 			res.redirect("/workspaces");
 		} else {
 			req.flash('danger', 'There was an error: ' + JSON.stringify(errors));
-			res.redirect("/workspaces/new");
+			res.redirect("/workspaces/" + workspace.handle);
 		}
 
 	});
