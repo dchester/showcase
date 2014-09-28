@@ -1,0 +1,66 @@
+{% extends 'layout.html' %}
+
+{% set title = 'Site' %}
+
+{% block nav %}
+	<ul class="nav">
+		<li><a href="/workspaces">Workspaces</a></li>
+		<li><a href="/workspaces/{{ workspace.handle }}/collections">{{ workspace.title }}</a></li>
+		<li><a href="/workspaces/{{ workspace.handle }}/pages">Pages</a></li>
+		<li><a href="/workspaces/{{ workspace.handle }}/pages/config">Config</a></li>
+	</ul>
+{% endblock %}
+
+{% block pagetitle %}
+	<div class="pagetitle">
+		<h1>Pages Configuration</h1>
+	</div>
+{% endblock %}
+
+{% block content %}
+
+<div class="content content-condensed">
+	{% if site %}
+		<form method="post">
+			<table class="table">
+				<tr>
+					<th>
+						Global Template
+						<div class="muted">Required</div>
+					</th>
+					<td>
+						<textarea name="template" class="code">{{ site.template }}</textarea>
+						<div class="description">
+							Parent Swig template from which other pages will inherit.  Include the doctype, header, footer, etc.  Required to have `{% raw %}{% block content %}{% endblock %}{% endraw %}` where the page content should go.
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<th>
+						Global CSS
+						<div class="muted">Required</div>
+					</th>
+					<td>
+						<textarea name="css" class="code">{{ site.css }}</textarea>
+						<div class="description">
+							Site-wide cascading style sheet.
+						</div>
+					</td>
+				</tr>
+			</table>
+
+			<button class="btn btn-primary btn-large permission-administrator">
+				<i class="icon-ok icon-white"></i>
+				Save
+			</button>
+		</form>
+	{% else %}
+		<p>Pages are not yet enabled for this workspace.</p><br>
+		<form action="/workspaces/{{ workspace.handle }}/pages/initialize" method="POST">
+			<button class="btn btn-primary" >Enable Pages</button>
+		</form>
+	{% endif %}
+</div>
+
+{% endblock %}
+

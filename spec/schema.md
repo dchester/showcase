@@ -109,4 +109,29 @@ Uploaded files associated with items
 - description
 ```
 
+### Sites
 
+```
+- workspace_id  unique
+- template      text
+- css           text
+```
+
+### Pages
+
+```
+- site_id
+- title
+- url_path
+- data_sources  text
+- template      text
+- css           text
+```
+
+### Page Data Sources
+
+```
+page_id
+data_url
+alias
+```

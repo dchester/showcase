@@ -1,3 +1,4 @@
+var gx = require('gx');
 var Collection = require('../lib/collection.js');
 var controls = require('../lib/fields').controls;
 

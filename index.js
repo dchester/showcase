@@ -2,7 +2,6 @@ var http = require('http');
 var express = require('express');
 var path = require('path');
 var swig = require('swig');
-var consolidate = require('consolidate');
 var Dreamer = require('dreamer');
 var async = require('async');
 var flash = require('connect-flash');
@@ -19,7 +18,7 @@ var app = express();
 app.showcase = {};
 
 var views = __dirname + '/views';
-swig.init({ root: views, allowErrors: true });
+swig.setDefaults({ views: views });
 
 var externalMiddleware = [];
 
@@ -80,7 +79,7 @@ exports.initialize = function(config) {
 	app.showcase.config = config;
 
 	app.configure(function(){
-		app.engine('.html', consolidate.swig);
+		app.engine('.html', swig.renderFile);
 		app.set('router', router);
 		app.set('view engine', 'html');
 		app.set('views', views);
@@ -118,6 +117,9 @@ exports.initialize = function(config) {
 	require('./routes/users.js').initialize(app);
 	require('./routes/login.js').initialize(app);
 	require('./routes/files.js').initialize(app);
+	require('./routes/page.js').initialize(app);
+	require('./routes/site.js').initialize(app);
+	require('./routes/site-preview.js').initialize(app);
 
 	var Radio = function() {};
 	util.inherits(Radio, require('events').EventEmitter);

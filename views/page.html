@@ -1,0 +1,100 @@
+{% extends 'layout.html' %}
+
+{% set title = 'Page' %}
+
+{% block pagetitle %}
+	<div class="pagetitle">
+		{% if page.id %}
+			<h1>{{ page.title }}</h1>
+		{% else %}
+			<h1>New Page</h1>
+		{% endif %}
+	</div>
+{% endblock %}
+
+{% block nav %}
+	<ul class="nav">
+		<li><a href="/workspaces">Workspaces</a></li>
+		<li><a href="/workspaces/{{ workspace.handle }}/collections">{{ workspace.title }}</a></li>
+		<li><a href="/workspaces/{{ workspace.handle }}/pages">Pages</a></li>
+		<li><a href="/workspaces/{{ workspace.handle }}/pages/{{ page.id }}">{{ page.title }}</a></li>
+	</ul>
+{% endblock %}
+
+{% block content %}
+
+<div class="content content-condensed">
+	<form method="post">
+		<input type="hidden" name="site_id" value="{{ site_id }}">
+		<table class="table">
+			<tr>
+				<th>
+					Title
+					<div class="muted">Required</div>
+				</th>
+				<td>
+					<input type="text" name="title" value="{{ page.title }}">
+					<div class="description">
+						Title of the page
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<th>
+					Page URL
+					<div class="muted">Required</div>
+				</th>
+				<td>
+					<input type="text" name="url_path" value="{{ page.url_path }}">
+					<div class="description">
+						Relative URL for this page.  Ex: /books
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<th>
+					Data
+					<div class="muted">Optional</div>
+				</th>
+				<td>
+					<textarea name="data_sources">{{ page.data_sources }}</textarea>
+					<div class="description">
+						Data sources, one per line with each line containing a variable name you choose and a data URL separated by whitespace.  Ex: `books /api/books`
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<th>
+					Content Template
+					<div class="muted">Required</div>
+				</th>
+				<td>
+					<textarea name="template" class="code">{{ page.template }}</textarea>
+					<div class="description">
+						Content of the page, as a <a href="http://paularmstrong.github.io/swig/">Swig</a> template (<a href="https://daringfireball.net/projects/markdown/basics">Markdown</a> or <a href="https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Introduction">HTML</a>).
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<th>
+					Content CSS
+					<div class="muted">Optional</div>
+				</th>
+				<td>
+					<textarea name="css" class="code">{{ page.css }}</textarea>
+					<div class="description">
+						Cascading styles specific to this page
+					</div>
+				</td>
+			</tr>
+		</table>
+
+		<button class="btn btn-primary btn-large permission-administrator">
+			<i class="icon-ok icon-white"></i>
+			Save
+		</button>
+	</form>
+</div>
+
+{% endblock %}
+

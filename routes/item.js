@@ -111,6 +111,10 @@ exports.initialize = function(app) {
 		var action = 'Edit';
 		var fields = item.collection.fields;
 
+		fields.forEach(function(field) {
+			item.data[field] = item.data[field] === undefined ? '' : item.data[field];
+		});
+
 		res.render("item.html", {
 			item: item,
 			collection: item.collection,
@@ -191,10 +195,17 @@ exports.initialize = function(app) {
 
 		var collection = yield Collection.load({ id: collection_id });
 
+		var item = { data: {} };
+
+		collection.fields.forEach(function(field) {
+			item.data[field.name] = item.data[field.name] === undefined ? '' : item.data[field.name];
+		});
+
 		res.render("item.html", {
 			collection: collection,
 			fields: collection.fields,
-			action: 'New'
+			action: 'New',
+			item: item
 		});
 	});
 

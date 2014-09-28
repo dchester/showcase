@@ -12,23 +12,17 @@
 {% block pagetitle %}
 	<div class="pagetitle">
 		<h1>{{ workspace.title }}</h1>
-
-		<div class="btn-group">
-			<a class="btn dropdown-toggle" data-toggle="dropdown" href="#"><i class="icon-gear"></i><span class="caret"></span></a>
-			<ul class="dropdown-menu">
-				<li><a class="permission-administrator" href="/workspaces/{{ workspace.handle }}/collections/new">New Collection</a></li>
-				<li><a href="/workspaces/{{ workspace.handle }}/api">REST API</a></li>
-				<li><a class="permission-administrator" href="/workspaces/{{ workspace.handle }}/edit">Configure Workspace</a></li>
-			</ul>
-		</div>
-
-		<hr>
-		<h3 class="muted">{{ workspace.description }}</h3>
+		{% include "_workspace_menu.html" %}
 	</div>
 {% endblock %}
 
 {% block content %}
 	<div class="content">
+		<ul class="nav nav-tabs">
+			<li class="active"><a href="#">Data</a></li>
+			<li><a href="pages">Pages</a></li>
+		</ul>
+		<h3 class="muted">Data collections accessible via Pages or API</h3>
 		{% if collections.length %}
 			<table class="table">
 				{% for collection in collections %}
@@ -55,6 +49,7 @@
 					</tr>
 				{% endfor %}
 			</table>
+			<a class="permission-administrator btn btn-tertiary" href="/workspaces/{{ workspace.handle }}/collections/new">New Collection</a>
 		{% else %}
 			<a class="permission-administrator btn btn-primary" href="/workspaces/{{ workspace.handle }}/collections/new">New Collection</a>
 		{% endif %}

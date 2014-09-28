@@ -154,6 +154,20 @@ select, textarea, input[type="text"], input[type="password"], input[type="dateti
 .breadcrumbs .nav > li > a {
 	display: inline-block;
 }
+.nav.nav-tabs li a {
+	color: #aaa;
+	padding: 11px 15px;
+	border-radius: 3px 3px 0 0;
+}
+.nav.nav-tabs li.active a {
+	color: #444;
+}
+.nav.nav-tabs li a:hover {
+	color: #368cb1;
+}
+.nav.nav-tabs li.active a:hover {
+	color: #444;
+}
 .pagetitle {
 	margin: 0;
 	background: white;
@@ -275,6 +289,9 @@ h3.muted {
 	margin: 0;
 	padding: 0 20px 100px 20px;
 	background: white;
+}
+.content > .nav.nav-tabs:first-child {
+	margin-top: 15px;
 }
 .nowrap {
 	white-space: nowrap;
@@ -491,4 +508,9 @@ hr.heavy {
 	background-size: 6px 6px;
 	margin: 2em 0;
 	border: none;
+}
+form .table td textarea.code {
+	height: 90vh;
+	font-family: monospace;
+	font-size: 11px;
 }
