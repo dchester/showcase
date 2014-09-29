@@ -85,6 +85,7 @@ exports.initialize = function(config) {
 		app.set('views', views);
 		app.set('port', process.env.PORT || config.port || 3000);
 		app.use(middleware.errorHandler);
+		app.use(middleware.staticRewrite);
 		app.use(express.static(path.join(__dirname, 'public')), { maxAge: 600 });
 		app.use(express.static(storagePath));
 		app.use(express.favicon());
