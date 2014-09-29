@@ -69,9 +69,9 @@ exports.initialize = function(app) {
 		if (!page) return res.send(404);
 
 		site_css_hash = md5(site.css);
-		site_css_url = '/sites/' + site_id + '/preview/static/' + site_css_hash + '/site.css';
+		site_css_url = 'static/' + site_css_hash + '/site.css';
 		page_css_hash = md5(page.css);
-		page_css_url = '/sites/' + site_id + '/preview/static/' + page_css_hash + '/page-' + page.id + '.css';
+		page_css_url = 'static/' + page_css_hash + '/page-' + page.id + '.css';
 
 		// fetch the data
 
