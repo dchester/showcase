@@ -40,7 +40,7 @@ exports.initialize = function(app) {
 		res.send(page.css);
 	});
 
-	app.get(/^\/sites\/(\w+)\/preview\/(.+)/, function*(req, res) {
+	app.get(/^\/sites\/(\w+)\/preview\/(.*)/, function*(req, res) {
 
 		var site_id = req.params[0];
 		var url_path = "/" + req.params[1];
