@@ -4,6 +4,7 @@ var Deferrals = require('../lib/deferrals');
 var Item = require('../lib/item');
 var api = require('../lib/api.js');
 var Sort = require('../lib/sort');
+var clone = require('../lib/clone');
 
 var Collection = require('../lib/collection.js');
 var EXAMPLE_LENGTH = 1500;
@@ -229,6 +230,28 @@ exports.initialize = function(app) {
 
 			res.render("api.html", { collection_resources: collection_resources });
 		});
+	});
+
+	app.get('/api/:workspace_handle', workspaceLoader, function*(req, res) {
+
+		var workspace = clone(req.showcase.workspace);
+		delete workspace.id;
+
+		var collections = yield Collection.all({ workspace_handle: workspace.handle });
+
+		collections.forEach(function(collection) {
+			delete collection.id;
+			delete collection.workspace_handle;
+			collection.fields.forEach(function(field) {
+				delete field.id;
+				delete field.collection_id;
+				delete field.index;
+				delete field.meta;
+			});
+		});
+
+		workspace.collections = collections;
+		res.json(workspace);
 	});
 };
 
