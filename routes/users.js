@@ -1,12 +1,14 @@
 var async = require('async');
 var gx = require('gx');
 var Permission = require('../lib/permission');
+var config = require('config');
 
 exports.initialize = function(app) {
 
 	var models = app.dreamer.models;
+	var requireSuperuser = app.showcase.middleware.requireSuperuser;
 
-	app.get("/admin/users", function*(req, res) {
+	app.get("/admin/users", requireSuperuser, function*(req, res) {
 
 		var users = yield models.users
 			.findAll({})
@@ -15,12 +17,12 @@ exports.initialize = function(app) {
 		res.render("users.html", { users: users });
 	});
 
-	app.get("/admin/users/new", function(req, res) {
+	app.get("/admin/users/new", requireSuperuser, function(req, res) {
 
 		res.render("user.html", { action: 'New' });
 	});
 
-	app.get("/admin/users/:user_id/edit", function*(req, res) {
+	app.get("/admin/users/:user_id/edit", requireSuperuser, function*(req, res) {
 
 		var user_id = req.params.user_id;
 		var user, workspaces, permissions;
@@ -41,6 +43,10 @@ exports.initialize = function(app) {
 		var workspaces = yield null;
 		var permissions = yield null;
 
+		var is_config_superuser = (config.auth.superusers || [])
+			.filter(function(username) { return username === user.username })
+			.length;
+
 		workspaces.forEach(function(workspace) {
 
 			var workspace_permission = permissions
@@ -55,11 +61,12 @@ exports.initialize = function(app) {
 		res.render("user.html", { 
 			action: 'Edit',
 			user: user,
-			workspaces: workspaces
+			workspaces: workspaces,
+			is_config_superuser: is_config_superuser
 		});
 	});
 
-	app.post("/admin/users/:user_id/edit", function*(req, res) {
+	app.post("/admin/users/:user_id/edit", requireSuperuser, function*(req, res) {
 
 		var user_id = req.params.user_id;
 		var username = req.body.username;
@@ -81,11 +88,8 @@ exports.initialize = function(app) {
 
 		var workspace_permissions = [];
 
-		var workspace_handles = Array.isArray(req.body.workspace_handle) ? 
-			req.body.workspace_handle : [ req.body.workspace_handle ];
-
-		var permissions = Array.isArray(req.body.permission) ? 
-			req.body.permission : [ req.body.permission ];
+		var workspace_handles = arrayify(req.body.workspace_handle);
+		var permissions = arrayify(req.body.permission);
 
 		workspace_handles.forEach(function(handle, index) {
 			permission = {
@@ -117,7 +121,7 @@ exports.initialize = function(app) {
 		});
 	});
 
-	app.post("/admin/users/new", function*(req, res) {
+	app.post("/admin/users/new", requireSuperuser, function*(req, res) {
 
 		var is_superuser = Number(req.body.is_superuser) || 0;
 		var username = req.body.username;
@@ -140,4 +144,8 @@ exports.initialize = function(app) {
 	});
 };
 
-
+function arrayify(data) {
+	if (Array.isArray(data)) return data;
+	else if (data === undefined) return [];
+	else return [ data ];
+};

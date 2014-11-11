@@ -1,9 +1,12 @@
-h2 {
-	margin-top: 1.6em;
-}
 h2:first-of-type {
 	margin-top: 0.3em;
 
+}
+h3 {
+	font-size: 20px;
+}
+h5 {
+	color: #666;
 }
 .resource-description {
 	margin: 12px 0 24px;
@@ -18,14 +21,14 @@ h2:first-of-type {
 .parameters th {
 	border-right: 1px solid #ddd;
 }
-h5 {
-	color: #666;
-}
 .row {
 	margin-left: 0px;
 }
 .nav.nav-tabs.nav-stacked {
 	margin-top: 0.6em;
+}
+.resources-listing {
+	position: relative;
 }
 .resources-listing-nav {
 	margin-right: 30px;
@@ -39,4 +42,14 @@ h5 {
 }
 .table {
 	min-width: inherit;
+}
+.preview-link {
+	position: absolute;
+	right: 14px;
+	margin-top: -41px;
+	color: #888;
+	background: rgba(0,0,0,0.05);
+	padding: 1px 8px;
+	font-size: 12px;
+	border-radius: 2px;
 }

@@ -42,56 +42,137 @@
 
 		<div class="span8 resources-listing">
 
-			{% for resources in collection_resources %}
+			{% for resource in collection_resources %}
 
-				<a name="{{ resources.collection.name }}"></a>
+				<a name="{{ resource.collection.name }}"></a>
 
-				<h2>{{ resources.collection.title }}</h2>
+				<h2>{{ resource.collection.title }}</h2>
 
-				{% for resource in resources %}
+				<h3>List {{ resource.collection.title }}</h3>
 
-					<h4>
-						<p target="_blank" href="{{ resource.example_uri }}">
-							{{ resource.method }} {{ resource.route }}
-							{% if resource.preview %}
-								&nbsp;<small><a class="btn btn-link" href="{{ resource.preview }}" target="_blank">preview</a></small>
-							{% endif %}
-						</p>
-					</h4>
+				<pre><code>GET /api/{{ workspace.handle }}/{{ resource.collection.name }}</code></pre>
+				<a class="preview-link" href="/api/{{ workspace.handle }}/{{ resource.collection.name }}" target="_blank">Preview &rarr;</a>
 
-					<div class="resource-description">{{ resource.description }}</div>
+				<div class="resource-description">
+					Get a listing of {{ resource.collection.title|lower }}.
+				</div>
 
-					{% if resource.parameters %}
-						<h5>Request Parameters</h5>
-						<table class="table parameters">
-							<tr>
-								<th>Name</th>
-								<th>Required?</th>
-								<th>Description</th>
-							</tr>
+				<h5>Request Parameters</h5>
+				<table class="table parameters">
+					<tr>
+						<th>Name</th>
+						<th>Required?</th>
+						<th>Description</th>
+					</tr>
 
-							{% for parameter in resource.parameters %}
-								<tr>
-									<td>{{ parameter.name }}</td>
-									<td>{% if parameter.is_required %}Required{% else %}Optional{% endif %}</td>
-									<td>{{ parameter.description }}</td>
-								</tr>
-							{% endfor %}
-						</table>
-					{% endif %}
+					{% for field in resource.collection.fields %}
+						<tr>
+							<td>{{ field.name }}</td>
+							<td>Optional</td>
+							<td>Filter to items with {{ field.name }} equal to the supplied value</td>
+						</tr>
+					{% endfor %}
+					<tr>
+						<td>status</td>
+						<td>Optional</td>
+						<td>Limit results to the specified status of <code>published</code> or <code>draft</code></td>
+					</tr>
+					<tr>
+						<td>page</td>
+						<td>Optional</td>
+						<td>Page number of the result set starting with page <code>1</code></td>
+					</tr>
+					<tr>
+						<td>per_page</td>
+						<td>Optional</td>
+						<td>Number of items to show per page of results</td>
+					</tr>
+					<tr>
+						<td>q</td>
+						<td>Optional</td>
+						<td>Search query matching against all fields</td>
+					</tr>
+				</table>
 
-					{% if resource.example_response %}
-						<pre><code>{{ resource.example_response }}</code></pre>
-					{% endif %}
+				{% if resource.example_listing_response %}
+					<h5>Example Response</h5>
+					<pre><code>{{ resource.example_listing_response }}</code></pre>
+				{% endif %}
 
-					<hr>
+				<hr>
 
-				{% endfor %}
+				<h3>Get a {{ resource.collection.title }} Item</h3>
+
+				<pre><code>GET /api/{{ workspace.handle }}/{{resource.collection.name}}/:identifier</code></pre>
+
+				<div class="resource-description">
+					Get a details on a single one of the {{ resource.collection.title|lower }}. The identifier may be either the <code>id</code> for the item, or alternatively its <code>key</code> in the case that it has a field with that name.
+				</div>
+
+				<hr>
+
+				<h3>Create {{ resource.collection.title }}</h3>
+
+				<pre><code>POST /api/{{ workspace.handle }}/{{resource.collection.name}}</code></pre>
+
+				<div class="resource-description">
+					Create an item in the {{ resource.collection.title }} collection.
+				</div>
+
+				<h5>Request Parameters</h5>
+				<table class="table parameters">
+					<tr>
+						<th>Name</th>
+						<th>Required?</th>
+						<th>Description</th>
+					</tr>
+
+					{% for field in resource.collection.fields %}
+						<tr>
+							<td>{{ field.name }}</td>
+							<td>{% if field.is_required %}Required{% else %}Optional{% endif %}</td>
+							<td>{{ field.description }}</td>
+						</tr>
+					{% endfor %}
+				</table>
+
+				<hr>
+
+				<h3>Update {{ resource.collection.title }}</h3>
+
+				<pre><code>PATCH /api/{{ workspace.handle }}/{{resource.collection.name}}/:identifier</code></pre>
+
+				<div class="resource-description">
+					Update an item in the {{ resource.collection.title }} collection.
+				</div>
+
+				<h5>Request Parameters</h5>
+				<table class="table parameters">
+					<tr>
+						<th>Name</th>
+						<th>Required?</th>
+						<th>Description</th>
+					</tr>
+
+					{% for field in resource.collection.fields %}
+						<tr>
+							<td>{{ field.name }}</td>
+							<td>Optional</td>
+							<td>{{ field.description }}</td>
+						</tr>
+					{% endfor %}
+
+					<tr>
+						<td>status</td>
+						<td>Optional</td>
+						<td>Specify status of <code>published</code> or <code>draft</code></td>
+					</tr>
+				</table>
+
+				<hr class="heavy">
 
 			{% endfor %}
-
 		</div>
-	</div>
 	</div>
 
 {% endblock %}

@@ -29,6 +29,10 @@
 			{% set icon_color = "icon-black" %}
 			{% include "pagination.html" %}
 		</div>
+		<form class="search_form">
+			<input type="text" name="q" value="{{ q }}" placeholder="Search...">
+			<button class="btn"><i class="icon-search"></i></button>
+		</form>
 		<hr>
 		<h3 class="muted">{{ collection.description }}</h3>
 	</div>
@@ -42,11 +46,14 @@
 
 			<table class="table">
 				<tr>
-					<th>ID</th>
-					{% for field in fields %}
-						<th>{{ field.title }}</th>
+					{% for col in column_fields %}
+						<th>
+							<a href="{{ col.sort_url }}">
+								{{ col.title }}
+								<span class="sort_indicator">{{ col.sort_indicator }}</span>
+							</a>
+						</th>
 					{% endfor %}
-					<th></th>
 					<th></th>
 				</tr>
 

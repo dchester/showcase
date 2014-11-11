@@ -3,6 +3,8 @@ var armrest = require('armrest');
 var Deferrals = require('../lib/deferrals');
 var Item = require('../lib/item');
 var api = require('../lib/api.js');
+var Sort = require('../lib/sort');
+var clone = require('../lib/clone');
 
 var Collection = require('../lib/collection.js');
 var EXAMPLE_LENGTH = 1500;
@@ -89,7 +91,7 @@ exports.initialize = function(app) {
 		res.send(204);
 	});
 
-	app.post('/api/:workspace_handle/:collection_handle/:item_id', workspaceLoader, function*(req, res) {
+	var patchItem = function*(req, res) {
 
 		var workspace = req.showcase.workspace;
 		var item_id = req.params.item_id;
@@ -122,7 +124,10 @@ exports.initialize = function(app) {
 		yield item.save({ user_id: user_id });
 
 		res.json(Item.distill(item));
-	});
+	};
+
+	app.patch('/api/:workspace_handle/:collection_handle/:item_id', workspaceLoader, patchItem);
+	app.post('/api/:workspace_handle/:collection_handle/:item_id', workspaceLoader, patchItem);
 
 	app.get('/api/:workspace_handle/:collection_handle', workspaceLoader, function*(req, res) {
 
@@ -131,6 +136,8 @@ exports.initialize = function(app) {
 		var page = req.query.page || 0;
 		var collection, items;
 		var workspace = req.showcase.workspace;
+		var sort = Sort.deserialize(req.query.sort);
+		var search = req.query.q;
 
 		var collection = yield Collection.load({ name: name, workspace_handle: workspace.handle });
 
@@ -153,21 +160,13 @@ exports.initialize = function(app) {
 			}
 		});
 
-		if (req.query.sort) {
-			var sort = [];
-			var indicators = String(req.query.sort).split(',');
-			indicators.forEach(function(indicator) {
-				var components = indicator.split(':');
-				sort.push({ field_name: components[0], order: components[1] || 'asc' });
-			});
-		}
-
 		var items = yield Item.all({
 			collection_id: collection.id,
 			criteria: criteria,
 			sort: sort,
 			page: page,
 			per_page: per_page,
+			search: search
 		});
 
 		items.forEach(function(item) {
@@ -180,8 +179,11 @@ exports.initialize = function(app) {
 			distilled_items.push(Item.distill(item));
 		});
 
-		var totalCount = items.totalCount;
-		var content_range = "items 0-" + (totalCount - 1) + "/" + totalCount;
+		var total_count = items.totalCount;
+		var range_start = (items.page - 1) * items.per_page;
+		var range_end = range_start + distilled_items.length - 1;
+
+		var content_range = "items " + range_start + "-" + range_end + "/" + total_count;
 
 		res.header('Content-Range', content_range);
 		res.json(distilled_items);
@@ -205,38 +207,18 @@ exports.initialize = function(app) {
 				params: { per_page: 1 },
 				success: function(items, response) {
 
-					var resources = [];
-					resources.collection = collection;
+					var resource = { collection: collection };
 
 					var example_response = response.body;
 					if (example_response && example_response.length > EXAMPLE_LENGTH) {
 						example_response = example_response.substring(0, EXAMPLE_LENGTH) + '...';
 					}
 
-					var resource = {
-						method: 'GET',
-						route: route,
-						preview: route,
-						description: 'Get a listing of ' + collection.title.toLowerCase(),
-						example_uri: route
-					};
-
 					if (response.body !== '[]') {
-						resource.example_response = example_response;
+						resource.example_listing_response = example_response;
 					}
 
-					resources.push(resource);
-
-					var write_resource = {
-						method: 'POST',
-						route: route,
-						description: 'Create ' + collection.title.toLowerCase(),
-						parameters: collection.fields
-					}
-
-					resources.push(write_resource);
-
-					collection_resources.push(resources);
+					collection_resources.push(resource);
 					cb();
 				}
 			});
@@ -248,6 +230,28 @@ exports.initialize = function(app) {
 
 			res.render("api.html", { collection_resources: collection_resources });
 		});
+	});
+
+	app.get('/api/:workspace_handle', workspaceLoader, function*(req, res) {
+
+		var workspace = clone(req.showcase.workspace);
+		delete workspace.id;
+
+		var collections = yield Collection.all({ workspace_handle: workspace.handle });
+
+		collections.forEach(function(collection) {
+			delete collection.id;
+			delete collection.workspace_handle;
+			collection.fields.forEach(function(field) {
+				delete field.id;
+				delete field.collection_id;
+				delete field.index;
+				delete field.meta;
+			});
+		});
+
+		workspace.collections = collections;
+		res.json(workspace);
 	});
 };
 

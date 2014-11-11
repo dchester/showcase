@@ -13,6 +13,7 @@ var router = require('./lib/gx-express-router');
 var gx = require('gx');
 var passport = require('passport');
 var strategy = require('./lib/passport-strategy');
+var User = require('./lib/user');
 
 var app = express();
 app.showcase = {};
@@ -40,6 +41,13 @@ exports.initialize = function(config) {
 		throw new Error("please specify files.storage_path in config");
 	}
 
+	var secret = config.secret;
+
+	if (!secret) {
+		console.warn("falling back to default session secret; please send a secret to showcase.initialize");
+		secret = "arthur is fond of jimz";
+	}
+
 	var dreamer = Dreamer.initialize({
 		app: app,
 		schema: __dirname + "/spec/schema.md",
@@ -50,7 +58,8 @@ exports.initialize = function(config) {
 
 	app.dreamer = dreamer;
 
-	passport.use(config.auth.passport_strategy || strategy.local);
+	config.auth.passport_strategy = config.auth.passport_strategy || strategy.local;
+	passport.use(config.auth.passport_strategy);
 
 	var storagePath;
 	if (!config.files.storage_path.match(/^\//)) {
@@ -64,8 +73,6 @@ exports.initialize = function(config) {
 
 	var File = require('./lib/file');
 	File.methods(config.files);
-
-	var secret = 'arthur is fond of jimz';
 
 	var middleware = require('./lib/middleware').initialize(app);
 	app.showcase.middleware = middleware;
@@ -142,4 +149,6 @@ exports.run = function() {
 };
 
 exports.app = app;
+
+exports.mergeUser = User.merge;
 

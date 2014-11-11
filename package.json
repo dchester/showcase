@@ -1,6 +1,6 @@
 {
   "name": "showcase",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "devDependencies": {
     "nodeunit": "*",
     "bower": "*",

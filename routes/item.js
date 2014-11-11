@@ -1,9 +1,12 @@
+var querystring = require('querystring');
 var async = require('async');
 var Pagination = require('pagination').ItemPaginator;
 
 var Deferrals = require('../lib/deferrals');
 var Collection = require('../lib/collection');
 var Item = require('../lib/item');
+var Sort = require('../lib/sort');
+var clone = require('../lib/clone');
 
 exports.initialize = function(app) {
 
@@ -30,17 +33,22 @@ exports.initialize = function(app) {
 		var page = Number(req.query.page) || 1;
 		var per_page = app.showcase.config.items_per_page || 100;
 		var fields_count = app.showcase.config.item_summary_display_fields_count || 8;
+		var sort = Sort.deserialize(req.query.sort);
+		var search = req.query.q;
 
 		var items = yield Item.all({
 			collection_id: collection_id,
 			per_page: per_page,
-			page: page
+			page: page,
+			sort: sort,
+			search: search
 		});
 
 		var pagination = new Pagination({
 			rowsPerPage: per_page,
 			totalResult: items.totalCount,
-			current: page
+			current: page,
+			prelink: req.url
 		});
 
 		pagination.data = pagination.getPaginationData();
@@ -58,12 +66,36 @@ exports.initialize = function(app) {
 		});
 
 		var fields = items.collection.fields.slice(0, fields_count - 1);
+		var sort_attribute = sort && sort.length ? sort[0] : {};
+
+		var column_fields = [].concat(
+			[ { name: 'id', title: 'ID' } ],
+			fields,
+			[ { name: 'status', title: 'Status' } ]
+		);
+
+		column_fields.forEach(function(f) {
+
+			var query = clone(req.query);
+			delete query.page;
+
+			if (sort_attribute.field_name == f.name) {
+				query.sort = f.name + (sort_attribute.order == 'desc' ? ':asc' : ':desc');
+				f.sort_url = '?' + querystring.stringify(query);
+				f.sort_indicator = sort_attribute.order == 'desc' ? '▾' : '▴';
+			} else {
+				query.sort = f.name;
+				f.sort_url = '?' + querystring.stringify(query);
+			}
+		});
 
 		res.render("items.html", { 
 			items: items,
 			collection: items.collection,
 			fields: fields,
-			pagination: pagination.data
+			pagination: pagination.data,
+			column_fields: column_fields,
+			q: search
 		});
 	});
 

@@ -48,11 +48,11 @@
 							<option value="1" {% if user.is_superuser %}selected="selected"{% endif %}>Superuser</option>
 						</select>
 						<div class="description">
-							Is this user all-powerful?
+							Is this user all-powerful?  User must log out and back in for changes to take effect.
 						</div>
 					</td>
 				</tr>
-				{% if workspaces %}
+				{% if workspaces.length %}
 					<tr class="workspaces-row {% if user.is_superuser %}superuser{% endif %}">
 						<th>
 							Workspace<br>Permissions
@@ -77,11 +77,14 @@
 					</tr>
 				{% endif %}
 			</table>
-
-			<button class="btn btn-primary btn-large">
-				<i class="icon-ok icon-white"></i>
-				Save
-			</button>
+			{% if is_config_superuser %}
+				<div class="muted">User is configured as a superuser in showcase configuration file, so cannot be edited via this interface.</div>
+			{% else %}
+				<button class="btn btn-primary btn-large">
+					<i class="icon-ok icon-white"></i>
+					Save
+				</button>
+			{% endif %}
 		</form>
 	</div>
 

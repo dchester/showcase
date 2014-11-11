@@ -1,6 +1,19 @@
 # Showcase
 
-Lightweight pluggable CMS in Node.js with a RESTful API
+Lightweight pluggable CMS in Node.js with an admin interface and RESTful API
+
+#### Features:
+
+- Admin interface
+- Respectable read/write REST+JSON API
+- Pluggable file storage
+- User management w/ roles and permissions
+- Workspaces for multi-tentant support
+- Optional [Passport](http://passportjs.org) / OAuth integration
+- Custom fields via plugins
+- Events via [EventEmitter](http://nodejs.org/api/events.html#events_class_events_eventemitter) radio
+- Basic searching & sorting
+
 
 ## Getting Started
 
@@ -90,6 +103,11 @@ Under the hood these are sent through to the [Sequelize constructor](http://sequ
 - `files.name` specifies a function to generate a filename for an uploaded file
 
 By default files will be stored directly to `files.storage_path`, but you may override this functionality by specifying override methods to `store` and `retrieve`, etc.  These override methods take a callback as a parameter and are bound to `File` instances. See `examples/files.js` for an example.
+
+And other various top-level configuration options:
+
+- `port` specifies the TCP port to listen on
+- `secret` specifies the secret used to hash session data (anything random enough will do)
 
 ### showcase.registerField(field)
 
