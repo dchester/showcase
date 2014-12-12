@@ -230,4 +230,20 @@ exports.initialize = function(app) {
 		req.flash('info', "Created item");
 		res.redirect("/workspaces/" + workspace.handle + "/collections/" + collection_id + "/items");
 	});
+	app.get("/workspaces/:workspace_handle/collections/:collection_id/export", workspaceLoader, workspaceEditor, function*(req, res) {
+		var collection_id = req.params.collection_id;
+		var collection = yield Collection.load({ id: collection_id });
+		var page = Number(req.query.page) || 0;
+		var per_page = 100;
+		var fields_count = 100;
+
+		var items = yield Item.all({
+			collection_id: collection_id,
+			per_page: 100
+		});
+
+		items.forEach(function(item){delete item["collection"]});
+		res.setHeader("Content-Type","application/vnd.json");
+		res.send({collection: collection, items: items});
+	});
 };

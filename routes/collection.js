@@ -1,5 +1,7 @@
 var Collection = require('../lib/collection.js');
+var Item = require('../lib/item');
 var controls = require('../lib/fields').controls;
+var fs = require('fs');
 
 var coalesceArray = function(data) {
 	return Array.isArray(data) ? data : [ data ];
@@ -142,6 +144,52 @@ exports.initialize = function(app) {
 		yield collection.destroy();
 
 		res.redirect("/workspaces/" + workspace.handle + "/collections");
+	});
+	app.get("/workspaces/:workspace_handle/collections/import", workspaceLoader, workspaceAdmin, function*(req, res) {
+		res.render("import.html");
+	});
+
+	app.post("/workspaces/:workspace_handle/collections/import", workspaceLoader, workspaceAdmin, function*(req, res) {
+		console.log(req.files);
+		var workspace = req.showcase.workspace;
+		var file = fs.readFileSync(req.files.workspace.path);
+		var user_id = req.session.user_id;
+		//console.log(JSON.parse(file));
+		collection_data = JSON.parse(file);
+		fields = [];
+		console.log("COLLECTION",collection_data.collection);
+		collection_data.collection.fields.forEach(function(field){
+				field_data = {
+					title : field.title,
+					name  : field.name,
+					data_type : field.data_type,
+					description: field.description,
+					is_required : field.is_required,
+					index : field.index,
+					meta : field.meta,
+					control : field.control
+				};
+				fields.push(field_data);
+		});
+		var collection = yield Collection.create({
+			title: collection_data.collection.title,
+			description: collection_data.collection.description,
+			name: req.params.name,
+			workspace_handle: workspace.handle,
+			fields: fields
+		});
+		collection_data.items.forEach( function(itm){
+			var collection_item = Item.create({
+				collection_id: collection.id,
+				status: itm.status,
+				data: itm.data,
+				user_id: user_id
+			});
+			console.log(collection_item);
+		});
+
+		req.flash('info', 'Imported collection');
+		res.redirect('/workspaces/' + workspace.handle + '/collections');
 	});
 
 };

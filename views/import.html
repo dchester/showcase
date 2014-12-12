@@ -1,0 +1,47 @@
+{% extends 'layout.html' %}
+
+{% set title = 'Import Collection' %}
+
+{% block css %}
+	<link rel="stylesheet" type="text/css" href="/css/collection.css">
+{% endblock %}
+
+{% block nav %}
+	<ul class="nav">
+		<li><a href="/workspaces">Workspaces</a></li>
+		<li><a href="/workspaces/{{ workspace.handle }}/collections">{{ workspace.title }}</a></li>
+			<li><a href="">Import Collection</a></li>
+	</ul>
+{% endblock %}
+
+{% block pagetitle %}
+	<div class="pagetitle">
+			<h1>Import Collection</h1>
+		<br>
+	</div>
+{% endblock %}
+
+{% block content %}
+
+
+<div class="content"> 
+<form id="collection" method=post enctype="multipart/form-data">
+	<table class="table" id="collection_form">
+		<tr>
+			<th>Collection Name</th>
+			<td><input type="text" name="name"/><td>
+		</tr>
+		<tr>
+			<th>Collection Import File</th>
+			<td><input type="file" name="workspace"/></td>
+		</tr>
+	</table>
+	<!--button class="btn btn-primary btn-large permission-administrator" id="import_collection">
+		<i class="icon-ok icon-white"></i>
+			Import
+	</button-->
+	<input type="submit"  class="btn btn-primary btn-large permission-administrator" id="import_collection" name="Import"/>
+
+</form>
+</div>
+{% endblock %}
