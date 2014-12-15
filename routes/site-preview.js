@@ -9,6 +9,7 @@ var marked = require('marked');
 var marked_section = require('../lib/marked-section');
 var m_tag = require('../lib/swig-markdown');
 var Loader = require('../lib/swig-loader');
+var pagination = require('pagination');
 
 exports.initialize = function(app) {
 
@@ -76,7 +77,7 @@ exports.initialize = function(app) {
 		// fetch the data
 
 		var queue = [];
-		var data = { site_css_url: site_css_url, page_css_url: page_css_url };
+		var data = { site_css_url: site_css_url, page_css_url: page_css_url, req: req };
 
 		page.data_sources
 			.split("\n")
@@ -85,13 +86,19 @@ exports.initialize = function(app) {
 				var name = source[0];
 				var url = source[1];
 				if (!url || !name) return;
-				var url_data = URL.parse(url);
+				var url_data = URL.parse(url, true);
+				delete url_data.search;
 				if (!url_data.hostname) {
 					url_data.hostname = url_data.hostname || 'localhost';
 					url_data.protocol = url_data.protocol || 'http';
 					url_data.port = app.get('port');
 				}
 				url_data.pathname = interpolatePath(url_data.pathname, route.params);
+				Object.keys(url_data.query).forEach(function(key) {
+					if (url_data.query[key] == ':' + key) {
+						url_data.query[key] = req.query[key];
+					}
+				});
 				url = URL.format(url_data);
 				queue.push({ name: name, url: url });
 			});
@@ -105,6 +112,7 @@ exports.initialize = function(app) {
 		for (var i = 0; i < queue.length; i++) {
 			// harvest the results
 			data[queue[i].name] = yield null;
+			data[queue[i].name]._meta.url = queue[i].url;
 		}
 
 		var layout_filename = '/site-' + site.id + '-layout.html'
@@ -119,6 +127,35 @@ exports.initialize = function(app) {
 		var page_template_key = '/page-' + page.id;
 		swig._loader.set(page_template_key, preamble + page.template);
 		var content_template = swig.compileFile(page_template_key, preamble + page.template);
+
+		data.pagination = function(entity, page, per_page, total_count) {
+
+			page = Number(page || req.query.page || 1);
+			per_page = Number(per_page || URL.parse(entity._meta.url, true).query.per_page || 40);
+
+			if (entity._meta && entity._meta.headers['content-range']) {
+				var matches = entity._meta.headers['content-range'].match(/\w+ (\d+)\-(\d+)\/(\d+)/);
+				if (matches) total_count = total_count || matches[3];
+			}
+
+			var base_url_data = URL.parse(req.originalUrl, true);
+			delete base_url_data.search;
+			delete base_url_data.query.page;
+			base_url = URL.format(base_url_data);
+
+			pager = pagination.create('item', {
+				prelink: base_url,
+				current: page,
+				rowsPerPage: per_page,
+				totalResult: total_count
+			});
+
+			pager.renderCurrentPageReport = function(min, max, total) {
+				return min + " - " + max + " of " + total;
+			}
+
+			return pager;
+		}
 
 		var output = content_template(data);
 
@@ -152,6 +189,7 @@ function complete() {
 	// fish out the data param
  	return function(err, response, data) {
 		if (err) console.warn(err);
+		data._meta = { headers: response.headers };
 		callback(err, data);
 	}
 }
