@@ -95,7 +95,8 @@ exports.initialize = function(app) {
 			fields: fields,
 			pagination: pagination.data,
 			column_fields: column_fields,
-			q: search
+			q: search,
+			sort: sort && sort.length ? sort_attribute : null
 		});
 	});
 

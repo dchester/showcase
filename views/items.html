@@ -41,10 +41,9 @@
 {% block content %}
 	<div class="content">
 
-
 		{% if items.length %}
 
-			<table class="table">
+			<table class="table items-table">
 				<tr>
 					{% for col in column_fields %}
 						<th>
@@ -59,13 +58,15 @@
 
 				{% for item in items %}
 
-					<tr>
+					<tr class="item-row" data-item-id="{{ item.id }}">
 						<td>
 							<a href="/workspaces/{{ workspace.handle }}/collections/{{ collection.id }}/items/{{ item.id }}/edit">#{{ item.id }}</a>
 						</td>
 
 						{% for field in fields %}
-							<td><p class="preview">{{ item.data[field.name]|default('')|raw }}</p></td>
+							<td {% if sort.field_name == field.name %}class="sorted-column"{% endif %}>
+								<div class="preview">{{ item.data[field.name]|default('')|raw }}</div>
+							</td>
 						{% endfor %}
 
 						<td>
@@ -96,4 +97,14 @@
 		{% endif %}
 	</div>
 
+{% endblock %}
+
+{% block footer_js %}
+	<script>
+		window.Showcase = window.Showcase || {};
+		Showcase.page = {
+			workspace_handle: '{{ workspace.handle|e("js") }}',
+			collection_name: '{{ collection.name|e("js") }}'
+		};
+	</script>
 {% endblock %}

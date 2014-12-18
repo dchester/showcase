@@ -6,14 +6,8 @@ module.exports = {
 	validator: null,
 	placeholder: '',
 	preview: function(value) {
-
-		if (typeof value !== 'object') {
-			try { JSON.parse(value) }
-			catch(e) { return '' }
-		} else if (value === null) {
-			return '';
-		}
-		return '<h4><i class="muted large icon-picture"></i></h4>';
+		if (value === null) return '';
+		return '<h4><i data-image-url="' + value.url + '"class="muted large icon-picture"></i></h4>';
 	},
 	deflate: function(field, item, models, callback) {
 		if (!item.data[field.name]) return callback('');

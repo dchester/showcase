@@ -137,6 +137,9 @@ var registerPlugins = function() {
 
 	var image = require('./plugins/image');
 	plugins.register('field', image);
+
+	var display_order = require('./plugins/display_order');
+	plugins.register('field', display_order);
 }
 
 exports.plugins = plugins;
