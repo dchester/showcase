@@ -39,7 +39,7 @@
 		<form id="item_form" method="post" enctype="multipart/form-data">
 			<table class="table">
 				{% for field in fields %}
-					<tr>
+					<tr class="field-row-{{ field.name }} field-type-{{ field.control.name }}">
 						<th>
 							{{ field.title }}
 							<div class="muted">
