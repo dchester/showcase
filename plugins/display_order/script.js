@@ -85,11 +85,10 @@ Showcase.Plugins.DisplayOrder = Showcase.Class.create({
 
 		var item_id = row.getAttribute('data-item-id');
 		this.rowValue(row, value);
-		var adjusted_value = value - item_id;
 
 		$.ajax({
 			url: '/api/' + this.workspace_handle + '/' + this.collection_name + '/' + item_id,
-			data: { display_order: adjusted_value },
+			data: { display_order: value },
 			type: 'PATCH'
 		});
 	}
