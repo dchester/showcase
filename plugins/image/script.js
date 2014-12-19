@@ -20,16 +20,22 @@ Showcase.Plugins.Image = Showcase.Class.create({
 		this.populate();
 
 		dropzone.on("complete", function(file) {
-			console.log('added file!');
-			console.log(file);
 			var response = JSON.parse(file.xhr.responseText);
 			file.previewElement.setAttribute("data-file-id", response[0].id);
 			this.sync();
 
 		}.bind(this));
 
+		dropzone.on("sending", function() {
+			var form = this.input.form;
+			form.addEventListener('submit', function(e) {
+				e.preventDefault();
+				form.classList.add('loading');
+				dropzone.on("complete", form.submit);
+			});
+		}.bind(this));
+
 		dropzone.on("removedfile", function() {
-			console.log('removed file!');
 			this.sync();
 
 		}.bind(this));

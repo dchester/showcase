@@ -4,6 +4,7 @@
 	position: relative;
 	margin-bottom: 10px;
 }
+.sc-image .dz-started,
 .sc-image .dz.populated {
 	padding-bottom: 0;
 }
@@ -109,6 +110,7 @@
 .sc-image .dz-preview[data-file-id] .dz-progress {
 	display: none;	
 }
+.sc-image .dz-started .target,
 .sc-image .dz.populated .target {
 	display: none;
 }
@@ -123,4 +125,13 @@
 	padding: 10px;
 	color: rgba(0,0,0,0.4);
 	pointer-events: none;
+}
+#item_form.loading + .actions > * {
+	pointer-events: none;
+	opacity: 0;
+}
+#item_form.loading + .actions:before {
+	content: "Uploading...";
+	color: #888;
+	font-size: 20px;
 }

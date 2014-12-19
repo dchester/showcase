@@ -60,36 +60,38 @@
 			</table>
 		</form>
 
-		{% if item.status == "published" %}
-			<button form="item_form" name="_status" value="published" class="btn btn-primary btn-large permission-editor">
-				<i class="icon-ok icon-white"></i>
-				Update
-			</button>
-			<button form="item_form" name="_status" value="draft" class="btn btn-large permission-editor">
-				<i class="icon-undo icon-white"></i>
-				Unpublish
-			</button>
-		{% else %}
-			<button form="item_form" name="_status" value="published" class="btn btn-primary btn-large permission-editor">
-				<i class="icon-ok icon-white"></i>
-				Publish
-			</button>
-			<button form="item_form" name="_status" value="draft" class="btn btn-secondary btn-large permission-editor">
-				<i class="icon-save icon-white"></i>
-				Save Draft
-			</button>
-		{% endif %}
-
-		{% if item.id %}
-			<form action="/workspaces/{{ workspace.handle }}/collections/{{ collection.id }}/items/{{ item.id }}" method="post" class="delete">
-				<input type="hidden" name="_method" value="delete">
-				<button class="btn btn-large btn-text permission-editor">
-					<i class="icon-remove"></i>
-					Delete
+		<div class="actions">
+			{% if item.status == "published" %}
+				<button form="item_form" name="_status" value="published" class="btn btn-primary btn-large permission-editor">
+					<i class="icon-ok icon-white"></i>
+					Update
 				</button>
-			</form>
-			<span class="muted light">Last updated by {{ item.user.username }} {{ item.updated_relative_time }}</span>
-		{% endif %}
+				<button form="item_form" name="_status" value="draft" class="btn btn-large permission-editor">
+					<i class="icon-undo icon-white"></i>
+					Unpublish
+				</button>
+			{% else %}
+				<button form="item_form" name="_status" value="published" class="btn btn-primary btn-large permission-editor">
+					<i class="icon-ok icon-white"></i>
+					Publish
+				</button>
+				<button form="item_form" name="_status" value="draft" class="btn btn-secondary btn-large permission-editor">
+					<i class="icon-save icon-white"></i>
+					Save Draft
+				</button>
+			{% endif %}
+			{% if item.id %}
+				<form action="/workspaces/{{ workspace.handle }}/collections/{{ collection.id }}/items/{{ item.id }}" method="post" class="delete">
+					<input type="hidden" name="_method" value="delete">
+					<button class="btn btn-large btn-text permission-editor">
+						<i class="icon-remove"></i>
+						Delete
+					</button>
+				</form>
+				<span class="muted light">Last updated by {{ item.user.username }} {{ item.updated_relative_time }}</span>
+			{% endif %}
+		</div>
+
 
 		{% if revisions.length %}
 			<br><br><br><hr><br>
