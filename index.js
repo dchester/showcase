@@ -72,6 +72,7 @@ exports.initialize = function(config) {
 
 	var File = require('./lib/file');
 	File.methods(config.files);
+	app.showcase.File = File;
 
 	var middleware = require('./lib/middleware').initialize(app);
 	app.showcase.middleware = middleware;
