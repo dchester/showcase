@@ -33,8 +33,12 @@ exports.initialize = function(app) {
 		var page = Number(req.query.page) || 1;
 		var per_page = app.showcase.config.items_per_page || 100;
 		var fields_count = app.showcase.config.item_summary_display_fields_count || 8;
-		var sort = Sort.deserialize(req.query.sort);
 		var search = req.query.q;
+
+		req.session.saved_sort = req.session.saved_sort || {};
+		var serialized_sort = req.query.sort || req.session.saved_sort[collection_id];
+		req.session.saved_sort[collection_id] = serialized_sort;
+		var sort = Sort.deserialize(serialized_sort);
 
 		var items = yield Item.all({
 			collection_id: collection_id,
