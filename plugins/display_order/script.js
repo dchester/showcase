@@ -16,58 +16,63 @@ Showcase.Plugins.DisplayOrder = Showcase.Class.create({
 			forcePlaceholderSize: true,
 			tolerance: 'pointer',
 			start: function(event, ui) {
-				console.log('setting height');
 				ui.placeholder.height(ui.item.height());
-				console.log(ui.placeholder.height());
 			},
 			update: function(event, ui) {
 
 				var row = ui.item.context;
-				var rows = this.rows();
-				var i;
-
-				rows.forEach(function(r, index) { if (r === row) i = index; });
-				var initial_value = this.rowValue(row);
-
-				if (rows.length == 1) {
-
-					// only one row; nothing to do
-					return;
-
-				} else if (rows.length == 2) {
-
-					// two rows: swap values
-					var reference_row = rows[i - 1] || rows [i + 1];
-					var reference_value = this.rowValue(reference_row);
-					this.saveRow(row, reference_value);
-					this.saveRow(reference_row, initial_value);
-
-				} else if (rows[i - 1] && rows[i + 1]) {
-
-					// common case -- in between existing rows
-					var value = (this.rowValue(rows[i - 1]) + this.rowValue(rows[i + 1])) / 2;
-					this.saveRow(row, value);
-
-				} else if (rows[i - 1] && !rows[i + 1] && rows[i - 2]) {
-
-					// moved to last position with two previous
-					var reference_value = this.rowValue(rows[i - 1]);
-					this.saveRow(row, reference_value);
-					this.saveRow(rows[i - 1], (reference_value + this.rowValue(rows[i - 2])) / 2);
-
-				} else if (rows[i + 1] && !rows[i - 1] && rows[i + 2]) {
-
-					// moved to first position with two subsequent
-					var reference_value = this.rowValue(rows[i + 1]);
-					this.saveRow(row, reference_value);
-					this.saveRow(rows[i + 1], (reference_value + this.rowValue(rows[i + 2])) / 2);
-
-				} else {
-					return;
-				}
+				this.place(row);
 
 			}.bind(this)
 		});
+
+		this._addListeners();
+	},
+
+	place: function(row) {
+
+		var rows = this.rows();
+		var i;
+
+		rows.forEach(function(r, index) { if (r === row) i = index; });
+		var initial_value = this.rowValue(row);
+
+		if (rows.length == 1) {
+
+			// only one row; nothing to do
+			return;
+
+		} else if (rows.length == 2) {
+
+			// two rows: swap values
+			var reference_row = rows[i - 1] || rows [i + 1];
+			var reference_value = this.rowValue(reference_row);
+			this.saveRow(row, reference_value);
+			this.saveRow(reference_row, initial_value);
+
+		} else if (rows[i - 1] && rows[i + 1]) {
+
+			// common case -- in between existing rows
+			var value = (this.rowValue(rows[i - 1]) + this.rowValue(rows[i + 1])) / 2;
+			this.saveRow(row, value);
+
+		} else if (rows[i - 1] && !rows[i + 1] && rows[i - 2]) {
+
+			// moved to last position with two previous
+			var reference_value = this.rowValue(rows[i - 1]);
+			this.saveRow(row, reference_value);
+			this.saveRow(rows[i - 1], (reference_value + this.rowValue(rows[i - 2])) / 2);
+
+		} else if (rows[i + 1] && !rows[i - 1] && rows[i + 2]) {
+
+			// moved to first position with two subsequent
+			var reference_value = this.rowValue(rows[i + 1]);
+			this.saveRow(row, reference_value);
+			this.saveRow(rows[i + 1], (reference_value + this.rowValue(rows[i + 2])) / 2);
+
+		} else {
+			return;
+		}
 	},
 
 	rows: function() {
@@ -75,7 +80,6 @@ Showcase.Plugins.DisplayOrder = Showcase.Class.create({
 	},
 
 	rowValue: function(row, value) {
-		console.log(row, value);
 		var el = row.querySelector('.display-order');
 		if (value) return el.setAttribute('data-initial-value', value);
 		return Number(el.getAttribute('data-initial-value'));
@@ -91,6 +95,44 @@ Showcase.Plugins.DisplayOrder = Showcase.Class.create({
 			data: { display_order: value },
 			type: 'PATCH'
 		});
+	},
+
+	_addListeners: function() {
+
+		var up_buttons = [].slice.call(this.container.querySelectorAll('button.up'));
+		var dn_buttons = [].slice.call(this.container.querySelectorAll('button.dn'));
+
+		up_buttons.forEach(function(btn) {
+			btn.addEventListener('click', function(e) {
+				var row = btn.parentNode.parentNode.parentNode.parentNode;
+				var rows = this.rows();
+
+				var i;
+				rows.forEach(function(r, index) { if (r === row) i = index; });
+
+
+				if (rows[i - 1]) {
+					row.parentNode.insertBefore(row, rows[i - 1]);
+				}
+				this.place(row);
+
+			}.bind(this));
+		}, this);
+
+		dn_buttons.forEach(function(btn) {
+			btn.addEventListener('click', function(e) {
+				var row = btn.parentNode.parentNode.parentNode.parentNode;
+				var rows = this.rows();
+
+				var i;
+				rows.forEach(function(r, index) { if (r === row) i = index; });
+
+				if (rows[i + 1]) {
+					row.parentNode.insertBefore(rows[i + 1], row);
+				}
+				this.place(rows[i + 1]);
+			}.bind(this));
+		}, this);
 	}
 });
 

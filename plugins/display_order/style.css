@@ -47,3 +47,21 @@
 .field-type-display_order {
 	display: none;
 }
+.display-order button {
+	display: none;
+	background: #eee;
+	border: none;
+	padding: 5px 12px;
+	margin: 2px;
+	position: relative;
+	top: -17px;
+	color: #888;
+	border-radius: 2px;
+	font-family: FontAwesome;
+}
+body.touch .display-order button {
+	display: block;
+}
+body.touch .display-order {
+	background: none;
+}

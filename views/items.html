@@ -107,4 +107,9 @@
 			collection_name: '{{ collection.name|e("js") }}'
 		};
 	</script>
+	<script>
+		if ('ontouchstart' in window) {
+			document.body.classList.add('touch');
+		}
+	</script>
 {% endblock %}
