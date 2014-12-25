@@ -168,6 +168,43 @@ exports.validateType = function(test) {
 	});
 };
 
+exports.validateCustomType = function(test) {
+
+	gx(function*() {
+
+		var item = yield Item.create({
+			collection_id: 1,
+			user_id: 1,
+			data: {
+				title: "Rung Ho!",
+				author: "Talbot Mundy",
+				isbn: "1557424047"
+			},
+		});
+
+		item.update({
+			data: {
+				title: "Rung Ho!",
+				author: "Talbot Mundy",
+				isbn: "55555"
+			}
+		});
+
+		// temporarily override the validator for isbn/number with a custom one
+		var isbn_field = item.collection.fields.filter(function(o) { return o.name === 'isbn'; }).pop();
+		isbn_field.control.validator = function(value,field,messages) {
+			messages.push("custom error message: "+value);
+			return 0;
+		};
+
+		var errors = item.validate();
+		isbn_field.control.validator = 'isNumeric'; // restore validator
+
+		test.deepEqual(errors, { isbn: 'Failed assertion: custom error message: 55555' });
+		test.done();
+	});
+};
+
 exports.build = function(test) {
 
 	gx(function*() {
