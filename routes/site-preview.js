@@ -128,20 +128,21 @@ exports.initialize = function(app) {
 		swig._loader.set(page_template_key, preamble + page.template);
 		var content_template = swig.compileFile(page_template_key, preamble + page.template);
 
-		data.pagination = function(entity, page, per_page, total_count) {
+		data.pagination = function(entity, options) {
 
-			page = Number(page || req.query.page || 1);
-			per_page = Number(per_page || URL.parse(entity._meta.url, true).query.per_page || 40);
+			var page = Number(options.page || req.query.page || 1);
+			var per_page = Number(options.per_page || URL.parse(entity._meta.url, true).query.per_page || 40);
+			var total_count = 1;
 
 			if (entity._meta && entity._meta.headers['content-range']) {
 				var matches = entity._meta.headers['content-range'].match(/\w+ (\d+)\-(\d+)\/(\d+)/);
-				if (matches) total_count = total_count || matches[3];
+				if (matches) var total_count = options.total_count || matches[3];
 			}
 
 			var base_url_data = URL.parse(req.originalUrl, true);
 			delete base_url_data.search;
 			delete base_url_data.query.page;
-			base_url = URL.format(base_url_data);
+			base_url = options.base_url || URL.format(base_url_data);
 
 			pager = pagination.create('item', {
 				prelink: base_url,
