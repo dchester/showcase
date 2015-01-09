@@ -168,6 +168,56 @@ exports.validateType = function(test) {
 	});
 };
 
+exports.validateCustomType = function(test) {
+
+	gx(function*() {
+
+		var item = yield Item.create({
+			collection_id: 1,
+			user_id: 1,
+			data: {
+				title: "Rung Ho!",
+				author: "Talbot Mundy",
+				isbn: "1557424047"
+			},
+		});
+
+		item.update({
+			data: {
+				title: "Rung Ho!",
+				author: "Talbot Mundy",
+				isbn: "55555"
+			}
+		});
+
+		// temporarily override the validator for isbn/number with a custom one
+		var isbn_field = item.collection.fields.filter(function(o) { return o.name === 'isbn'; }).pop();
+
+		isbn_field.control.validator = function(value,field) {
+			return { is_valid: false, error_message: "custom message: "+value };
+		};
+		test.deepEqual(item.validate(), { isbn: 'Failed assertion: custom message: 55555' }, 'validator returns object: invalid');
+
+		isbn_field.control.validator = function(value,field) { return { is_valid: false, error_message: '' }; };
+		test.deepEqual(item.validate(), { isbn: 'Failed assertion: invalid value' }, 'validator returns object; zero-length error message');
+
+		isbn_field.control.validator = function(value,field) { return { is_valid: false }; };
+		test.deepEqual(item.validate(), { isbn: 'Failed assertion: invalid value' }, 'validator returns object; but no error message');
+
+		isbn_field.control.validator = function(value,field) { return { is_valid: true }; };
+		test.deepEqual(item.validate(), null, 'validator returns object: valid');
+
+		isbn_field.control.validator = function(value,field) { return false; };
+		test.deepEqual(item.validate(), { isbn: 'Failed assertion: invalid value' }, 'validator returns boolean: invalid');
+
+		isbn_field.control.validator = function(value,field) { return true; };
+		test.deepEqual(item.validate(), null, 'validator returns boolean: valid');
+
+		isbn_field.control.validator = 'isNumeric'; // restore validator
+		test.done();
+	});
+};
+
 exports.build = function(test) {
 
 	gx(function*() {
