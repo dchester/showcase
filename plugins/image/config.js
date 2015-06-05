@@ -36,6 +36,11 @@ module.exports = {
 		if (!parsed_data) return callback(null);
 		var file_id = parsed_data.file_id;
 
+		if (!file_id || file_id == 'undefined'){
+			console.log("found undefined file_id in field: " + field.name);
+			return callback(null);
+		}
+
 		File.load({ id: file_id }, function(err, file) {
 
 			var inflated_file = {
