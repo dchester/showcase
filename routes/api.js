@@ -189,6 +189,16 @@ exports.initialize = function(app) {
 		res.json(distilled_items);
 	});
 
+	app.get('api/workspaces/:workspace_handle', workspaceLoader, function* (req, res) {
+
+		var workspace = req.showcase.workspace;
+		var api = armrest.client("localhost:" + app.get('port'));
+
+		var collections = yield Collection.all({ workspace_handle: workspace.handle });
+
+		res.json(collections);
+	});
+
 	app.get('/workspaces/:workspace_handle/api', workspaceLoader, function* (req, res) {
 
 		var workspace = req.showcase.workspace;
