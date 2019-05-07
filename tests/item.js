@@ -261,6 +261,10 @@ exports.load = function(test) {
 		test.equal(item.data.author, "Talbot Mundy");
 		test.equal(item.data.isbn, "1557424047");
 		test.strictEqual(item.data.is_public_domain, true);
+
+		item2 = yield Item.load({ id: 0 });
+		test.equal(item2, undefined);
+
 		test.done();
 	})
 };
